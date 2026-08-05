@@ -4,7 +4,7 @@ VERSION := $(shell node -p "require('./manifest.json').version")
 DIST_DIR := dist
 PACKAGE := $(DIST_DIR)/map-making-app-tools-$(VERSION).zip
 UNPACKED_DIR := $(DIST_DIR)/map-making-app-tools-unpacked
-SOURCES := manifest.json content.js content.css icon16.png icon32.png icon48.png icon128.png
+SOURCES := manifest.json content.js page.js content.css options.html options.css options.js icon16.png icon32.png icon48.png icon128.png
 
 .PHONY: package unpacked validate clean
 

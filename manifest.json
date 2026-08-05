@@ -2,7 +2,12 @@
   "manifest_version": 3,
   "name": "Map Making App Tools",
   "version": "1.0.0",
-  "description": "Map Making Appのマップ編集画面で、左右ペインの幅をドラッグして変更できるようにします。",
+  "description": "Map Making Appの画面幅調整とロケーション整理を使いやすくします。",
+  "permissions": ["storage"],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "icons": {
     "16": "icon16.png",
     "32": "icon32.png",
@@ -15,6 +20,12 @@
       "css": ["content.css"],
       "js": ["content.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://map-making.app/maps/*"],
+      "js": ["page.js"],
+      "run_at": "document_idle",
+      "world": "MAIN"
     }
   ]
 }
