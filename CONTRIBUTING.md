@@ -23,7 +23,7 @@ Map Making App Toolsへの不具合報告、改善案、質問、Pull Requestを
 - 外部ライブラリを追加しない
 - 対象URLと対象要素を安易に広げない
 - 25%〜75%の制約、グリッドのgapを考慮した計算、SPA遷移時の後片付けを維持する
-- 動作が変わる場合はREADME、ホームページ、プライバシーポリシーも更新する
+- 動作が変わる場合はREADMEと、[`browser-extensions-site`](https://github.com/geoguessrwaiwai-lab/browser-extensions-site)で管理する案内サイト・プライバシーポリシーも更新する
 - `dist/`内の生成物をコミットしない
 
 ## 検証
@@ -31,5 +31,4 @@ Map Making App Toolsへの不具合報告、改善案、質問、Pull Requestを
 ```bash
 make validate
 make package
-make site-package
 ```

@@ -1,6 +1,6 @@
 # メンテナンスガイド
 
-この文書は、Map Making App Toolsのリリース、Chrome ウェブストア掲載、案内サイトの運用手順をまとめたものです。
+この文書は、Map Making App ToolsのリリースとChrome ウェブストア掲載の運用手順をまとめたものです。
 
 ## バージョン管理
 
@@ -15,12 +15,12 @@
 1. `main`が最新で、作業ツリーがクリーンであることを確認する。
 2. `manifest.json`の`version`を更新する。
 3. `CHANGELOG.md`を更新する。
-4. `make clean validate package site-package unpacked`を実行する。
+4. `make clean validate package unpacked`を実行する。
 5. `dist/map-making-app-tools-unpacked`をChromeへ読み込み、READMEの動作確認項目を確認する。
 6. CIが成功したことを確認して`main`へマージする。
 7. `v<version>`形式のannotated tagとGitHub Releaseを作成する。
 8. `dist/map-making-app-tools-<version>.zip`をChrome ウェブストアへ提出する。
-9. `dist/map-making-app-tools-site.zip`を案内サイトへ公開する。
+9. 動作や説明を変更した場合は、`browser-extensions-site`リポジトリの案内ページとプライバシーポリシーを更新する。
 
 ## Chrome ウェブストア
 
@@ -36,11 +36,8 @@
 
 ## ホームページ
 
-`homepage/`はCloudflare Workers & Pagesなどへ静的ファイルとして直接公開できます。
+案内サイトは[`browser-extensions-site`](https://github.com/geoguessrwaiwai-lab/browser-extensions-site)リポジトリで管理します。
 
-```bash
-cd homepage
-python3 -m http.server 8000
-```
-
-公開URLは`https://mma.geoguessr-waiwai.workers.dev/`です。公開構成は日本語版の`/`、`/privacy/`、`/contact/`と、英語版の`/en/`、`/en/privacy/`、`/en/contact/`です。既定のルートページは日本語です。
+- 日本語版: `https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/`
+- 英語版: `https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/en/`
+- プライバシーポリシー: `https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/privacy/`

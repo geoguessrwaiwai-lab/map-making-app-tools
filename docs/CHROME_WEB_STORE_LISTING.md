@@ -84,10 +84,10 @@ This is an unofficial extension and is not affiliated with, endorsed by, or asso
 
 ## URL
 
-- ホームページ: `https://mma.geoguessr-waiwai.workers.dev/`
-- プライバシーポリシー: `https://mma.geoguessr-waiwai.workers.dev/privacy/`
-- 英語版ホームページ: `https://mma.geoguessr-waiwai.workers.dev/en/`
-- 英語版プライバシーポリシー: `https://mma.geoguessr-waiwai.workers.dev/en/privacy/`
+- ホームページ: `https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/`
+- プライバシーポリシー: `https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/privacy/`
+- 英語版ホームページ: `https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/en/`
+- 英語版プライバシーポリシー: `https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/en/privacy/`
 - サポート: `https://github.com/geoguessrwaiwai-lab/map-making-app-tools/issues`
 
 ## プライバシーに関する取り組み
