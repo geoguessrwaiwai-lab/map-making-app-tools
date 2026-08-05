@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <defs><pattern id="roads" width="62" height="48" patternUnits="userSpaceOnUse"><path d="M-8 13 70 40M15-5 39 55" fill="none" stroke="#ff8b4a" stroke-width="1.5"/></pattern></defs>
+  <rect width="640" height="400" fill="#222320"/>
+  <text x="18" y="25" fill="#f4f4f2" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="800">← 🗺️  Map Making App Tools</text>
+  <g transform="translate(18 40)">
+    <rect width="604" height="338" rx="4" fill="#65c9db"/>
+    <rect width="604" height="338" rx="4" fill="url(#roads)" opacity=".8"/>
+    <g transform="translate(10 10)" font-family="sans-serif" font-size="9"><rect width="52" height="28" rx="2" fill="#fff"/><text x="10" y="18" fill="#222">Map⌄</text><rect x="60" width="118" height="28" rx="2" fill="#fff"/><text x="70" y="18" fill="#777">Search for places...</text></g>
+    <path d="m58 129 34-35 26 25 27-46 36 19 25-28 41 27 25 58-22 57-54 27-76-10-25-42-39-18Z" fill="#f4f1e7" stroke="#2b2c29" stroke-width="10" stroke-linejoin="round"/>
+    <g fill="#292a27"><circle cx="95" cy="137" r="4"/><circle cx="128" cy="177" r="4"/><circle cx="165" cy="118" r="4"/><circle cx="205" cy="188" r="4"/><circle cx="235" cy="139" r="4"/></g>
+    <rect x="278" width="326" height="338" fill="#222320"/>
+    <g transform="translate(294 17)" font-family="-apple-system, BlinkMacSystemFont, sans-serif">
+      <text y="13" fill="#f2f2ef" font-size="11" font-weight="800">⌄ Tags</text>
+      <rect x="58" width="112" height="22" rx="2" fill="#fff"/><text x="67" y="15" fill="#777" font-size="9">Filter tags...</text>
+      <g font-size="8" font-weight="700"><rect y="34" width="52" height="20" rx="10" fill="#1738c9"/><text x="9" y="47" fill="#ced7ff">✎ 青26 1</text><rect x="58" y="34" width="61" height="20" rx="10" fill="#1738c9"/><text x="68" y="47" fill="#ced7ff">✎ 青25 67</text><rect x="125" y="34" width="68" height="20" rx="10" fill="#1738c9"/><text x="135" y="47" fill="#ced7ff">✎ 青24 108</text><rect x="199" y="34" width="61" height="20" rx="10" fill="#d72b20"/><text x="209" y="47" fill="#ffd1ca">✎ 赤25 137</text>
+      <rect y="61" width="57" height="20" rx="10" fill="#5b5c59"/><text x="9" y="74" fill="#ddd">✎ 黒26 1</text><rect x="63" y="61" width="64" height="20" rx="10" fill="#d7d7d5"/><text x="73" y="74" fill="#222">✎ 白26 47</text><rect x="133" y="61" width="65" height="20" rx="10" fill="#963e9b"/><text x="143" y="74" fill="#f3d4fa">✎ NoCar 18</text>
+      <rect y="88" width="113" height="20" rx="10" fill="#aa3b5d"/><text x="10" y="101" fill="#f5d1dd">✎ ランブルストリップ 224</text><rect x="119" y="88" width="99" height="20" rx="10" fill="#43a243"/><text x="129" y="101" fill="#182016">✎ 塩コショウ舗装 11</text>
+      <rect y="115" width="55" height="20" rx="10" fill="#899d2e"/><text x="10" y="128" fill="#171814">✎ 山 46</text><rect x="61" y="115" width="74" height="20" rx="10" fill="#a88632"/><text x="71" y="128" fill="#171814">✎ テーブル山 12</text><rect x="141" y="115" width="61" height="20" rx="10" fill="#3d82a5"/><text x="151" y="128" fill="#d9edf8">✎ 細道 40</text>
+      </g>
+      <text y="164" fill="#f2f2ef" font-size="11" font-weight="800">⌄ Selections</text><text x="79" y="164" fill="#ddd" font-size="10">(0 locations selected)</text>
+      <rect y="177" width="112" height="23" rx="4" fill="#9f2c25"/><text x="9" y="192" fill="#ffd2ce" font-size="9">Delete selected locations</text><rect x="120" y="177" width="119" height="23" rx="4" fill="#d9dcda"/><text x="130" y="192" fill="#222" font-size="9">Review selected locations</text>
+      <text y="231" fill="#f2f2ef" font-size="11" font-weight="800">Tools</text><text y="260" fill="#eee" font-size="10">Duplicate distance (metres):</text><rect x="135" y="244" width="60" height="23" rx="3" fill="#fff"/><text x="143" y="259" fill="#222" font-size="10">1</text><rect x="203" y="244" width="80" height="23" rx="4" fill="#d9dcda"/><text x="212" y="259" fill="#222" font-size="9">Find duplicates</text>
+    </g>
+    <g><rect x="271" y="0" width="14" height="338" rx="7" fill="#67e8f9"/><path d="m268 151-10 18 10 18m20-36 10 18-10 18" fill="none" stroke="#181916" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+  </g>
+</svg>

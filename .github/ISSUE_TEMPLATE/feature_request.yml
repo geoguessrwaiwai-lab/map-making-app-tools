@@ -1,0 +1,31 @@
+name: 機能提案
+description: 新しい機能や使い勝手の改善を提案する
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: checkboxes
+    id: existing
+    attributes:
+      label: 事前確認
+      options:
+        - label: 同じ内容のIssueがないか検索しました。
+          required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: 解決したい問題
+      description: 現在どのような不便があるか説明してください。
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 提案する動作
+      description: 期待する使い方や操作を説明してください。
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 代替案
+      description: 検討した別の方法があれば記載してください。

@@ -1,0 +1,58 @@
+name: 不具合報告
+description: 再現する不具合や予期しない動作を報告する
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        報告ありがとうございます。マップ名やユーザー名などの個人情報は入力しないでください。
+        セキュリティに関わる詳細はPrivate vulnerability reportingから報告してください。
+  - type: checkboxes
+    id: existing
+    attributes:
+      label: 事前確認
+      options:
+        - label: 同じ内容のIssueがないか検索しました。
+          required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options: [Windows, macOS, Linux, ChromeOS, その他]
+    validations:
+      required: true
+  - type: input
+    id: chrome-version
+    attributes:
+      label: Chromeのバージョン
+      placeholder: "例: 140.0.7339.80"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      placeholder: |
+        1. マップ編集ページを開く
+        2. 境界線をドラッグする
+        3. …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待した動作
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 実際の動作
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: 補足情報
+      description: 個人情報を除いたスクリーンショットや追加情報があれば記載してください。

@@ -1,0 +1,23 @@
+name: 質問
+description: 使い方や仕様について質問する
+title: "[Question]: "
+labels: [question]
+body:
+  - type: checkboxes
+    id: existing
+    attributes:
+      label: 事前確認
+      options:
+        - label: READMEと既存のIssueを確認しました。
+          required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: 質問内容
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 背景・補足
+      description: 個人情報を除き、質問の背景があれば記載してください。

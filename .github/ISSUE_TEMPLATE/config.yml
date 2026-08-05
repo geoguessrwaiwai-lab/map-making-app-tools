@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: セキュリティ上の問題を非公開で報告する
+    url: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/security/advisories/new
+    about: 脆弱性の詳細は公開Issueに書かず、こちらから報告してください。

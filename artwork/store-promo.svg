@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="280" viewBox="0 0 440 280">
+  <rect width="440" height="280" fill="#222320"/>
+  <rect x="0" width="175" height="280" fill="#65c9db"/>
+  <g opacity=".85" stroke="#ff8b4a" stroke-width="2"><path d="M-15 48 190 128M8 218l179-112M65-20 40 300M142-10 96 295"/></g>
+  <path d="m24 105 31-36 28 18 25-35 31 30 20 50-30 45-49 12-43-29Z" fill="#f4f1e7" stroke="#2b2c29" stroke-width="8" stroke-linejoin="round"/>
+  <g transform="translate(203 36)"><rect width="54" height="16" rx="8" fill="#1738c9"/><rect x="61" width="66" height="16" rx="8" fill="#d72b20"/><rect y="24" width="74" height="16" rx="8" fill="#963e9b"/><rect x="81" y="24" width="51" height="16" rx="8" fill="#43a243"/><rect y="48" width="61" height="16" rx="8" fill="#a88632"/></g>
+  <g><rect x="168" y="0" width="14" height="280" rx="7" fill="#67e8f9"/><path d="m164 118-10 22 10 22m22-44 10 22-10 22" fill="none" stroke="#181916" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <text x="204" y="133" fill="#67e8f9" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="800" letter-spacing="1.6">CHROME EXTENSION</text>
+  <text x="204" y="164" fill="#f4f4f2" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="23" font-weight="800">編集スペースを、</text>
+  <text x="204" y="194" fill="#f4f4f2" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="23" font-weight="800">ちょうどいい幅に。</text>
+  <text x="204" y="224" fill="#b7bbb5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">ドラッグで 25% — 75%</text>
+</svg>

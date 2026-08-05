@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A Chrome extension that lets you resize the left and right panes in the Map Making App map editor.">
+    <meta name="theme-color" content="#08111f">
+    <title>Map Making App Tools</title>
+    <link rel="alternate" hreflang="ja" href="/">
+    <link rel="alternate" hreflang="en" href="/en/">
+    <link rel="alternate" hreflang="x-default" href="/">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="stylesheet" href="/reset.css">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/en/">
+        <img src="/favicon.png" width="32" height="32" alt="">
+        <span>Map Making App<br><strong>Tools</strong></span>
+      </a>
+      <div class="header-actions">
+        <nav aria-label="Main navigation">
+          <a aria-current="page" href="/en/">Features</a>
+          <a href="/en/privacy/">Privacy</a>
+          <a href="/en/contact/">Contact</a>
+        </nav>
+        <a class="github-link" href="https://github.com/geoguessrwaiwai-lab/map-making-app-tools" aria-label="View the source code on GitHub">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .7a11.5 11.5 0 0 0-3.64 22.4c.58.1.79-.25.79-.56v-2.23c-3.22.7-3.9-1.37-3.9-1.37-.52-1.34-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.57-.29-5.27-1.28-5.27-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.16 1.18a10.9 10.9 0 0 1 5.76 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.58.23 2.75.11 3.04.74.81 1.19 1.83 1.19 3.09 0 4.41-2.71 5.38-5.29 5.67.42.36.79 1.06.79 2.15v3.24c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .7Z"/></svg>
+        </a>
+        <a class="header-install-button" href="#install">Install</a>
+        <nav class="language-switcher" aria-label="Language selection">
+          <a href="/" lang="ja">日本語</a>
+          <a aria-current="page" href="/en/" lang="en">English</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">CHROME EXTENSION</p>
+          <h1>Shape your workspace<br><span>to fit the task.</span></h1>
+          <p class="lead">Add a draggable divider to the Map Making App editor's fixed two-pane layout. Give the map more room when exploring, or expand the settings when you need to focus.</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#install">See installation steps <span aria-hidden="true">→</span></a>
+            <span class="privacy-note">No extra permissions. No data collection.</span>
+          </div>
+        </div>
+
+        <div class="range-card" aria-label="Resizable range">
+          <span>LEFT PANE</span>
+          <strong>25%</strong>
+          <div class="range-track"><i></i></div>
+          <strong>75%</strong>
+        </div>
+      </section>
+
+      <section class="demo-section" aria-labelledby="demo-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">DEMO</p>
+            <h2 id="demo-title">See it in action</h2>
+          </div>
+          <p>Watch the divider move as the two editor panes are resized.</p>
+        </div>
+
+        <div class="demo-video-frame">
+          <video controls autoplay muted loop playsinline preload="metadata" poster="/assets/resizable-editor-demo-poster.jpg" aria-label="Demo video showing the divider being dragged between two Map Making App panes">
+            <source src="/assets/resizable-editor-demo.mp4" type="video/mp4">
+            Your browser does not support video playback.
+          </video>
+        </div>
+      </section>
+
+      <section aria-labelledby="features-title">
+        <p class="eyebrow">FEATURES</p>
+        <h2 id="features-title">Small, focused, and privacy-friendly.</h2>
+        <div class="cards">
+          <article class="card"><span class="card-number">01</span><h3>Resize by dragging</h3><p>Place the pointer over the center divider and drag it left or right.</p></article>
+          <article class="card"><span class="card-number">02</span><h3>Limited to 25%–75%</h3><p>The divider stays within a practical range so neither pane becomes unusably narrow.</p></article>
+          <article class="card"><span class="card-number">03</span><h3>Keyboard accessible</h3><p>Focus the divider with Tab, then use the arrow keys, Home, or End.</p></article>
+          <article class="card"><span class="card-number">04</span><h3>Only runs in the editor</h3><p>It activates only when a numeric <code>/maps/</code> URL and the target editor grid are both present.</p></article>
+        </div>
+      </section>
+
+      <section class="install-section" id="install" aria-labelledby="install-title">
+        <div>
+          <p class="eyebrow">INSTALL</p>
+          <h2 id="install-title">Install from GitHub</h2>
+          <p>Until the extension is available in the Chrome Web Store, you can load it as an unpacked extension.</p>
+          <a class="primary-button" href="https://github.com/geoguessrwaiwai-lab/map-making-app-tools/archive/refs/heads/main.zip">Download the source code <span aria-hidden="true">↓</span></a>
+        </div>
+        <ol class="install-steps">
+          <li><span>1</span><p>Extract the downloaded ZIP file.</p></li>
+          <li><span>2</span><p>Open <code>chrome://extensions/</code> and enable Developer mode.</p></li>
+          <li><span>3</span><p>Select “Load unpacked” and choose the extracted folder.</p></li>
+          <li><span>4</span><p>Reload the Map Making App editor page.</p></li>
+        </ol>
+      </section>
+
+      <section class="privacy-banner">
+        <div><p class="eyebrow">PRIVACY FIRST</p><h2>We do not touch your data.</h2></div>
+        <p>The extension does not collect, store, or transmit map data or browsing history. It uses no external requests, cookies, or analytics. <a href="/en/privacy/">Read the privacy policy</a>.</p>
+      </section>
+    </main>
+
+    <footer><span>Map Making App Tools</span><span>An unofficial open-source extension.</span></footer>
+  </body>
+</html>
