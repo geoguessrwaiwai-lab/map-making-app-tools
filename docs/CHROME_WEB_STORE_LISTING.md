@@ -21,9 +21,11 @@ Map Making Appの画面幅調整とロケーション整理を使いやすくし
 ### 詳細な説明
 
 ```text
-Map Making App Toolsは、Map Making Appのマップ編集画面を使いやすい幅に調整するためのChrome拡張機能です。
+Map Making App Toolsは、Map Making Appのマップ編集画面の幅調整と、ロケーションの連続確認を支援するChrome拡張機能です。
 
 編集画面の中央に表示されるハンドルをドラッグすると、地図と作業エリアの幅を25%〜75%の範囲で変更できます。タグ編集などで右側を広く使いたい場合や、地図を大きく確認したい場合に、作業内容に合った幅へすぐに調整できます。
+
+「ぽちぽちモード」をONにすると、モード中に新しく選んだロケーションを、次にマップをクリックする直前にMap Making AppのDeleteボタンで削除します。モード開始前から保存されている地点は保護されるため、既存のロケーションを残したまま、新しく確認した候補を続けて整理できます。
 
 主な機能:
 ・中央のハンドルを左右へドラッグして画面幅を変更
@@ -36,6 +38,7 @@ Map Making App Toolsは、Map Making Appのマップ編集画面を使いやす�
 ・モード中に新しく選んだロケーションを、次のマップクリック時にDeleteボタンで削除
 ・モード開始前に選択済みのロケーションは削除せず保持
 ・モード開始時に読み込み済みの全保存地点を保護
+・保存地点を確認できない場合は、誤削除を防ぐためモードを開始しない
 ・マップのドラッグ操作ではロケーションを削除しない
 ・モードをOFFにすると、最後に新しく選択したロケーションも削除
 ・円形infoアイコンから機能の案内ページを表示
@@ -74,9 +77,11 @@ Adjust the editor screen width and streamline location cleanup in Map Making App
 ### Detailed description
 
 ```text
-Map Making App Tools is a Chrome extension that lets you adjust the Map Making App editor to a comfortable working width.
+Map Making App Tools is a Chrome extension that helps you resize the Map Making App editor and review locations in sequence.
 
 Drag the handle between the map and work area to adjust either screen section from 25% to 75%. Give the work area more room while editing tags, or enlarge the map when you need a clearer view.
+
+Turn on Pochi-pochi mode to remove each newly selected location with Map Making App's Delete button immediately before your next map click. Locations saved before the mode starts remain protected, so you can review and clean up new candidates without removing existing locations.
 
 Features:
 • Drag the center handle to adjust the editor screen width
@@ -85,10 +90,11 @@ Features:
 • Press Home for a 25% left section or End for a 75% left section
 • Reflow controls when the right screen section becomes narrow
 • Prevent page-level horizontal scrolling and keep any necessary scrolling inside the right screen section
-• Toggle Pochi-pochi mode from an iPhone-style switch in the top-right corner
+• Toggle Pochi-pochi mode from the switch in the top-right corner
 • Fire the site's Delete button before the next map click selects another location
 • Keep locations that had already been selected before the mode was enabled
 • Protect every saved location already loaded when the mode is enabled
+• Keep the mode off as a safety measure if saved locations cannot be checked
 • Ignore map drag gestures so panning never deletes a location
 • Delete the final newly selected location when the mode is turned off
 • Open the feature page from the circular info icon
@@ -201,7 +207,7 @@ ZIPには拡張機能の実行に必要なファイルだけが含まれ、ホ�
 - 公開範囲: `一般公開`
 - 地域: `すべての地域`
 - 価格: `無料`
-- テスト手順: インストール後、`https://map-making.app/maps/数字`形式の編集ページを画面幅801px以上で開き、中央のハンドルを左右へドラッグする。`chrome://extensions/`で本拡張機能の「詳細」から「拡張機能のオプション」を開くと、各機能とぽちぽちモードのデフォルトを設定できる
+- テスト手順: インストール後、`https://map-making.app/maps/数字`形式の編集ページを画面幅801px以上で開き、中央のハンドルを左右へドラッグする。画面右上の「ぽちぽちモード」をONにして新しいロケーションを選び、次にマップをクリックすると、直前の新しいロケーションがMap Making AppのDeleteボタンで削除される。モード開始前から保存されているロケーションと、マップをドラッグした場合のロケーションは削除されない。`chrome://extensions/`で本拡張機能の「詳細」から「拡張機能のオプション」を開くと、各機能とぽちぽちモードのデフォルトを設定できる
 
 ## 公式ガイド
 
