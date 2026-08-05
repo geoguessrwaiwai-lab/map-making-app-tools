@@ -6,6 +6,9 @@ Map Making Appのマップ編集画面で、左右50%ずつに固定されてい
 
 本プロジェクトは非公式であり、Map Making Appまたはその運営者との提携、承認、関係を示すものではありません。
 
+- [案内サイト](https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/)
+- [拡張機能のソースをダウンロード](https://github.com/geoguessrwaiwai-lab/map-making-app-tools/archive/refs/heads/main.zip)
+
 ## 動作仕様
 
 | 操作 | 動作 |
@@ -39,7 +42,7 @@ Map Making Appのマップ編集画面で、左右50%ずつに固定されてい
 - ポインター位置はドラッグ中の幅計算にだけ一時的に使用する
 - background、service worker、popup、optionsページを追加しない
 
-詳しくは[`homepage/privacy/index.html`](homepage/privacy/index.html)をご覧ください。
+詳しくは[プライバシーポリシー](https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/privacy/)をご覧ください。
 
 ## ディレクトリ構成
 
@@ -55,15 +58,6 @@ map-making-app-tools/
 ├── artwork/                      # アイコン・ストア画像の編集可能な原本
 ├── scripts/validate.mjs          # 構造・構文・安全性の検証
 ├── Makefile                      # 検証とZIP生成
-├── homepage/                     # 静的な案内サイト
-│   ├── index.html                # 機能説明、操作デモ、導入方法
-│   ├── assets/                   # MP4デモ動画とposter画像
-│   ├── reset.css                 # ブラウザ既定スタイルの差を吸収
-│   ├── styles.css
-│   ├── favicon.png
-│   ├── privacy/index.html        # プライバシーポリシー
-│   ├── contact/index.html        # お問い合わせ
-│   └── en/                       # 英語版の機能説明、ポリシー、お問い合わせ
 ├── store-assets/                 # Chrome Web Store掲載画像
 ├── docs/MAINTAINING.md           # リリース・公開手順
 ├── CONTRIBUTING.md
@@ -102,7 +96,6 @@ Node.js、`make`、`zip`を使用します。npmやyarnによる依存関係の�
 make validate       # 構造、構文、Manifest、安全性を検証
 make unpacked       # Chromeから直接読み込むフォルダを生成
 make package        # Chrome Web Store提出用ZIPを生成
-make site-package   # 静的ホームページのZIPを生成
 make clean          # 生成物を削除
 ```
 
@@ -111,21 +104,13 @@ make clean          # 生成物を削除
 ```text
 dist/map-making-app-tools-unpacked/
 dist/map-making-app-tools-1.0.0.zip
-dist/map-making-app-tools-site.zip
 ```
 
 ## ホームページ
 
-`homepage/`は外部依存のない静的サイトです。
+案内サイトは[`browser-extensions-site`](https://github.com/geoguessrwaiwai-lab/browser-extensions-site)リポジトリで管理しています。
 
-公開先: [https://mma.geoguessr-waiwai.workers.dev/](https://mma.geoguessr-waiwai.workers.dev/)
-
-```bash
-cd homepage
-python3 -m http.server 8000
-```
-
-ブラウザで[http://localhost:8000](http://localhost:8000)を開きます。日本語版の`/privacy/`と`/contact/`、英語版の`/en/`、`/en/privacy/`、`/en/contact/`も含まれます。既定のルートページは日本語です。
+公開先: [https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/](https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/)
 
 ## 動作確認
 

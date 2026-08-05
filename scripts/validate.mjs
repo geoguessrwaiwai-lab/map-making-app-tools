@@ -21,17 +21,6 @@ const REQUIRED_PROJECT_FILES = [
   "LICENSE",
   "docs/MAINTAINING.md",
   "docs/CHROME_WEB_STORE_LISTING.md",
-  "homepage/index.html",
-  "homepage/privacy/index.html",
-  "homepage/contact/index.html",
-  "homepage/en/index.html",
-  "homepage/en/privacy/index.html",
-  "homepage/en/contact/index.html",
-  "homepage/reset.css",
-  "homepage/styles.css",
-  "homepage/favicon.png",
-  "homepage/assets/resizable-editor-demo.mp4",
-  "homepage/assets/resizable-editor-demo-poster.jpg",
   "store-assets/screenshot-editor-640x400.png",
   "store-assets/small-promo-440x280.png",
   "artwork/icon.svg",
@@ -48,55 +37,6 @@ function assert(condition, message) {
 
 for (const path of REQUIRED_PROJECT_FILES) {
   assert(fs.existsSync(path), `Missing required file: ${path}`);
-}
-
-for (const htmlPath of [
-  "homepage/index.html",
-  "homepage/privacy/index.html",
-  "homepage/contact/index.html",
-  "homepage/en/index.html",
-  "homepage/en/privacy/index.html",
-  "homepage/en/contact/index.html"
-]) {
-  const html = fs.readFileSync(htmlPath, "utf8");
-  const resetIndex = html.indexOf('href="/reset.css"');
-  const stylesIndex = html.indexOf('href="/styles.css"');
-  assert(resetIndex !== -1, `${htmlPath} must include reset.css`);
-  assert(stylesIndex !== -1, `${htmlPath} must include styles.css`);
-  assert(resetIndex < stylesIndex, `${htmlPath} must load reset.css before styles.css`);
-}
-
-const LANGUAGE_PAGE_PAIRS = [
-  ["homepage/index.html", 'href="/en/"'],
-  ["homepage/privacy/index.html", 'href="/en/privacy/"'],
-  ["homepage/contact/index.html", 'href="/en/contact/"'],
-  ["homepage/en/index.html", 'href="/"'],
-  ["homepage/en/privacy/index.html", 'href="/privacy/"'],
-  ["homepage/en/contact/index.html", 'href="/contact/"']
-];
-
-for (const [htmlPath, counterpartLink] of LANGUAGE_PAGE_PAIRS) {
-  const html = fs.readFileSync(htmlPath, "utf8");
-  assert(html.includes(counterpartLink), `${htmlPath} must link to its translated counterpart`);
-}
-
-const demoVideo = fs.readFileSync("homepage/assets/resizable-editor-demo.mp4");
-const demoPoster = fs.readFileSync("homepage/assets/resizable-editor-demo-poster.jpg");
-assert(
-  demoVideo.subarray(4, 8).toString("ascii") === "ftyp",
-  "homepage demo video must use an MP4 container"
-);
-assert(
-  demoPoster[0] === 0xff && demoPoster[1] === 0xd8,
-  "homepage demo poster must be a JPEG image"
-);
-
-for (const htmlPath of ["homepage/index.html", "homepage/en/index.html"]) {
-  const html = fs.readFileSync(htmlPath, "utf8");
-  assert(
-    html.includes('/assets/resizable-editor-demo.mp4'),
-    `${htmlPath} must include the MP4 demo video`
-  );
 }
 
 const manifest = JSON.parse(fs.readFileSync("manifest.json", "utf8"));

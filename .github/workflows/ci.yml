@@ -27,4 +27,4 @@ jobs:
       - name: Validate source files
         run: make validate
       - name: Verify distributable packages
-        run: make package site-package
+        run: make package
