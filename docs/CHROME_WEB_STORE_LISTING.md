@@ -15,7 +15,7 @@ Map Making App Tools
 ### 概要
 
 ```text
-Map Making Appのマップ編集画面で、左右ペインの幅をドラッグして変更できるようにします。
+Map Making Appの画面幅調整とロケーション整理を使いやすくします。
 ```
 
 ### 詳細な説明
@@ -26,16 +26,27 @@ Map Making App Toolsは、Map Making Appのマップ編集画面を使いやす�
 編集画面の中央に表示されるハンドルをドラッグすると、地図と作業エリアの幅を25%〜75%の範囲で変更できます。タグ編集などで右側を広く使いたい場合や、地図を大きく確認したい場合に、作業内容に合った幅へすぐに調整できます。
 
 主な機能:
-・中央のハンドルを左右へドラッグしてペイン幅を変更
+・中央のハンドルを左右へドラッグして画面幅を変更
 ・左右の矢印キーで1%ずつ調整
 ・Shift + 左右の矢印キーで5%ずつ調整
-・Homeキーで左ペインを25%、Endキーで75%に変更
-・狭くなった右ペインの操作項目を見やすく配置
-・ページ全体の横スクロールを防ぎ、必要な場合は右ペイン内だけでスクロール
+・Homeキーで左側の画面幅を25%、Endキーで75%に変更
+・狭くなった右側の画面領域の操作項目を見やすく配置
+・ページ全体の横スクロールを防ぎ、必要な場合は右側の画面領域内だけでスクロール
+・画面右上のトグルで「ぽちぽちモード」を切り替え
+・モード中に新しく選んだロケーションを、次のマップクリック時にDeleteボタンで削除
+・モード開始前に選択済みのロケーションは削除せず保持
+・モード開始時に読み込み済みの全保存地点を保護
+・マップのドラッグ操作ではロケーションを削除しない
+・モードをOFFにすると、最後に新しく選択したロケーションも削除
+・円形infoアイコンから機能の案内ページを表示
+・マップURLごとにぽちぽちモードのON／OFFを保存し、次回表示時に復元
+・拡張機能のオプション画面で、画面幅調整とぽちぽちモードを個別にON／OFF
+・URL別設定がないマップに使う、ぽちぽちモードのデフォルトON／OFFを設定
+・URL別設定をスクロール一覧と部分一致検索で管理し、個別または一括で全体デフォルトへ戻す
 
 本拡張機能は画面幅801px以上で動作します。800px以下ではハンドルを表示せず、Map Making App本来のレイアウトを使用します。
 
-外部通信、広告、分析ツール、Cookie、ブラウザストレージ、外部JavaScriptは使用しません。マップ情報、入力内容、閲覧履歴などのユーザーデータを収集、保存、送信しません。
+外部通信、広告、分析ツール、Cookie、外部JavaScriptは使用しません。拡張機能専用ストレージには、機能別設定、ぽちぽちモードの全体デフォルト、対象のマップURLとURL別のON／OFFだけを保存します。地点ID、pano ID、座標はページ内で一時的に処理し、保存または外部送信しません。
 
 本拡張機能は非公式であり、Map Making Appまたはその運営者との提携、承認、関係を示すものではありません。
 ```
@@ -57,7 +68,7 @@ Map Making App Tools
 ### Summary
 
 ```text
-Resize the map and work-area panes in Map Making App by dragging their divider.
+Adjust the editor screen width and streamline location cleanup in Map Making App.
 ```
 
 ### Detailed description
@@ -65,19 +76,30 @@ Resize the map and work-area panes in Map Making App by dragging their divider.
 ```text
 Map Making App Tools is a Chrome extension that lets you adjust the Map Making App editor to a comfortable working width.
 
-Drag the handle between the map and work area to resize either pane from 25% to 75%. Give the work area more room while editing tags, or enlarge the map when you need a clearer view.
+Drag the handle between the map and work area to adjust either screen section from 25% to 75%. Give the work area more room while editing tags, or enlarge the map when you need a clearer view.
 
 Features:
-• Drag the center handle to resize the editor panes
+• Drag the center handle to adjust the editor screen width
 • Use the Left and Right arrow keys for 1% adjustments
 • Hold Shift with the arrow keys for 5% adjustments
-• Press Home for a 25% left pane or End for a 75% left pane
-• Reflow controls when the right pane becomes narrow
-• Prevent page-level horizontal scrolling and keep any necessary scrolling inside the right pane
+• Press Home for a 25% left section or End for a 75% left section
+• Reflow controls when the right screen section becomes narrow
+• Prevent page-level horizontal scrolling and keep any necessary scrolling inside the right screen section
+• Toggle Pochi-pochi mode from an iPhone-style switch in the top-right corner
+• Fire the site's Delete button before the next map click selects another location
+• Keep locations that had already been selected before the mode was enabled
+• Protect every saved location already loaded when the mode is enabled
+• Ignore map drag gestures so panning never deletes a location
+• Delete the final newly selected location when the mode is turned off
+• Open the feature page from the circular info icon
+• Save the Pochi-pochi mode default for each map URL and restore it on the next visit
+• Enable or disable screen width adjustment and Pochi-pochi mode independently from the extension options page
+• Choose the default Pochi-pochi ON/OFF state for map URLs without a saved preference
+• Manage per-URL preferences in a searchable, scrollable list and reset them individually or all at once
 
 The extension is active at viewport widths of 801 pixels or more. At 800 pixels or less, it hides the handle and leaves the original Map Making App layout unchanged.
 
-The extension does not use external network requests, advertising, analytics, cookies, browser storage, or remote JavaScript. It does not collect, store, or transmit map data, form input, browsing history, or other user data.
+The extension does not use external network requests, advertising, analytics, cookies, or remote JavaScript. Extension-local storage contains only feature preferences, the global Pochi-pochi default, the target map URL, and its URL-specific ON/OFF value. Location IDs, pano IDs, and coordinates are processed temporarily in page memory and are not stored or transmitted.
 
 This is an unofficial extension and is not affiliated with, endorsed by, or associated with Map Making App or its operators.
 ```
@@ -95,25 +117,37 @@ This is an unofficial extension and is not affiliated with, endorsed by, or asso
 ### 単一用途
 
 ```text
-Map Making Appのマップ編集画面で、地図と作業エリアの境界をドラッグまたはキーボードで移動し、左右ペインの幅を調整できるようにすること。
+Map Making Appの編集画面で左右の画面幅を調整し、利用者が明示的に有効化した間だけ新しく確認したロケーションを次の選択時に削除できるようにすること。
 ```
 
 ### Single purpose (English)
 
 ```text
-Allow users to resize the map and work-area panes in the Map Making App editor by dragging the divider or using the keyboard.
+Allow users to adjust Map Making App editor screen widths and, while explicitly enabled, delete each newly reviewed location when selecting the next one.
 ```
 
 ### サイトアクセスの理由
 
 ```text
-本拡張機能はhttps://map-making.app/maps/*でのみコンテンツスクリプトを実行します。対象ページの編集グリッドを検出し、ペイン幅、ドラッグハンドル、狭幅時のレイアウトだけを調整するために必要です。ページ内容、マップ情報、入力値を収集、保存、送信しません。
+本拡張機能はhttps://map-making.app/maps/*でのみコンテンツスクリプトを実行します。対象ページの編集グリッドとロケーションプレビューを検出し、画面幅を調整し、ぽちぽちモード中の地点変更と削除を処理するために必要です。地点ID、pano ID、座標はページ内で一時的に処理するだけで、収集、保存、送信しません。
 ```
 
 ### Host access justification (English)
 
 ```text
-The content script runs only on https://map-making.app/maps/* so it can detect the editor grid and adjust its pane widths, resize handle, and narrow-pane layout. It does not collect, store, or transmit page content, map data, or form values.
+The content scripts run only on https://map-making.app/maps/* so they can adjust the editor screen width and detect location changes for Pochi-pochi mode. Location IDs, pano IDs, and coordinates are processed temporarily in page memory and are not collected, stored, or transmitted.
+```
+
+### `storage`権限の理由
+
+```text
+機能別の有効・無効、ぽちぽちモードの全体デフォルト、および現在のマップURLをキーとしたON／OFFを拡張機能専用のローカルストレージへ保存するために使用します。地点ID、pano ID、座標、選択履歴は保存しません。
+```
+
+### `storage` permission justification (English)
+
+```text
+The storage permission saves feature enable/disable preferences, the global Pochi-pochi default, and the ON/OFF value keyed by the current map URL. It does not store location IDs, pano IDs, coordinates, or selection history.
 ```
 
 ### リモートコード
@@ -133,7 +167,7 @@ The content script runs only on https://map-making.app/maps/* so it can detect t
 - ユーザーのアクティビティ: `収集しない`
 - ウェブサイトのコンテンツ: `収集しない`
 
-ポインターのX座標はドラッグ中の幅計算にだけ一時的に使用し、記録、保存、送信しません。
+ポインターのX座標、地点ID、pano ID、座標は、幅計算またはぽちぽちモードの判定にだけ一時的に使用し、記録、保存、送信しません。機能別設定、全体デフォルト、対象のマップURLとURLごとのON／OFF設定だけを端末内の拡張機能専用ストレージへ保存し、外部へ送信しません。
 
 ### 開示・認証項目
 
@@ -167,7 +201,7 @@ ZIPには拡張機能の実行に必要なファイルだけが含まれ、ホ�
 - 公開範囲: `一般公開`
 - 地域: `すべての地域`
 - 価格: `無料`
-- テスト手順: インストール後、`https://map-making.app/maps/数字`形式の編集ページを画面幅801px以上で開き、中央のハンドルを左右へドラッグする
+- テスト手順: インストール後、`https://map-making.app/maps/数字`形式の編集ページを画面幅801px以上で開き、中央のハンドルを左右へドラッグする。`chrome://extensions/`で本拡張機能の「詳細」から「拡張機能のオプション」を開くと、各機能とぽちぽちモードのデフォルトを設定できる
 
 ## 公式ガイド
 

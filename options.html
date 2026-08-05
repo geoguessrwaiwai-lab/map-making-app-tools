@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Map Making App Tools 設定</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <img src="icon48.png" width="48" height="48" alt="">
+        <div>
+          <p class="eyebrow">MAP MAKING APP TOOLS</p>
+          <h1>拡張機能の設定</h1>
+        </div>
+      </header>
+
+      <section aria-labelledby="features-title">
+        <h2 id="features-title">使用する機能</h2>
+        <p class="section-description">機能ごとに有効・無効を切り替えられます。変更は開いているMap Making Appにも反映されます。</p>
+
+        <label class="setting-row">
+          <span><strong>画面幅調整</strong><small>左右の画面領域の境界線をドラッグして幅を変更します。</small></span>
+          <span class="switch"><input id="resize-enabled" type="checkbox"><span aria-hidden="true"></span></span>
+        </label>
+
+        <label class="setting-row">
+          <span><strong>ぽちぽちモード</strong><small>新しく確認したロケーションを、次の選択時に削除します。</small></span>
+          <span class="switch"><input id="pochipochi-enabled" type="checkbox"><span aria-hidden="true"></span></span>
+        </label>
+      </section>
+
+      <section aria-labelledby="defaults-title">
+        <h2 id="defaults-title">ぽちぽちモードの初期状態</h2>
+        <label class="setting-row">
+          <span><strong>ONをデフォルトにする</strong><small>URL別の設定がまだないマップでは、ぽちぽちモードをONで開始します。</small></span>
+          <span class="switch"><input id="pochipochi-default-enabled" type="checkbox"><span aria-hidden="true"></span></span>
+        </label>
+        <p class="note">Map Making App上で切り替えたURLには、そのURL専用のON／OFFが保存され、こちらのデフォルトより優先されます。</p>
+
+        <div class="url-settings" aria-labelledby="url-settings-title">
+          <div class="url-settings-heading">
+            <div>
+              <h3 id="url-settings-title">URLごとの設定</h3>
+              <p>保存済みのURL別設定を変更したり、全体デフォルトへ戻したりできます。</p>
+            </div>
+            <span id="url-settings-count" class="url-settings-count"></span>
+          </div>
+          <label class="search-field">
+            <span class="visually-hidden">URLを検索</span>
+            <input id="url-settings-search" type="search" placeholder="URLの一部を入力して検索" autocomplete="off">
+          </label>
+          <div id="url-settings-list" class="url-settings-list" role="list"></div>
+          <p id="url-settings-empty" class="url-settings-empty" hidden>該当するURL別設定はありません。</p>
+          <div class="url-settings-actions">
+            <button id="url-settings-delete-all" class="danger-button" type="button">URLごとの設定をすべて削除</button>
+          </div>
+        </div>
+      </section>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <a class="help-link" href="https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/" target="_blank" rel="noopener noreferrer">使い方とプライバシーについて</a>
+    </main>
+
+    <dialog id="delete-all-dialog" class="confirm-dialog" aria-labelledby="delete-all-title">
+      <h2 id="delete-all-title">URLごとの設定をすべて削除しますか？</h2>
+      <p>保存されているすべてのURL別ON／OFFを削除します。各マップには、ぽちぽちモードの全体デフォルトが適用されるようになります。</p>
+      <div class="dialog-actions">
+        <button id="delete-all-cancel" type="button">キャンセル</button>
+        <button id="delete-all-confirm" class="danger-button" type="button">すべて削除</button>
+      </div>
+    </dialog>
+    <script src="options.js"></script>
+  </body>
+</html>

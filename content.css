@@ -1,16 +1,16 @@
 @media (min-width: 801px) {
-  .page-map-editor {
+  html.mma-resize-feature-enabled .page-map-editor {
     min-width: 0;
     max-width: calc(100vw - 2rem);
     overflow-x: clip;
   }
 
-  .page-map-editor > * {
+  html.mma-resize-feature-enabled .page-map-editor > * {
     min-width: 0 !important;
     max-width: 100%;
   }
 
-  .page-map-editor > .mma-resizable-work-area {
+  html.mma-resize-feature-enabled .page-map-editor > .mma-resizable-work-area {
     container-name: mma-resizable-work-area;
     container-type: inline-size;
     overflow-x: auto !important;
@@ -18,7 +18,7 @@
   }
 
   @container mma-resizable-work-area (max-width: 640px) {
-    .page-map-editor .location-preview__meta {
+    html.mma-resize-feature-enabled .page-map-editor .location-preview__meta {
       grid-template-areas:
         "desc"
         "date"
@@ -27,20 +27,20 @@
       grid-template-columns: minmax(0, 1fr);
     }
 
-    .page-map-editor .location-preview__date,
-    .page-map-editor .location-preview__actions,
-    .page-map-editor .location-preview__tags {
+    html.mma-resize-feature-enabled .page-map-editor .location-preview__date,
+    html.mma-resize-feature-enabled .page-map-editor .location-preview__actions,
+    html.mma-resize-feature-enabled .page-map-editor .location-preview__tags {
       min-width: 0;
       max-width: 100%;
     }
 
-    .page-map-editor .location-preview__actions {
+    html.mma-resize-feature-enabled .page-map-editor .location-preview__actions {
       width: 100%;
       flex-wrap: wrap;
       justify-self: stretch;
     }
 
-    .page-map-editor .location-preview__date .nselect {
+    html.mma-resize-feature-enabled .page-map-editor .location-preview__date .nselect {
       max-width: 100%;
     }
   }
@@ -83,4 +83,115 @@ html.mma-is-resizing,
 html.mma-is-resizing * {
   cursor: col-resize !important;
   user-select: none !important;
+}
+
+.mma-pochipochi-control {
+  position: fixed;
+  z-index: 2147483647;
+  top: 7px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 6px 8px 6px 12px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 18px;
+  background: rgb(17 24 39 / 88%);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 24%);
+  color: #fff;
+  font: 600 12px/1.2 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(8px);
+}
+
+.mma-pochipochi-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.mma-pochipochi-info {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid currentcolor;
+  border-radius: 50%;
+  color: #dbeafe;
+  font: 700 12px/1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-decoration: none;
+}
+
+.mma-pochipochi-info:hover {
+  color: #fff;
+}
+
+.mma-pochipochi-info:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+.mma-pochipochi-control[data-error="true"] {
+  border-color: #ef4444;
+}
+
+.mma-pochipochi-control[data-initializing="true"] {
+  display: none;
+}
+
+.mma-pochipochi-control[data-loading="true"] .mma-pochipochi-switch {
+  opacity: 0.65;
+}
+
+.mma-pochipochi-label {
+  white-space: nowrap;
+}
+
+.mma-pochipochi-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mma-pochipochi-switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #6b7280;
+  transition: background-color 160ms ease;
+}
+
+.mma-pochipochi-switch::after {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 35%);
+  content: "";
+  transition: transform 160ms ease;
+}
+
+.mma-pochipochi-input:checked + .mma-pochipochi-switch {
+  background: #34c759;
+}
+
+.mma-pochipochi-input:checked + .mma-pochipochi-switch::after {
+  transform: translateX(18px);
+}
+
+.mma-pochipochi-input:focus-visible + .mma-pochipochi-switch {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
 }
