@@ -113,27 +113,6 @@
     document.documentElement.classList.remove("mma-is-resizing");
   }
 
-  /** フォーカス中は矢印キーでも境界を移動できるようにする。 */
-  function handleKeyDown(event) {
-    const amount = event.shiftKey ? 5 : 1;
-    let nextPercent = null;
-
-    if (event.key === "ArrowLeft") {
-      nextPercent = leftPercent - amount;
-    } else if (event.key === "ArrowRight") {
-      nextPercent = leftPercent + amount;
-    } else if (event.key === "Home") {
-      nextPercent = MIN_PERCENT;
-    } else if (event.key === "End") {
-      nextPercent = MAX_PERCENT;
-    }
-
-    if (nextPercent !== null) {
-      applyPercent(nextPercent);
-      event.preventDefault();
-    }
-  }
-
   /** 右カラムを、その実幅に応じたレスポンシブ表示の基準として記録する。 */
   function markWorkArea() {
     if (!editor) {
@@ -163,13 +142,11 @@
     handle.setAttribute("aria-label", "左右の画面幅を変更");
     handle.setAttribute("aria-valuemin", String(MIN_PERCENT));
     handle.setAttribute("aria-valuemax", String(MAX_PERCENT));
-    handle.tabIndex = 0;
     handle.addEventListener("pointerdown", handlePointerDown);
     handle.addEventListener("pointermove", handlePointerMove);
     handle.addEventListener("pointerup", finishDragging);
     handle.addEventListener("pointercancel", finishDragging);
     handle.addEventListener("lostpointercapture", finishDragging);
-    handle.addEventListener("keydown", handleKeyDown);
     document.body.append(handle);
 
     resizeObserver = new ResizeObserver(positionHandle);

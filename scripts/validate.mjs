@@ -80,6 +80,8 @@ new vm.Script(optionsSource, { filename: "options.js" });
 assert(contentSource.includes("/^\\/maps\\/\\d+\\/?$/"), "runtime path check must remain limited to numeric map IDs");
 assert(contentSource.includes('const MIN_PERCENT = 25'), "minimum screen width must remain 25%");
 assert(contentSource.includes('const MAX_PERCENT = 75'), "maximum screen width must remain 75%");
+assert(!contentSource.includes('handle.addEventListener("keydown"'), "the resize handle must not register keyboard controls");
+assert(!contentSource.includes("handle.tabIndex"), "the pointer-only resize handle must not enter the tab order");
 assert(
   contentSource.includes('window.matchMedia("(min-width: 801px)")'),
   "the resize handle must only be enabled at viewport widths of 801px or more"

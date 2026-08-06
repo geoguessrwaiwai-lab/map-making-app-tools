@@ -25,30 +25,7 @@ Map Making App Toolsは、Map Making Appのマップ編集画面の幅調整と�
 
 編集画面の中央に表示されるハンドルをドラッグすると、地図と作業エリアの幅を25%〜75%の範囲で変更できます。タグ編集などで右側を広く使いたい場合や、地図を大きく確認したい場合に、作業内容に合った幅へすぐに調整できます。
 
-「ぽちぽちモード」をONにすると、モード中に新しく選んだロケーションを、次にマップをクリックする直前にMap Making AppのDeleteボタンで削除します。モード開始前から保存されている地点は保護されるため、既存のロケーションを残したまま、新しく確認した候補を続けて整理できます。
-
-主な機能:
-・中央のハンドルを左右へドラッグして画面幅を変更
-・左右の矢印キーで1%ずつ調整
-・Shift + 左右の矢印キーで5%ずつ調整
-・Homeキーで左側の画面幅を25%、Endキーで75%に変更
-・狭くなった右側の画面領域の操作項目を見やすく配置
-・ページ全体の横スクロールを防ぎ、必要な場合は右側の画面領域内だけでスクロール
-・画面右上のトグルで「ぽちぽちモード」を切り替え
-・モード中に新しく選んだロケーションを、次のマップクリック時にDeleteボタンで削除
-・モード開始前に選択済みのロケーションは削除せず保持
-・モード開始時に読み込み済みの全保存地点を保護
-・モード中にSaveまたはCloseしたロケーションを保護
-・保存地点を確認できない場合は、誤削除を防ぐためモードを開始しない
-・マップのドラッグ操作ではロケーションを削除しない
-・モードをOFFにすると、最後に新しく選択したロケーションも削除
-・円形infoアイコンから機能の案内ページを表示
-・マップURLごとにぽちぽちモードのON／OFFを保存し、次回表示時に復元
-・拡張機能のオプション画面で、画面幅調整とぽちぽちモードを個別にON／OFF
-・URL別設定がないマップに使う、ぽちぽちモードのデフォルトON／OFFを設定
-・URL別設定をスクロール一覧と部分一致検索で管理し、個別または一括で全体デフォルトへ戻す
-
-本拡張機能は画面幅801px以上で動作します。800px以下ではハンドルを表示せず、Map Making App本来のレイアウトを使用します。
+「ぽちぽちモード」をONにすると、現在のマップの保存状態を汚すことなく、新しい地点を連続して選択し、閲覧できます。もとから保存されている地点は保護されるため、既存のロケーションを残したまま、新しく確認した候補を続けて整理できます。
 
 外部通信、広告、分析ツール、Cookie、外部JavaScriptは使用しません。拡張機能専用ストレージには、機能別設定、ぽちぽちモードの全体デフォルト、対象のマップURLとURL別のON／OFFだけを保存します。地点ID、pano ID、座標はページ内で一時的に処理し、保存または外部送信しません。
 
@@ -78,38 +55,15 @@ Adjust the editor screen width and streamline location cleanup in Map Making App
 ### Detailed description
 
 ```text
-Map Making App Tools is a Chrome extension that helps you resize the Map Making App editor and review locations in sequence.
+Map Making App Tools is a Chrome extension that helps you adjust the Map Making App editor width and review locations in sequence.
 
-Drag the handle between the map and work area to adjust either screen section from 25% to 75%. Give the work area more room while editing tags, or enlarge the map when you need a clearer view.
+Drag the handle in the center of the editor to adjust the widths of the map and work area within a range of 25% to 75%. Whether you need more room on the right for tasks such as editing tags or a larger map for closer inspection, you can quickly resize the screen to suit your work.
 
-Turn on Pochi-pochi mode to remove each newly selected location with Map Making App's Delete button immediately before your next map click. Locations saved before the mode starts remain protected, so you can review and clean up new candidates without removing existing locations.
+Turn on Pochi-pochi mode to continuously select and view new locations without cluttering the current map's saved state. Locations that were already saved remain protected, so you can continue reviewing and organizing new candidates while keeping existing locations intact.
 
-Features:
-• Drag the center handle to adjust the editor screen width
-• Use the Left and Right arrow keys for 1% adjustments
-• Hold Shift with the arrow keys for 5% adjustments
-• Press Home for a 25% left section or End for a 75% left section
-• Reflow controls when the right screen section becomes narrow
-• Prevent page-level horizontal scrolling and keep any necessary scrolling inside the right screen section
-• Toggle Pochi-pochi mode from the switch in the top-right corner
-• Fire the site's Delete button before the next map click selects another location
-• Keep locations that had already been selected before the mode was enabled
-• Protect every saved location already loaded when the mode is enabled
-• Protect locations kept with Save or Close while the mode is enabled
-• Keep the mode off as a safety measure if saved locations cannot be checked
-• Ignore map drag gestures so panning never deletes a location
-• Delete the final newly selected location when the mode is turned off
-• Open the feature page from the circular info icon
-• Save the Pochi-pochi mode default for each map URL and restore it on the next visit
-• Enable or disable screen width adjustment and Pochi-pochi mode independently from the extension options page
-• Choose the default Pochi-pochi ON/OFF state for map URLs without a saved preference
-• Manage per-URL preferences in a searchable, scrollable list and reset them individually or all at once
+The extension does not use external network requests, advertising, analytics tools, cookies, or remote JavaScript. Extension-local storage contains only feature settings, the global Pochi-pochi mode default, the target map URL, and the URL-specific ON/OFF setting. Location IDs, pano IDs, and coordinates are processed temporarily within the page and are neither stored nor transmitted externally.
 
-The extension is active at viewport widths of 801 pixels or more. At 800 pixels or less, it hides the handle and leaves the original Map Making App layout unchanged.
-
-The extension does not use external network requests, advertising, analytics, cookies, or remote JavaScript. Extension-local storage contains only feature preferences, the global Pochi-pochi default, the target map URL, and its URL-specific ON/OFF value. Location IDs, pano IDs, and coordinates are processed temporarily in page memory and are not stored or transmitted.
-
-This is an unofficial extension and is not affiliated with, endorsed by, or associated with Map Making App or its operators.
+This is an unofficial extension and is not affiliated with, endorsed by, or otherwise associated with Map Making App or its operators.
 ```
 
 ## URL
