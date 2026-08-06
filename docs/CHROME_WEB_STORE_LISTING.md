@@ -1,6 +1,6 @@
 # Chrome Web Store 掲載情報
 
-Map Making App Tools `1.1.0` のChrome Web Store提出用情報です。
+Map Making App Tools `1.2.0` のChrome Web Store提出用情報です。
 
 ホームページはCloudflare Workersで公開しています。
 
@@ -23,7 +23,7 @@ Map Making Appの画面幅調整とロケーション整理を使いやすくし
 ```text
 Map Making App Toolsは、Map Making Appのマップ編集画面の幅調整と、ロケーションの連続確認を支援するChrome拡張機能です。
 
-編集画面の中央に表示されるハンドルをドラッグすると、地図と作業エリアの幅を25%〜75%の範囲で変更できます。タグ編集などで右側を広く使いたい場合や、地図を大きく確認したい場合に、作業内容に合った幅へすぐに調整できます。
+編集画面の中央に表示されるハンドルをドラッグすると、地図と作業エリアの幅を25%〜75%の範囲で変更できます。タグ編集などで右側を広く使いたい場合や、地図を大きく確認したい場合に、作業内容に合った幅へすぐに調整できます。地図が500px未満になるとインポート操作を、300px未満になると合計表示を自動的に隠し、それぞれの幅以上に戻ると再表示します。地点数表示がある場合の境界は、それぞれ560pxと360pxです。
 
 「ぽちぽちモード」をONにすると、現在のマップの保存状態を汚すことなく、新しい地点を連続して選択し、閲覧できます。もとから保存されている地点は保護されるため、既存のロケーションを残したまま、新しく確認した候補を続けて整理できます。
 
@@ -57,7 +57,7 @@ Adjust the editor screen width and streamline location cleanup in Map Making App
 ```text
 Map Making App Tools is a Chrome extension that helps you adjust the Map Making App editor width and review locations in sequence.
 
-Drag the handle in the center of the editor to adjust the widths of the map and work area within a range of 25% to 75%. Whether you need more room on the right for tasks such as editing tags or a larger map for closer inspection, you can quickly resize the screen to suit your work.
+Drag the handle in the center of the editor to adjust the widths of the map and work area within a range of 25% to 75%. Whether you need more room on the right for tasks such as editing tags or a larger map for closer inspection, you can quickly resize the screen to suit your work. The import control is automatically hidden below 500 px and the total display below 300 px; each reappears when the map returns to its respective threshold or wider. When the location count is present, these thresholds increase to 560 px and 360 px, respectively.
 
 Turn on Pochi-pochi mode to continuously select and view new locations without cluttering the current map's saved state. Locations that were already saved remain protected, so you can continue reviewing and organizing new candidates while keeping existing locations intact.
 
