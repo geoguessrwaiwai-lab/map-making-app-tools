@@ -18,9 +18,11 @@
 4. `make clean validate package unpacked`を実行する。
 5. `dist/map-making-app-tools-unpacked`をChromeへ読み込み、READMEの動作確認項目を確認する。
 6. CIが成功したことを確認して`main`へマージする。
-7. `v<version>`形式のannotated tagとGitHub Releaseを作成する。
-8. `dist/map-making-app-tools-<version>.zip`をChrome ウェブストアへ提出する。
-9. 動作や説明を変更した場合は、`browser-extensions-site`リポジトリの案内ページとプライバシーポリシーを更新する。
+7. `main`のリリース対象コミットへ`v<version>`形式のannotated tagを作成し、リモートへpushする。
+8. タグに対応するGitHub ReleaseをDraft・Prereleaseではない公開状態で作成し、`dist/map-making-app-tools-<version>.zip`をRelease assetとして添付する。タグのpushだけでリリース作業を完了しない。
+9. GitHub Releaseの公開状態と、対象ZIPがアップロード済みであることを確認する。
+10. `dist/map-making-app-tools-<version>.zip`をChrome ウェブストアへ提出する。
+11. 動作や説明を変更した場合は、`browser-extensions-site`リポジトリの案内ページとプライバシーポリシーを更新する。
 
 ## Chrome ウェブストア
 

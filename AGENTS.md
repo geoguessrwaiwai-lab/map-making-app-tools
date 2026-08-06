@@ -21,9 +21,15 @@
 
 ## 検証と生成物
 
-- 拡張機能を変更した場合は、`make validate`と`make package`を実行する。
+- 拡張機能を変更した場合は、`make validate`、`make package`、`make unpacked`を実行する。
 - `scripts/validate.mjs`で検証している対象URL、権限なし、外部通信なしの不変条件を弱めない。
 - `dist/`内のZIPや展開済みファイルをソース管理に追加しない。
+
+## リリース
+
+- リリース公開の依頼では、`main`へのマージとタグのpushだけで完了としない。
+- `v<version>`のannotated tagに対応するGitHub Releaseを作成し、`dist/map-making-app-tools-<version>.zip`をRelease assetとして添付する。
+- 完了前に、GitHub ReleaseがDraftでもPrereleaseでもない公開状態であり、対象ZIPがアップロード済みであることを確認する。
 
 ## 作業時の注意
 
