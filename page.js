@@ -63,12 +63,30 @@
     return Number.isFinite(lat) && Number.isFinite(lng) ? `${lat},${lng}` : "";
   }
 
-  function getLocationKey(location, openedLocation = null) {
+  function getLocationKeys(location, openedLocation = null) {
     const id = location?.id ?? openedLocation?.location?.id ?? openedLocation?.id;
     const panoId = location?.panoId || (openedLocation ? getDomPanoId() : "");
     const coordinates = coordinateKey(location?.location);
-    const key = id != null ? `id:${id}` : `streetview:${panoId}|${coordinates}`;
-    return key === "streetview:|" ? "" : key;
+    const keys = [];
+
+    if (id != null) {
+      keys.push(`id:${id}`);
+    }
+    if (panoId || coordinates) {
+      keys.push(`streetview:${panoId}|${coordinates}`);
+    }
+
+    return keys;
+  }
+
+  function protectLocation(location) {
+    for (const key of location.keys) {
+      previouslySelectedKeys.add(key);
+    }
+  }
+
+  function isProtectedLocation(location) {
+    return location.keys.some((key) => previouslySelectedKeys.has(key));
   }
 
   /** 選択地点を、地点IDを優先した安定キーと削除用オブジェクトへ変換する。 */
@@ -80,12 +98,13 @@
       return null;
     }
 
-    const key = getLocationKey(location, openedLocation);
+    const keys = getLocationKeys(location, openedLocation);
+    const key = keys[0] || "";
     if (!key) {
       return null;
     }
 
-    return { key, location };
+    return { key, keys, location };
   }
 
   function showDeleteError() {
@@ -136,9 +155,9 @@
       }
 
       for (const location of locations) {
-        const key = getLocationKey(location);
-        if (key) {
-          previouslySelectedKeys.add(key);
+        const keys = getLocationKeys(location);
+        if (keys.length > 0) {
+          protectLocation({ keys });
         }
       }
 
@@ -171,10 +190,10 @@
 
     if (!currentLocation) {
       currentLocation = nextLocation;
-      if (modeEnabled && !previouslySelectedKeys.has(nextLocation.key)) {
+      if (modeEnabled && !isProtectedLocation(nextLocation)) {
         transientLocationKey = nextLocation.key;
       } else {
-        previouslySelectedKeys.add(nextLocation.key);
+        protectLocation(nextLocation);
       }
       return;
     }
@@ -187,11 +206,11 @@
     currentLocation = nextLocation;
 
     if (modeEnabled) {
-      transientLocationKey = previouslySelectedKeys.has(nextLocation.key)
+      transientLocationKey = isProtectedLocation(nextLocation)
         ? null
         : nextLocation.key;
     } else {
-      previouslySelectedKeys.add(nextLocation.key);
+      protectLocation(nextLocation);
       transientLocationKey = null;
     }
   }
@@ -292,6 +311,24 @@
     clickDeleteButton();
   }
 
+  /** Deleteによるプレビュー消失を、SaveまたはCloseとして扱わない。 */
+  function handleLocationDelete(event) {
+    const deleteButton =
+      event.target instanceof Element ? event.target.closest(DELETE_BUTTON_SELECTOR) : null;
+    if (!(deleteButton instanceof HTMLButtonElement) || deleteButton.disabled) {
+      return;
+    }
+
+    const visibleLocation = getCurrentLocation();
+    if (
+      visibleLocation &&
+      transientLocationKey === visibleLocation.key &&
+      currentLocation?.key === visibleLocation.key
+    ) {
+      transientLocationKey = null;
+    }
+  }
+
   function setModeEnabled(enabled, reportInitializationError = true) {
     const visibleLocation = getCurrentLocation();
     if (visibleLocation) {
@@ -323,7 +360,7 @@
     transientLocationKey = null;
 
     if (currentLocation) {
-      previouslySelectedKeys.add(currentLocation.key);
+      protectLocation(currentLocation);
     }
 
     control?.classList.toggle("is-active", enabled);
@@ -547,6 +584,26 @@
       return;
     }
 
+    const panoramaRemoved = mutations.some((mutation) =>
+      [...mutation.removedNodes].some(
+        (node) =>
+          node instanceof Element &&
+          (node.matches(PANORAMA_SELECTOR) || node.querySelector(PANORAMA_SELECTOR))
+      )
+    );
+
+    if (
+      panoramaRemoved &&
+      !document.querySelector(PANORAMA_SELECTOR) &&
+      modeEnabled &&
+      currentLocation &&
+      transientLocationKey === currentLocation.key
+    ) {
+      // 拡張機能自身のDeleteでは対象キーを先に解除するため、ここには到達しない。
+      protectLocation(currentLocation);
+      transientLocationKey = null;
+    }
+
     const panoramaChanged = mutations.some((mutation) => {
       const target = mutation.target;
       if (target instanceof Element && target.closest(PANORAMA_SELECTOR)) {
@@ -576,6 +633,7 @@
   document.addEventListener("pointermove", handleMapPointerMove, true);
   document.addEventListener("pointerup", handleMapPointerUp, true);
   document.addEventListener("pointercancel", handleMapPointerCancel, true);
+  document.addEventListener("click", handleLocationDelete, true);
   document.addEventListener("click", handleMapClick, true);
   document.addEventListener(SETTINGS_RESPONSE_EVENT, handleStoredSetting);
   document.addEventListener(SETTINGS_UPDATE_EVENT, handleStoredSettingsUpdate);

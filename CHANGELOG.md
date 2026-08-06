@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-06
+
+### Fixed
+
+- ぽちぽちモード中にSaveまたはCloseしたロケーションが、再選択後のマップクリックで削除される不具合を修正
+
 ## [1.0.0] - 2026-08-05
 
 ### Added
@@ -32,5 +38,6 @@
 
 - 案内サイトを共通の`browser-extensions-site`リポジトリへ移行
 
-[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/releases/tag/v1.0.0

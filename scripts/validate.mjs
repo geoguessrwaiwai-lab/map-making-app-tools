@@ -46,7 +46,7 @@ for (const path of REQUIRED_PROJECT_FILES) {
 const manifest = JSON.parse(fs.readFileSync("manifest.json", "utf8"));
 assert(manifest.manifest_version === 3, "manifest_version must be 3");
 assert(/^\d+\.\d+\.\d+$/.test(manifest.version), "manifest version must use MAJOR.MINOR.PATCH");
-assert(manifest.version === "1.0.0", "the initial review package must remain version 1.0.0");
+assert(manifest.version === "1.1.0", "the release package must remain version 1.1.0");
 assert(JSON.stringify(manifest.permissions) === JSON.stringify(["storage"]), "only the storage permission is allowed");
 assert(manifest.options_ui?.page === "options.html", "the extension management page must link to options.html");
 assert(manifest.options_ui?.open_in_tab === true, "the options page must open in a full tab");
@@ -135,6 +135,10 @@ for (const [name, pattern] of forbiddenPatterns) {
 assert(pageSource.includes('const PANORAMA_SELECTOR = ".location-preview__panorama"'), "pochi-pochi mode must watch the supplied panorama DOM");
 assert(pageSource.includes('const MAP_SELECTOR = ".map-embed"'), "pochi-pochi mode must capture clicks from the supplied map DOM");
 assert(pageSource.includes("deleteButton.click()"), "pochi-pochi mode must fire the site's delete button before map click propagation");
+assert(pageSource.includes("panoramaRemoved"), "disappearing Street View DOM must be detected");
+assert(pageSource.includes("!document.querySelector(PANORAMA_SELECTOR)"), "panorama replacement must not be mistaken for closing Street View");
+assert(pageSource.includes("protectLocation(currentLocation)"), "closing Street View must protect the current location");
+assert(pageSource.includes('document.addEventListener("click", handleLocationDelete, true)'), "Delete must be excluded from Street View close protection");
 assert(pageSource.includes("transientLocationKey === visibleLocation.key"), "turning the mode off must delete only the final newly selected location");
 assert(pageSource.includes("mapEditor.getLocationsInBBox(bounds)"), "all loaded locations must be protected before enabling pochi-pochi mode");
 assert(pageSource.includes("!protectExistingLocations()"), "pochi-pochi mode must fail closed when existing locations cannot be enumerated");
