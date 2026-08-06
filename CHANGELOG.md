@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-06
+
+### Added
+
+- 左側の地図が500px未満になったときインポート操作を、300px未満になったとき合計表示を隠し、地点数表示がある場合は各境界を60px増やすレスポンシブ表示
+
 ## [1.1.0] - 2026-08-06
 
 ### Fixed
@@ -42,6 +48,7 @@
 
 - 案内サイトを共通の`browser-extensions-site`リポジトリへ移行
 
-[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/releases/tag/v1.0.0

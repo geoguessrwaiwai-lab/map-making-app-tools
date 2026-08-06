@@ -46,7 +46,7 @@ for (const path of REQUIRED_PROJECT_FILES) {
 const manifest = JSON.parse(fs.readFileSync("manifest.json", "utf8"));
 assert(manifest.manifest_version === 3, "manifest_version must be 3");
 assert(/^\d+\.\d+\.\d+$/.test(manifest.version), "manifest version must use MAJOR.MINOR.PATCH");
-assert(manifest.version === "1.1.0", "the release package must remain version 1.1.0");
+assert(manifest.version === "1.2.0", "the release package must remain version 1.2.0");
 assert(JSON.stringify(manifest.permissions) === JSON.stringify(["storage"]), "only the storage permission is allowed");
 assert(manifest.options_ui?.page === "options.html", "the extension management page must link to options.html");
 assert(manifest.options_ui?.open_in_tab === true, "the options page must open in a full tab");
@@ -117,6 +117,43 @@ assert(
 assert(
   contentStyles.includes('"date"') && contentStyles.includes('"actions"'),
   "date and actions must stack into separate rows in narrow work areas"
+);
+assert(
+  contentSource.includes('const MAP_IMPORT_BREAKPOINT_PX = 500'),
+  "map import visibility must use the 500px breakpoint"
+);
+assert(
+  contentSource.includes('width < MAP_IMPORT_BREAKPOINT_PX'),
+  "map import must only be hidden below the breakpoint"
+);
+assert(
+  /\.page-map-editor\.mma-narrow-map\s+\.map-meta__import\s*\{[^}]*display:\s*none/s.test(contentStyles),
+  "map import must be hidden while the map is narrow"
+);
+assert(
+  contentSource.includes('const MAP_TOTAL_BREAKPOINT_PX = 300'),
+  "map total visibility must use the 300px breakpoint"
+);
+assert(
+  contentSource.includes('width < MAP_TOTAL_BREAKPOINT_PX'),
+  "map total must only be hidden below the breakpoint"
+);
+assert(
+  /\.page-map-editor\.mma-compact-map\s+\.map-meta__total\s*\{[^}]*display:\s*none/s.test(contentStyles),
+  "map total must be hidden while the map is compact"
+);
+assert(
+  contentSource.includes('const MAP_COUNT_SELECTOR = ".map-meta__count"'),
+  "map count must be detected using the supplied selector"
+);
+assert(
+  contentSource.includes('const MAP_COUNT_BREAKPOINT_OFFSET_PX = 60'),
+  "map count must increase responsive breakpoints by 60px"
+);
+assert(
+  contentSource.includes('MAP_IMPORT_BREAKPOINT_PX + breakpointOffset') &&
+    contentSource.includes('MAP_TOTAL_BREAKPOINT_PX + breakpointOffset'),
+  "map count breakpoint offset must apply to both map metadata controls"
 );
 
 const forbiddenPatterns = [

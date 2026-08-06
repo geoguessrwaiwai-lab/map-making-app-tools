@@ -10,6 +10,14 @@
     max-width: 100%;
   }
 
+  html.mma-resize-feature-enabled .page-map-editor.mma-narrow-map .map-meta__import {
+    display: none;
+  }
+
+  html.mma-resize-feature-enabled .page-map-editor.mma-compact-map .map-meta__total {
+    display: none;
+  }
+
   html.mma-resize-feature-enabled .page-map-editor > .mma-resizable-work-area {
     container-name: mma-resizable-work-area;
     container-type: inline-size;

@@ -2,11 +2,18 @@
   "use strict";
 
   const EDITOR_SELECTOR = ".page-map-editor";
+  const MAP_SELECTOR = ".map-embed";
+  const MAP_COUNT_SELECTOR = ".map-meta__count";
   const TARGET_PATH = /^\/maps\/\d+\/?$/;
   const MIN_PERCENT = 25;
   const MAX_PERCENT = 75;
   const DEFAULT_PERCENT = 50;
   const WORK_AREA_CLASS = "mma-resizable-work-area";
+  const NARROW_MAP_CLASS = "mma-narrow-map";
+  const COMPACT_MAP_CLASS = "mma-compact-map";
+  const MAP_IMPORT_BREAKPOINT_PX = 500;
+  const MAP_TOTAL_BREAKPOINT_PX = 300;
+  const MAP_COUNT_BREAKPOINT_OFFSET_PX = 60;
   const SUPPORTED_VIEWPORT = window.matchMedia("(min-width: 801px)");
   const SETTINGS_REQUEST_EVENT = "mma-pochipochi-settings-request";
   const SETTINGS_RESPONSE_EVENT = "mma-pochipochi-settings-response";
@@ -21,6 +28,7 @@
   let editor = null;
   let handle = null;
   let resizeObserver = null;
+  let observedMap = null;
   let dragging = false;
   let leftPercent = DEFAULT_PERCENT;
   let previousInlineColumns = "";
@@ -128,6 +136,46 @@
     }
   }
 
+  /** 地図の実幅に応じたインポート操作と合計表示の状態を反映する。 */
+  function updateMapWidthState(width = observedMap?.getBoundingClientRect().width) {
+    if (!editor) {
+      return;
+    }
+
+    const breakpointOffset = editor.querySelector(MAP_COUNT_SELECTOR)
+      ? MAP_COUNT_BREAKPOINT_OFFSET_PX
+      : 0;
+    editor.classList.toggle(
+      NARROW_MAP_CLASS,
+      Number.isFinite(width) && width < MAP_IMPORT_BREAKPOINT_PX + breakpointOffset
+    );
+    editor.classList.toggle(
+      COMPACT_MAP_CLASS,
+      Number.isFinite(width) && width < MAP_TOTAL_BREAKPOINT_PX + breakpointOffset
+    );
+  }
+
+  /** 地図DOMの再生成に追従し、現在の要素だけを幅監視の対象にする。 */
+  function observeMap() {
+    if (!editor || !resizeObserver) {
+      return;
+    }
+
+    const nextMap = editor.querySelector(MAP_SELECTOR);
+    if (observedMap !== nextMap) {
+      if (observedMap) {
+        resizeObserver.unobserve(observedMap);
+      }
+
+      observedMap = nextMap;
+      if (observedMap) {
+        resizeObserver.observe(observedMap);
+      }
+    }
+
+    updateMapWidthState();
+  }
+
   /** 対象の編集画面へハンドルを取り付ける。 */
   function attach(nextEditor) {
     editor = nextEditor;
@@ -149,8 +197,16 @@
     handle.addEventListener("lostpointercapture", finishDragging);
     document.body.append(handle);
 
-    resizeObserver = new ResizeObserver(positionHandle);
+    resizeObserver = new ResizeObserver((entries) => {
+      positionHandle();
+
+      const mapEntry = entries.find((entry) => entry.target === observedMap);
+      if (mapEntry) {
+        updateMapWidthState(mapEntry.contentRect.width);
+      }
+    });
     resizeObserver.observe(editor);
+    observeMap();
     window.addEventListener("scroll", positionHandle, true);
     window.addEventListener("resize", positionHandle);
     applyPercent(DEFAULT_PERCENT);
@@ -165,6 +221,8 @@
     window.removeEventListener("resize", positionHandle);
 
     if (editor?.isConnected) {
+      editor.classList.remove(NARROW_MAP_CLASS, COMPACT_MAP_CLASS);
+
       for (const child of editor.children) {
         child.classList.remove(WORK_AREA_CLASS);
       }
@@ -182,6 +240,7 @@
 
     handle?.remove();
     handle = null;
+    observedMap = null;
     editor = null;
   }
 
@@ -206,6 +265,7 @@
       attach(nextEditor);
     } else if (editor) {
       markWorkArea();
+      observeMap();
     }
   }
 
