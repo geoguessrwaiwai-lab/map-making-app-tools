@@ -1,6 +1,6 @@
 # Chrome Web Store 掲載情報
 
-Map Making App Tools `1.0.0` のChrome Web Store提出用情報です。
+Map Making App Tools `1.1.0` のChrome Web Store提出用情報です。
 
 ホームページはCloudflare Workersで公開しています。
 
@@ -38,6 +38,7 @@ Map Making App Toolsは、Map Making Appのマップ編集画面の幅調整と�
 ・モード中に新しく選んだロケーションを、次のマップクリック時にDeleteボタンで削除
 ・モード開始前に選択済みのロケーションは削除せず保持
 ・モード開始時に読み込み済みの全保存地点を保護
+・モード中にSaveまたはCloseしたロケーションを保護
 ・保存地点を確認できない場合は、誤削除を防ぐためモードを開始しない
 ・マップのドラッグ操作ではロケーションを削除しない
 ・モードをOFFにすると、最後に新しく選択したロケーションも削除
@@ -94,6 +95,7 @@ Features:
 • Fire the site's Delete button before the next map click selects another location
 • Keep locations that had already been selected before the mode was enabled
 • Protect every saved location already loaded when the mode is enabled
+• Protect locations kept with Save or Close while the mode is enabled
 • Keep the mode off as a safety measure if saved locations cannot be checked
 • Ignore map drag gestures so panning never deletes a location
 • Delete the final newly selected location when the mode is turned off
@@ -197,7 +199,7 @@ The storage permission saves feature enable/disable preferences, the global Poch
 ## 提出ファイル
 
 ```text
-dist/map-making-app-tools-1.0.0.zip
+dist/map-making-app-tools-1.1.0.zip
 ```
 
 ZIPには拡張機能の実行に必要なファイルだけが含まれ、ホームページやストア画像は含まれません。
