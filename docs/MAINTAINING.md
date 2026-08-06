@@ -27,6 +27,7 @@
 提出フォームへ転記する掲載文とプライバシー申告は[`CHROME_WEB_STORE_LISTING.md`](CHROME_WEB_STORE_LISTING.md)で管理します。
 
 - 商品名: `Map Making App Tools`
+- 公開ページ: `https://chromewebstore.google.com/detail/flhepjgbbcielemfkkkfimcfhgfomofj?utm_source=item-share-cb`
 - カテゴリー: ツール
 - 言語: 日本語
 - リモートコード: 使用しない

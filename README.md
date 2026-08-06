@@ -7,6 +7,7 @@ Map Making Appのマップ編集画面で、左右50%ずつに固定されてい
 本プロジェクトは非公式であり、Map Making Appまたはその運営者との提携、承認、関係を示すものではありません。
 
 - [案内サイト](https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/)
+- [Chrome ウェブストアからインストール](https://chromewebstore.google.com/detail/flhepjgbbcielemfkkkfimcfhgfomofj?utm_source=item-share-cb)
 - [拡張機能のソースをダウンロード](https://github.com/geoguessrwaiwai-lab/map-making-app-tools/archive/refs/heads/main.zip)
 
 ## 動作仕様

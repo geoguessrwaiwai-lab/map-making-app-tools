@@ -68,6 +68,7 @@ This is an unofficial extension and is not affiliated with, endorsed by, or othe
 
 ## URL
 
+- Chrome Web Store: `https://chromewebstore.google.com/detail/flhepjgbbcielemfkkkfimcfhgfomofj?utm_source=item-share-cb`
 - ホームページ: `https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/`
 - プライバシーポリシー: `https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/privacy/`
 - 英語版ホームページ: `https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/en/`
