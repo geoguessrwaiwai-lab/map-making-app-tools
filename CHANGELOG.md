@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-08-18
+
+### Fixed
+
+- モーダル（`dialog[open]`または`[role="dialog"]`）が開いている間、画面幅調整ハンドルを一時的に隠し、モーダルと重ならないようにした
+
 ## [1.2.0] - 2026-08-06
 
 ### Added
@@ -48,7 +54,8 @@
 
 - 案内サイトを共通の`browser-extensions-site`リポジトリへ移行
 
-[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/releases/tag/v1.0.0

@@ -46,7 +46,7 @@ for (const path of REQUIRED_PROJECT_FILES) {
 const manifest = JSON.parse(fs.readFileSync("manifest.json", "utf8"));
 assert(manifest.manifest_version === 3, "manifest_version must be 3");
 assert(/^\d+\.\d+\.\d+$/.test(manifest.version), "manifest version must use MAJOR.MINOR.PATCH");
-assert(manifest.version === "1.2.0", "the release package must remain version 1.2.0");
+assert(manifest.version === "1.3.0", "the release package must remain version 1.3.0");
 assert(JSON.stringify(manifest.permissions) === JSON.stringify(["storage"]), "only the storage permission is allowed");
 assert(manifest.options_ui?.page === "options.html", "the extension management page must link to options.html");
 assert(manifest.options_ui?.open_in_tab === true, "the options page must open in a full tab");
