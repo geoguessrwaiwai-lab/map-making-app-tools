@@ -24,10 +24,12 @@
   const RESIZE_FEATURE_KEY = "mma-feature-screen-resize-enabled";
   const POCHIPOCHI_FEATURE_KEY = "mma-feature-pochipochi-enabled";
   const POCHIPOCHI_DEFAULT_KEY = "mma-pochipochi-default-enabled";
+  const OPEN_DIALOG_SELECTOR = 'dialog[open], [role="dialog"]:not([data-state="closed"])';
 
   let editor = null;
   let handle = null;
   let resizeObserver = null;
+  let handleVisibilityObserver = null;
   let observedMap = null;
   let dragging = false;
   let leftPercent = DEFAULT_PERCENT;
@@ -80,6 +82,20 @@
     handle.style.left = `${boundary - handle.offsetWidth / 2}px`;
     handle.style.top = `${rect.top}px`;
     handle.style.height = `${rect.height}px`;
+  }
+
+  /** モーダルが開いている間、重ならないようハンドルを一時的に隠す。 */
+  function updateHandleVisibility() {
+    if (!handle) {
+      return;
+    }
+
+    const shouldHide = Boolean(document.querySelector(OPEN_DIALOG_SELECTOR));
+    if (shouldHide && dragging) {
+      finishDragging();
+    }
+
+    handle.hidden = shouldHide;
   }
 
   /** マウスポインターのX座標を、左側の画面領域の割合へ変換する。 */
@@ -197,6 +213,15 @@
     handle.addEventListener("lostpointercapture", finishDragging);
     document.body.append(handle);
 
+    handleVisibilityObserver = new MutationObserver(updateHandleVisibility);
+    handleVisibilityObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["open", "data-state"],
+    });
+    updateHandleVisibility();
+
     resizeObserver = new ResizeObserver((entries) => {
       positionHandle();
 
@@ -217,6 +242,8 @@
     finishDragging();
     resizeObserver?.disconnect();
     resizeObserver = null;
+    handleVisibilityObserver?.disconnect();
+    handleVisibilityObserver = null;
     window.removeEventListener("scroll", positionHandle, true);
     window.removeEventListener("resize", positionHandle);
 
