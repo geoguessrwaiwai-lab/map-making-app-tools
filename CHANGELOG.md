@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-08-24
+
+### Added
+
+- Tagsパネルにタググループ機能を追加。元の一覧の見た目を変えずに、グループの作成・編集・削除と、グループ単位でのタグ絞り込みができる。常時表示の「未分類」フィルター、部分一致検索・一括選択つきのタグ紐づけモーダル、既存タグをグループチップへドラッグ&ドロップして紐づける操作を備える。一覧から消えたタグ（手動削除・紐づくロケーション0件時の自動削除）は、2回連続で見当たらないことを確認でき次第、登録簿とグループ所属から自動的に除外する。各グループの編集ボタン横に、そのグループのタグをMap Making App本来の選択状態（`is-selected`）へ一括で切り替える（解除も可能な）チェックボックスを追加
+
+### Fixed
+
+- タブを開いた直後、Tagsパネルのタグがまだ読み込み中で一覧が一時的に空になっている間に、保存済みのグループ紐づけを全て未分類として消去してしまう不具合を修正
+
 ## [1.3.0] - 2026-08-18
 
 ### Fixed
@@ -54,7 +64,8 @@
 
 - 案内サイトを共通の`browser-extensions-site`リポジトリへ移行
 
-[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.0.0...v1.1.0

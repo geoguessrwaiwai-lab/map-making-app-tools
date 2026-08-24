@@ -16,6 +16,11 @@
       key: "mma-pochipochi-default-enabled",
       defaultValue: false,
       input: document.querySelector("#pochipochi-default-enabled")
+    },
+    tagGroups: {
+      key: "mma-feature-tag-groups-enabled",
+      defaultValue: true,
+      input: document.querySelector("#tag-groups-enabled")
     }
   };
   const URL_SETTING_PREFIX = "mma-pochipochi-default:";

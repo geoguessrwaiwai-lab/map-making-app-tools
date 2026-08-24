@@ -4,8 +4,10 @@ import vm from "node:vm";
 const REQUIRED_EXTENSION_FILES = [
   "manifest.json",
   "content.js",
+  "tag-groups.js",
   "page.js",
   "content.css",
+  "tag-groups.css",
   "options.html",
   "options.css",
   "options.js",
@@ -46,7 +48,7 @@ for (const path of REQUIRED_PROJECT_FILES) {
 const manifest = JSON.parse(fs.readFileSync("manifest.json", "utf8"));
 assert(manifest.manifest_version === 3, "manifest_version must be 3");
 assert(/^\d+\.\d+\.\d+$/.test(manifest.version), "manifest version must use MAJOR.MINOR.PATCH");
-assert(manifest.version === "1.3.0", "the release package must remain version 1.3.0");
+assert(manifest.version === "1.4.0", "the release package must remain version 1.4.0");
 assert(JSON.stringify(manifest.permissions) === JSON.stringify(["storage"]), "only the storage permission is allowed");
 assert(manifest.options_ui?.page === "options.html", "the extension management page must link to options.html");
 assert(manifest.options_ui?.open_in_tab === true, "the options page must open in a full tab");
@@ -55,8 +57,9 @@ assert(Array.isArray(manifest.content_scripts) && manifest.content_scripts.lengt
 
 const [contentScript, pageScript] = manifest.content_scripts;
 assert(JSON.stringify(contentScript.matches) === JSON.stringify(["https://map-making.app/maps/*"]), "content script matches must remain limited to Map Making App map paths");
-assert(JSON.stringify(contentScript.js) === JSON.stringify(["content.js"]), "content script entry point must be content.js");
-assert(JSON.stringify(contentScript.css) === JSON.stringify(["content.css"]), "content stylesheet must be content.css");
+assert(JSON.stringify(contentScript.js) === JSON.stringify(["content.js", "tag-groups.js"]), "content script entry points must be content.js and tag-groups.js");
+assert(JSON.stringify(contentScript.css) === JSON.stringify(["content.css", "tag-groups.css"]), "content stylesheets must be content.css and tag-groups.css");
+assert(!Object.hasOwn(contentScript, "world"), "content.js and tag-groups.js must run in the isolated world");
 assert(contentScript.run_at === "document_idle", "content script must run at document_idle");
 assert(JSON.stringify(pageScript.matches) === JSON.stringify(["https://map-making.app/maps/*"]), "MAIN world script matches must remain limited to Map Making App map paths");
 assert(JSON.stringify(pageScript.js) === JSON.stringify(["page.js"]), "MAIN world script entry point must be page.js");
@@ -68,16 +71,22 @@ for (const path of Object.values(manifest.icons ?? {})) {
 }
 
 const contentSource = fs.readFileSync("content.js", "utf8");
+const tagGroupsSource = fs.readFileSync("tag-groups.js", "utf8");
 const pageSource = fs.readFileSync("page.js", "utf8");
 const contentStyles = fs.readFileSync("content.css", "utf8");
 const optionsHtml = fs.readFileSync("options.html", "utf8");
 const optionsStyles = fs.readFileSync("options.css", "utf8");
 const optionsSource = fs.readFileSync("options.js", "utf8");
 new vm.Script(contentSource, { filename: "content.js" });
+new vm.Script(tagGroupsSource, { filename: "tag-groups.js" });
 new vm.Script(pageSource, { filename: "page.js" });
 new vm.Script(optionsSource, { filename: "options.js" });
 
 assert(contentSource.includes("/^\\/maps\\/\\d+\\/?$/"), "runtime path check must remain limited to numeric map IDs");
+assert(tagGroupsSource.includes("/^\\/maps\\/\\d+\\/?$/"), "tag group runtime path check must remain limited to numeric map IDs");
+assert(tagGroupsSource.includes('const EDITOR_SELECTOR = ".page-map-editor"'), "tag groups must only attach inside the map editor");
+assert(tagGroupsSource.includes('const TAG_MANAGER_SELECTOR = ".tag-manager"'), "tag groups must attach to the site's own Tags panel");
+assert(tagGroupsSource.includes("GROUPS_KEY_PREFIX"), "tag group definitions must be namespaced per map URL");
 assert(contentSource.includes('const MIN_PERCENT = 25'), "minimum screen width must remain 25%");
 assert(contentSource.includes('const MAX_PERCENT = 75'), "maximum screen width must remain 75%");
 assert(!contentSource.includes('handle.addEventListener("keydown"'), "the resize handle must not register keyboard controls");
@@ -167,6 +176,7 @@ const forbiddenPatterns = [
 
 for (const [name, pattern] of forbiddenPatterns) {
   assert(!pattern.test(contentSource), `content.js must not use ${name}`);
+  assert(!pattern.test(tagGroupsSource), `tag-groups.js must not use ${name}`);
   assert(!pattern.test(pageSource), `page.js must not use ${name}`);
   assert(!pattern.test(optionsSource), `options.js must not use ${name}`);
 }
@@ -200,6 +210,7 @@ assert(contentStyles.includes('.mma-pochipochi-control[data-initializing="true"]
 assert(optionsHtml.includes('id="resize-enabled"'), "the options page must show the screen width switch");
 assert(optionsHtml.includes('id="pochipochi-enabled"'), "the options page must show the Pochi-pochi feature switch");
 assert(optionsHtml.includes('id="pochipochi-default-enabled"'), "the options page must show the Pochi-pochi default switch");
+assert(optionsHtml.includes('id="tag-groups-enabled"'), "the options page must show the tag groups feature switch");
 assert(optionsHtml.includes('id="url-settings-search"'), "the options page must provide partial URL search");
 assert(optionsHtml.includes('id="url-settings-list"'), "the options page must list per-URL settings");
 assert(optionsHtml.includes('id="url-settings-delete-all"'), "the options page must provide bulk deletion for per-URL settings");
@@ -210,6 +221,7 @@ assert(/\.url-settings-list\s*\{[^}]*max-height:\s*320px[^}]*overflow-y:\s*auto/
 assert(optionsSource.includes('key: "mma-feature-screen-resize-enabled"'), "the options page must control screen width adjustment");
 assert(optionsSource.includes('key: "mma-feature-pochipochi-enabled"'), "the options page must control Pochi-pochi mode");
 assert(optionsSource.includes('key: "mma-pochipochi-default-enabled"'), "the options page must control the global Pochi-pochi default");
+assert(optionsSource.includes('key: "mma-feature-tag-groups-enabled"'), "the options page must control the tag groups feature");
 assert(contentSource.includes("SETTINGS_READY_EVENT"), "the isolated-world storage bridge must announce when it is ready");
 assert(pageSource.includes("SETTINGS_READY_EVENT, requestStoredSetting"), "the MAIN-world control must retry after the storage bridge is ready");
 assert(pageSource.includes("requestStoredSetting()"), "the saved URL default must be requested when the control mounts");

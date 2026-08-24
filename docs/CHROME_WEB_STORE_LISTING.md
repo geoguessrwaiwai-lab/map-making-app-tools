@@ -1,6 +1,6 @@
 # Chrome Web Store 掲載情報
 
-Map Making App Tools `1.3.0` のChrome Web Store提出用情報です。
+Map Making App Tools `1.4.0` のChrome Web Store提出用情報です。
 
 ホームページはCloudflare Workersで公開しています。
 
