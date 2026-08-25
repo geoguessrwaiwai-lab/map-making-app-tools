@@ -206,19 +206,21 @@
     applyFilter();
   }
 
-  function findNativeTagLi(name) {
+  /** 同名タグが複数存在する可能性があるため、一致する全てのliを返す。 */
+  function findNativeTagLis(name) {
+    const matches = [];
     if (!tagListEl) {
-      return null;
+      return matches;
     }
 
     for (const li of tagListEl.querySelectorAll(":scope > li.tag.has-button")) {
       const textEl = li.querySelector(".tag__text");
       if (textEl && getTagName(textEl) === name) {
-        return li;
+        matches.push(li);
       }
     }
 
-    return null;
+    return matches;
   }
 
   function isNativeTagSelected(li) {
@@ -240,14 +242,11 @@
    */
   function handleSelectAllForGroup(group, shouldSelectAll) {
     for (const name of getGroupTagNames(group.id)) {
-      const li = findNativeTagLi(name);
-      if (!li) {
-        continue;
-      }
-
-      const selected = isNativeTagSelected(li);
-      if (shouldSelectAll !== selected) {
-        li.click();
+      for (const li of findNativeTagLis(name)) {
+        const selected = isNativeTagSelected(li);
+        if (shouldSelectAll !== selected) {
+          li.click();
+        }
       }
     }
 
@@ -656,7 +655,7 @@
       const selectAllLabel = document.createElement("label");
       selectAllLabel.className = "mma-tag-groups__select-all";
       const groupTagNames = getGroupTagNames(group.id);
-      const groupTagLis = groupTagNames.map((name) => findNativeTagLi(name)).filter(Boolean);
+      const groupTagLis = groupTagNames.flatMap((name) => findNativeTagLis(name));
       const selectAllChecked =
         groupTagLis.length > 0 && groupTagLis.every((li) => isNativeTagSelected(li));
       const selectAllCheckbox = document.createElement("input");
