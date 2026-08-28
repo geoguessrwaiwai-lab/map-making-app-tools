@@ -75,7 +75,7 @@ assert(pageScript.world === "MAIN", "page.js must run in MAIN world to use the e
 assert(JSON.stringify(mapListScript.matches) === JSON.stringify(["https://map-making.app/"]), "the top page content script must remain limited to the map list page");
 assert(JSON.stringify(mapListScript.js) === JSON.stringify(["map-list.js"]), "top page content script entry point must be map-list.js");
 assert(JSON.stringify(mapListScript.css) === JSON.stringify(["map-list.css"]), "top page content stylesheet must be map-list.css");
-assert(mapListScript.run_at === "document_idle", "top page content script must run at document_idle");
+assert(mapListScript.run_at === "document_start", "the top page script must run at document_start so the native list never flashes before the folder view");
 assert(!Object.hasOwn(mapListScript, "world"), "map-list.js must run in the isolated world");
 
 for (const path of Object.values(manifest.icons ?? {})) {
@@ -191,8 +191,10 @@ for (const [name, pattern] of forbiddenPatterns) {
 }
 
 assert(mapListSource.includes("const TARGET_PATH = /^\\/$/"), "the top page runtime path check must remain limited to the exact map list path");
-assert(mapListSource.includes('const NATIVE_LIST_SELECTOR = \'[data-replace="InteractiveMapList"]\''), "the heading view must attach only to the site's own map list container");
-assert(mapListSource.includes("HEADINGS_KEY"), "heading definitions must be namespaced in extension storage");
+assert(mapListSource.includes('const NATIVE_LIST_SELECTOR = \'[data-replace="InteractiveMapList"]\''), "the folder view must attach only to the site's own map list container");
+assert(mapListSource.includes("HEADINGS_KEY"), "folder definitions must be namespaced in extension storage");
+assert(mapListSource.includes("BOOTING_CLASS") && mapListStyles.includes(".mma-map-list-booting"), "the native list must stay hidden until the folder view has rendered");
+assert(mapListSource.includes('document.readyState !== "loading"'), "attaching must wait for the parsed document so the #data block and updates section are available");
 assert(mapListSource.includes("FAVORITES_KEY"), "favorites must be namespaced in extension storage");
 assert(mapListSource.includes("COUNTRIES_KEY"), "country chips must be namespaced in extension storage");
 assert(mapListSource.includes("TAGS_KEY"), "map tags must be namespaced in extension storage");
@@ -217,8 +219,8 @@ assert(
 );
 assert(mapListStyles.includes("flex: 1 1 100px") && mapListStyles.includes("min-width: 0"), "map card titles must be able to shrink and ellipsize instead of overflowing narrow columns");
 assert(mapListSource.includes("document.body.append(footerEl)"), "the footer must attach to the end of the page, not a width-constrained container");
-assert(mapListStyles.includes(".mma-map-list__board") && mapListStyles.includes("grid-template-columns: 1fr 1fr"), "heading sections must be arranged in a two-column grid");
-assert(mapListStyles.includes(".mma-map-list__section--right"), "the unassigned section must be pinned to the right column of the heading grid");
+assert(mapListStyles.includes(".mma-map-list__board") && mapListStyles.includes("grid-template-columns: 1fr 1fr"), "folder sections must be arranged in a two-column grid");
+assert(mapListStyles.includes(".mma-map-list__section--right"), "the unassigned section must be pinned to the right column of the folder grid");
 assert(mapListSource.includes('unassignedSection.classList.add("mma-map-list__section--right")'), "the unassigned section must always be routed to the right-column class");
 
 assert(pageSource.includes('const PANORAMA_SELECTOR = ".location-preview__panorama"'), "pochi-pochi mode must watch the supplied panorama DOM");
@@ -250,7 +252,8 @@ assert(contentStyles.includes('.mma-pochipochi-control[data-initializing="true"]
 assert(optionsHtml.includes('id="resize-enabled"'), "the options page must show the screen width switch");
 assert(optionsHtml.includes('id="pochipochi-enabled"'), "the options page must show the Pochi-pochi feature switch");
 assert(optionsHtml.includes('id="pochipochi-default-enabled"'), "the options page must show the Pochi-pochi default switch");
-assert(optionsHtml.includes('id="map-list-enabled"'), "the options page must show the heading view switch");
+assert(optionsHtml.includes('id="map-list-enabled"'), "the options page must show the folder view switch");
+assert(optionsHtml.includes('id="map-list-new-tab"'), "the options page must show the open-in-new-tab switch");
 assert(optionsHtml.includes('id="url-settings-search"'), "the options page must provide partial URL search");
 assert(optionsHtml.includes('id="url-settings-list"'), "the options page must list per-URL settings");
 assert(optionsHtml.includes('id="url-settings-delete-all"'), "the options page must provide bulk deletion for per-URL settings");
@@ -261,7 +264,12 @@ assert(/\.url-settings-list\s*\{[^}]*max-height:\s*320px[^}]*overflow-y:\s*auto/
 assert(optionsSource.includes('key: "mma-feature-screen-resize-enabled"'), "the options page must control screen width adjustment");
 assert(optionsSource.includes('key: "mma-feature-pochipochi-enabled"'), "the options page must control Pochi-pochi mode");
 assert(optionsSource.includes('key: "mma-pochipochi-default-enabled"'), "the options page must control the global Pochi-pochi default");
-assert(optionsSource.includes('key: "mma-feature-map-list-enabled"'), "the options page must control the heading view feature");
+assert(optionsSource.includes('key: "mma-feature-map-list-enabled"'), "the options page must control the folder view feature");
+assert(optionsSource.includes('key: "mma-map-list-new-tab-enabled"'), "the options page must control whether map links open in a new tab");
+assert(
+  mapListSource.includes("NEW_TAB_KEY") && mapListSource.includes('link.target = "_blank"'),
+  "map cards must open in a new tab when the setting is on"
+);
 assert(contentSource.includes("SETTINGS_READY_EVENT"), "the isolated-world storage bridge must announce when it is ready");
 assert(pageSource.includes("SETTINGS_READY_EVENT, requestStoredSetting"), "the MAIN-world control must retry after the storage bridge is ready");
 assert(pageSource.includes("requestStoredSetting()"), "the saved URL default must be requested when the control mounts");

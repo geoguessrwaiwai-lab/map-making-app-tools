@@ -2,6 +2,13 @@
   display: none !important;
 }
 
+/* リロード直後、設定を読み込んで独自UIを描画し終えるまでネイティブの一覧を見せない。
+   display:noneにすると場所ごと詰まってしまうため、領域は保ったまま非表示にする。 */
+.mma-map-list-booting [data-replace="InteractiveMapList"],
+.mma-map-list-booting section.updates {
+  visibility: hidden !important;
+}
+
 /* Updatesセクションを畳んだ状態では、そのために確保されていた右側の余白を
    「Your Maps」側へ譲り渡す（ネイティブ側のカラム分割を無効化して全幅を使う）。 */
 .page-map-list:has(section.updates.mma-map-list-updates-hidden) {
@@ -16,19 +23,90 @@
 
 .mma-map-list__footer {
   display: flex;
-  flex-wrap: wrap;
   box-sizing: border-box;
   width: 100%;
-  align-items: center;
-  justify-content: center;
-  gap: 8px 28px;
+  flex-direction: column;
+  gap: 8px;
   margin: 24px 0 0;
   padding: 10px 20px;
   border-top: 1px solid rgb(255 255 255 / 14%);
-  background: rgb(15 23 42 / 70%);
   font-size: 12px;
   line-height: 1.3;
-  text-align: center;
+}
+
+.mma-map-list__footer-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px 20px;
+}
+
+/* 2段目は1段目とdividerで区切り、注記を左端、表示切り替えを中央に置く。 */
+.mma-map-list__footer-row--note {
+  padding-top: 8px;
+  border-top: 1px solid rgb(255 255 255 / 14%);
+}
+
+.mma-map-list__footer .mma-map-list__footnote {
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  opacity: 0.7;
+  text-align: left;
+}
+
+.mma-map-list__footer-slot {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  align-items: center;
+  gap: 6px 18px;
+}
+
+.mma-map-list__footer-slot--left {
+  justify-content: flex-start;
+}
+
+.mma-map-list__footer-slot--center {
+  justify-content: center;
+}
+
+.mma-map-list__footer-slot--right {
+  justify-content: flex-end;
+}
+
+/* 移動してきたネイティブのノードは、フッターでは1行のテキストとして横並びにする。
+   ネイティブ側の同じ詳細度のルールに確実に勝てるよう、フッターのクラスから指定する。 */
+.mma-map-list__footer .mma-map-list__footer-slot > * {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  text-align: left;
+}
+
+/* ネイティブのカード／ボタン風の装飾（背景・枠・太字・下線）を落として、ただのテキストとして見せる。
+   装飾が内側のラッパーに付いていることがあるため子孫まで含め、サイト側の指定に確実に勝つよう!importantで打ち消す。 */
+.mma-map-list__footer .mma-map-list__footer-slot > *,
+.mma-map-list__footer .mma-map-list__footer-slot :where(a, div, p, span, button) {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  font-weight: inherit !important;
+  text-decoration: none !important;
+}
+
+.mma-map-list__footer .mma-map-list__footer-slot a:hover {
+  text-decoration: underline !important;
+}
+
+/* 説明文（「learn how to use the app」など）はフッターでは省き、名前だけを出す。 */
+.mma-map-list__footer .ctas__label {
+  display: none;
 }
 
 .mma-map-list__footer .ctas {
@@ -40,37 +118,52 @@
   margin: 0;
 }
 
+/* 背景を外すと、色指定のないアイコン（Manual）が黒のままで見えなくなるため文字色に合わせる。
+   Discordのpathはfill属性を自前で持っているため、ここでの指定には影響されない。 */
 .mma-map-list__footer .ctas__icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 .mma-map-list__footer .ctas__title,
 .mma-map-list__footer .ctas__label {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.2;
 }
 
-.mma-map-list__footer .updates__version {
-  margin: 0;
+.mma-map-list__footer-icon {
+  font-size: 13px;
+  line-height: 1;
 }
 
-.mma-map-list__updates-toggle {
+/* 中央の項目はボタンではなくテキストとして見せる。 */
+.mma-map-list__footer-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
-  border: 1px solid rgb(255 255 255 / 20%);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 8%);
+  padding: 0;
+  border: 0;
+  background: none;
   color: inherit;
   font: inherit;
   font-size: 12px;
   cursor: pointer;
 }
 
-.mma-map-list__updates-toggle:hover {
-  background: rgb(255 255 255 / 16%);
+.mma-map-list__footer-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+  .mma-map-list__footer-row {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .mma-map-list__footer-slot {
+    justify-content: center;
+  }
 }
 
 .mma-map-list {
@@ -110,7 +203,7 @@
     grid-column: 1 / -1;
   }
 
-  /* 未分類は見出し（フォルダ）の並びに関わらず、常に右側のカラムへ固定する。 */
+  /* 未分類はフォルダの並びに関わらず、常に右側のカラムへ固定する。 */
   .mma-map-list__section--right {
     grid-column: 2;
   }
@@ -123,15 +216,40 @@
   align-items: center;
 }
 
-.mma-map-list__search {
+.mma-map-list__search-field {
+  position: relative;
+  display: flex;
   flex: 1 1 220px;
   min-width: 160px;
-  padding: 9px 12px;
+  max-width: 300px;
+  align-items: center;
+}
+
+.mma-map-list__search-icon {
+  position: absolute;
+  left: 10px;
+  width: 18px;
+  height: 18px;
+  fill: var(--mma-ml-muted);
+  pointer-events: none;
+}
+
+.mma-map-list__search {
+  width: 100%;
+  padding: 9px 12px 9px 34px;
   border: 1px solid var(--mma-ml-border);
   border-radius: 10px;
   background: var(--mma-ml-surface-2);
   color: var(--mma-ml-text);
   font: inherit;
+}
+
+/* 「＋ 新しいマップ」「＋ フォルダを追加」はツールバーの右端へ寄せる。 */
+.mma-map-list__toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: auto;
+  gap: 10px;
 }
 
 .mma-map-list__button {
@@ -153,12 +271,10 @@
   background: transparent;
 }
 
-.mma-map-list__spacer {
-  flex: 1 1 auto;
-}
-
 .mma-map-list__switch-view {
-  color: var(--mma-ml-muted);
+  /* フッターの中ではvarの定義元（.mma-map-list）の外に出るため、フォールバックを持たせる。 */
+  color: var(--mma-ml-muted, inherit);
+  font: inherit;
   font-size: 12px;
   text-decoration: underline;
   cursor: pointer;
@@ -246,7 +362,7 @@
   padding: 10px;
   color: var(--mma-ml-muted);
   font-size: 12px;
-  content: "ここにマップをドラッグ、またはカードの「見出しへ移動」から追加できます";
+  content: "ここにマップをドラッグ、またはカードの「フォルダへ移動」から追加できます";
 }
 
 .mma-map-list__card {
@@ -410,6 +526,11 @@
   color: #172033;
   box-shadow: 0 24px 70px rgb(15 23 42 / 30%);
   font: 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Updatesのポップアップだけは、変更履歴が読みやすいよう通常の2倍の幅にする。 */
+.mma-map-list-modal--wide {
+  width: min(840px, calc(100% - 32px));
 }
 
 .mma-map-list-modal__title {

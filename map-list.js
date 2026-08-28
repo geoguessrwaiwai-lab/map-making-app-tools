@@ -5,8 +5,12 @@
   const NATIVE_LIST_SELECTOR = '[data-replace="InteractiveMapList"]';
   const UPDATES_SECTION_SELECTOR = "section.updates";
   const UPDATES_HIDDEN_CLASS = "mma-map-list-updates-hidden";
+  const BOOTING_CLASS = "mma-map-list-booting";
+  // 設定の読み込みが終わらない・一覧が見つからないときに、ページを隠したままにしないための保険。
+  const BOOTING_TIMEOUT_MS = 2000;
   const FEATURE_KEY = "mma-feature-map-list-enabled";
   const VIEW_MODE_KEY = "mma-map-list-view-mode";
+  const NEW_TAB_KEY = "mma-map-list-new-tab-enabled";
   const HEADINGS_KEY = "mma-map-list-headings";
   const FAVORITES_KEY = "mma-map-list-favorites";
   const COUNTRIES_KEY = "mma-map-list-countries";
@@ -15,6 +19,13 @@
   const FAVORITES_ID = "__favorites__";
   const LABEL_MAX_LENGTH = 24;
   const PRODUCT_URL = "https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/";
+  // フッターの左右スロットは、ネイティブのノードの文言だけを見て振り分ける。
+  const ACCOUNT_TEXT_PATTERN = /log\s*out|sign\s*out|user\s*settings/i;
+  const CREDIT_TEXT_PATTERN = /version|reanna|©/i;
+  const FOOTER_ICONS = [
+    { pattern: /manual|マニュアル/i, icon: "📘" },
+    { pattern: /discord/i, icon: "💬" }
+  ];
   const TAG_PALETTE = [
     "#f87171", "#fb923c", "#fbbf24", "#a3e635", "#34d399",
     "#22d3ee", "#60a5fa", "#a78bfa", "#f472b6", "#94a3b8"
@@ -43,8 +54,10 @@
   ];
 
   let featureEnabled = true;
+  let openInNewTab = true;
   let settingsLoaded = false;
   let contextInvalidated = false;
+  let bootingTimer = null;
 
   let nativeListEl = null;
   let nativeListObserver = null;
@@ -54,6 +67,7 @@
   let updatesToggleButton = null;
   let footerEl = null;
   let movedFooterNodes = [];
+  let injectedFooterIcons = [];
 
   let mapsById = new Map();
   let headingsData = null;
@@ -85,6 +99,7 @@
     contextInvalidated = true;
     mutationObserver.disconnect();
     detach();
+    clearBooting();
   }
 
   function flagFromCode(code) {
@@ -160,7 +175,8 @@
         FAVORITES_KEY,
         COUNTRIES_KEY,
         TAGS_KEY,
-        VIEW_MODE_KEY
+        VIEW_MODE_KEY,
+        NEW_TAB_KEY
       ]);
 
       const headings = stored[HEADINGS_KEY];
@@ -202,6 +218,7 @@
           : defaultTagsData();
 
       viewMode = stored[VIEW_MODE_KEY] === "native" ? "native" : "custom";
+      openInNewTab = stored[NEW_TAB_KEY] !== false;
 
       return true;
     } catch (error) {
@@ -215,6 +232,7 @@
       countries = {};
       tagsData = defaultTagsData();
       viewMode = "custom";
+      openInNewTab = true;
       return true;
     }
   }
@@ -303,7 +321,7 @@
     return null;
   }
 
-  /** 見出しの初回自動生成用に、ネイティブのフォルダ構造を1回だけ読み取る。 */
+  /** 拡張機能側フォルダの初回自動生成用に、ネイティブのフォルダ構造を1回だけ読み取る。 */
   function readNativeFolderSeed() {
     const groups = [];
     const unassigned = [];
@@ -317,7 +335,7 @@
         const label =
           child.getAttribute("data-folder") ||
           child.querySelector(".map-folder__head strong")?.textContent?.trim() ||
-          "見出し";
+          "フォルダ";
         const ids = [];
         for (const link of child.querySelectorAll("a.map-link[href]")) {
           const match = link.getAttribute("href")?.match(/\/maps\/(\d+)/);
@@ -359,7 +377,7 @@
     return true;
   }
 
-  /** 新規作成・削除で増減したマップIDを、見出し/未分類/お気に入り/国/タグへ反映する。 */
+  /** 新規作成・削除で増減したマップIDを、フォルダ/未分類/お気に入り/国/タグへ反映する。 */
   function reconcileMapIds() {
     let changed = seedHeadingsIfNeeded();
     const currentIds = new Set(mapsById.keys());
@@ -438,7 +456,7 @@
     refreshTimer = window.setTimeout(refreshFromNative, 60);
   }
 
-  /* ---------- 見出し・カードの移動 ---------- */
+  /* ---------- フォルダ・カードの移動 ---------- */
 
   function findSectionArray(sectionId) {
     if (sectionId === UNASSIGNED_ID) {
@@ -509,7 +527,7 @@
     document.addEventListener("keydown", handleKeydown, true);
     document.body.append(overlay);
 
-    return { body, footer, close };
+    return { panel, body, footer, close };
   }
 
   function onEnterKey(input, handler) {
@@ -531,7 +549,7 @@
     return button;
   }
 
-  /* ---------- 見出し追加・編集・削除 ---------- */
+  /* ---------- フォルダ追加・編集・削除 ---------- */
 
   function openHeadingFormModal(titleText, initialLabel, onSubmit) {
     const modal = openModal(titleText);
@@ -552,7 +570,7 @@
 
     const label = document.createElement("label");
     label.className = "mma-map-list-modal__label";
-    label.textContent = `見出し名（絵文字も入力できます・${LABEL_MAX_LENGTH}文字まで）`;
+    label.textContent = `フォルダ名（絵文字も入力できます・${LABEL_MAX_LENGTH}文字まで）`;
     const input = document.createElement("input");
     input.type = "text";
     input.className = "mma-map-list-modal__input";
@@ -587,7 +605,7 @@
   }
 
   function handleAddHeading() {
-    openHeadingFormModal("見出しを追加", "", (label) => {
+    openHeadingFormModal("フォルダを追加", "", (label) => {
       headingsData.headings.push({ id: crypto.randomUUID(), label, mapIds: [] });
       persistHeadings();
       render();
@@ -595,7 +613,7 @@
   }
 
   function handleRenameHeading(heading) {
-    openHeadingFormModal("見出し名を変更", heading.label, (label) => {
+    openHeadingFormModal("フォルダ名を変更", heading.label, (label) => {
       heading.label = label;
       persistHeadings();
       render();
@@ -603,7 +621,7 @@
   }
 
   function handleDeleteHeading(heading) {
-    const modal = openModal("見出しを削除しますか？");
+    const modal = openModal("フォルダを削除しますか？");
     const message = document.createElement("p");
     message.className = "mma-map-list-modal__message";
     message.textContent = `「${heading.label}」を削除します。含まれていたマップは未分類に移動します。`;
@@ -874,6 +892,10 @@
     link.className = "mma-map-list__link";
     link.href = `/maps/${map.id}`;
     link.textContent = map.name;
+    if (openInNewTab) {
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+    }
     card.append(link);
 
     const count = document.createElement("span");
@@ -923,7 +945,7 @@
     if (movable) {
       const moveSelect = document.createElement("select");
       moveSelect.className = "mma-map-list__move-select";
-      moveSelect.title = "見出しへ移動";
+      moveSelect.title = "フォルダへ移動";
       for (const option of allSectionOptions()) {
         const optionEl = document.createElement("option");
         optionEl.value = option.id;
@@ -1002,19 +1024,19 @@
       addButton.type = "button";
       addButton.className = "mma-map-list__icon-button";
       addButton.textContent = "＋";
-      addButton.title = "この見出しに新しいマップを作成";
+      addButton.title = "このフォルダに新しいマップを作成";
       addButton.addEventListener("click", () => handleAddMapToHeading(heading));
       const renameButton = document.createElement("button");
       renameButton.type = "button";
       renameButton.className = "mma-map-list__icon-button";
       renameButton.textContent = "✎";
-      renameButton.title = "見出し名を変更";
+      renameButton.title = "フォルダ名を変更";
       renameButton.addEventListener("click", () => handleRenameHeading(heading));
       const deleteButton = document.createElement("button");
       deleteButton.type = "button";
       deleteButton.className = "mma-map-list__icon-button";
       deleteButton.textContent = "×";
-      deleteButton.title = "見出しを削除";
+      deleteButton.title = "フォルダを削除";
       deleteButton.addEventListener("click", () => handleDeleteHeading(heading));
       head.append(addButton, renameButton, deleteButton);
     }
@@ -1061,7 +1083,7 @@
 
     if (viewMode === "native") {
       // フッターへ移動していたUpdates関連のノードを含め、ページを完全に元の状態へ戻す。
-      // 「見出しビューに切り替える」ボタンだけを残した簡素なバーを追加する。
+      // 「フォルダビューに切り替える」ボタンだけを残した簡素なバーを追加する。
       detachFooter();
       nativeListEl.classList.remove("mma-map-list__native-hidden");
       const bar = document.createElement("div");
@@ -1069,7 +1091,7 @@
       const switchButton = document.createElement("button");
       switchButton.type = "button";
       switchButton.className = "mma-map-list__switch-view";
-      switchButton.textContent = "見出しビューに切り替える";
+      switchButton.textContent = "フォルダビューに切り替える";
       switchButton.addEventListener("click", () => {
         viewMode = "custom";
         persistViewMode();
@@ -1096,7 +1118,11 @@
       render();
       search.focus();
     });
-    toolbar.append(search);
+
+    const searchField = document.createElement("label");
+    searchField.className = "mma-map-list__search-field";
+    searchField.append(createSearchIcon(), search);
+    toolbar.append(searchField);
 
     const newMapButton = document.createElement("button");
     newMapButton.type = "button";
@@ -1106,29 +1132,18 @@
       pendingNewMapHeadingId = null;
       findNativeActionButton("New map")?.click();
     });
-    toolbar.append(newMapButton);
+
+    const actions = document.createElement("div");
+    actions.className = "mma-map-list__toolbar-actions";
+    actions.append(newMapButton);
 
     const addHeadingButton = document.createElement("button");
     addHeadingButton.type = "button";
     addHeadingButton.className = "mma-map-list__button mma-map-list__button--ghost";
-    addHeadingButton.textContent = "＋ 見出しを追加";
+    addHeadingButton.textContent = "＋ フォルダを追加";
     addHeadingButton.addEventListener("click", handleAddHeading);
-    toolbar.append(addHeadingButton);
-
-    const spacer = document.createElement("span");
-    spacer.className = "mma-map-list__spacer";
-    toolbar.append(spacer);
-
-    const switchButton = document.createElement("button");
-    switchButton.type = "button";
-    switchButton.className = "mma-map-list__switch-view";
-    switchButton.textContent = "以前の表示に切り替える";
-    switchButton.addEventListener("click", () => {
-      viewMode = "native";
-      persistViewMode();
-      render();
-    });
-    toolbar.append(switchButton);
+    actions.append(addHeadingButton);
+    toolbar.append(actions);
 
     root.append(toolbar);
 
@@ -1161,7 +1176,7 @@
       }
     }
 
-    // 見出し（フォルダ）は2カラムへ自然に流し込み、未分類は常に右カラムへ固定する。
+    // フォルダは2カラムへ自然に流し込み、未分類は常に右カラムへ固定する。
     for (const heading of headingsData.headings) {
       const section = createSection({
         id: heading.id,
@@ -1187,6 +1202,13 @@
 
     root.append(board);
 
+    // 注記はフッターの2段目に置く。フッターを作れなかったときだけ一覧の末尾に出す。
+    if (!footerEl) {
+      root.append(createFootnote());
+    }
+  }
+
+  function createFootnote() {
     const footnote = document.createElement("p");
     footnote.className = "mma-map-list__footnote";
     footnote.append("このUIは拡張機能によって変更されています。 ");
@@ -1196,14 +1218,73 @@
     link.rel = "noopener noreferrer";
     link.textContent = "詳しくはこちら";
     footnote.append(link);
-    root.append(footnote);
+    return footnote;
   }
 
   /* ---------- フッターの作成 ---------- */
 
+  /** 検索フォームの虫眼鏡アイコン（MaterialDesignIconsのmagnify）。 */
+  function createSearchIcon() {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "mma-map-list__search-icon");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute(
+      "d",
+      "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"
+    );
+    svg.append(path);
+    return svg;
+  }
+
+  function createFooterIcon(icon) {
+    const span = document.createElement("span");
+    span.className = "mma-map-list__footer-icon";
+    span.setAttribute("aria-hidden", "true");
+    span.textContent = icon;
+    return span;
+  }
+
+  function createFooterSlot(modifier) {
+    const slot = document.createElement("div");
+    slot.className = `mma-map-list__footer-slot mma-map-list__footer-slot--${modifier}`;
+    return slot;
+  }
+
+  /** ネイティブのノードは複製せず移動するため、元の位置を記録してから移す。 */
+  function moveFooterNode(node, slot) {
+    movedFooterNodes.push({ node, parent: node.parentNode, next: node.nextSibling });
+    slot.append(node);
+  }
+
+  /** ネイティブのノードは構造が読めないため、文言だけを見て左右中央へ振り分ける。 */
+  function footerSlotFor(node, slots) {
+    const text = node.textContent ?? "";
+    if (ACCOUNT_TEXT_PATTERN.test(text)) {
+      return slots.right;
+    }
+    if (CREDIT_TEXT_PATTERN.test(text)) {
+      return slots.left;
+    }
+    return slots.center;
+  }
+
+  /** 中央の項目には先頭にアイコンを付ける。ネイティブが既にアイコンを持つ場合は足さない。 */
+  function prependFooterIcon(node) {
+    if (node.querySelector(".ctas__icon, img, svg, .mma-map-list__footer-icon")) {
+      return;
+    }
+    const match = FOOTER_ICONS.find((entry) => entry.pattern.test(node.textContent ?? ""));
+    const icon = createFooterIcon(match ? match.icon : "🔗");
+    node.prepend(icon);
+    injectedFooterIcons.push(icon);
+  }
+
   /**
    * ネイティブのUpdatesセクションから、変更履歴の本文以外（マニュアル・Discordへの
-   * リンク、Log out／User settings、ReAnnaのクレジット表記）を1つのフッターへ移動する。
+   * リンク、Log out／User settings、バージョンとReAnnaのクレジット表記）を1つのフッターへ移動する。
+   * 左にバージョンとクレジット、中央にUpdates・マニュアル・Discord、右にアカウント操作を置く。
    * 変更履歴の本文（普段見ない情報）だけは、アイコンボタンからのポップアップでのみ見られるようにする。
    * ノードは複製せず移動するため、detachFooter()で元の位置へ正確に戻せるよう記録しておく。
    */
@@ -1220,35 +1301,78 @@
 
     updatesSectionEl = section;
     movedFooterNodes = [];
+    injectedFooterIcons = [];
+
+    const slots = {
+      left: createFooterSlot("left"),
+      center: createFooterSlot("center"),
+      right: createFooterSlot("right")
+    };
 
     updatesToggleButton = document.createElement("button");
     updatesToggleButton.type = "button";
-    updatesToggleButton.className = "mma-map-list__updates-toggle";
-    updatesToggleButton.textContent = "🕘 更新情報を見る";
+    updatesToggleButton.className = "mma-map-list__footer-link";
     updatesToggleButton.title = "更新情報（Updates）をポップアップで見る";
+    updatesToggleButton.append(createFooterIcon("🕘"), document.createTextNode("Updates"));
     updatesToggleButton.addEventListener("click", () => openUpdatesPopup(list));
+    slots.center.append(updatesToggleButton);
+
+    // Log out／User settingsがマニュアル・Discordと同じコンテナに入っていることがあるため、
+    // コンテナごとではなく項目単位で移動して、左右のスロットへ振り分けられるようにする。
+    const ctas = section.querySelector(".ctas");
+    const candidates = [];
+    if (ctas) {
+      candidates.push(...(ctas.children.length > 0 ? [...ctas.children] : [ctas]));
+    }
+    for (const selector of [".updates__version", ":scope > p:last-of-type"]) {
+      const node = section.querySelector(selector);
+      if (node && node !== list && !node.contains(list) && !candidates.includes(node)) {
+        candidates.push(node);
+      }
+    }
+
+    for (const node of candidates) {
+      const slot = footerSlotFor(node, slots);
+      if (slot === slots.center) {
+        prependFooterIcon(node);
+      }
+      moveFooterNode(node, slot);
+    }
+
+    const row = document.createElement("div");
+    row.className = "mma-map-list__footer-row";
+    row.append(slots.left, slots.center, slots.right);
+
+    const switchButton = document.createElement("button");
+    switchButton.type = "button";
+    switchButton.className = "mma-map-list__switch-view";
+    switchButton.textContent = "以前の表示に切り替える";
+    switchButton.addEventListener("click", () => {
+      viewMode = "native";
+      persistViewMode();
+      render();
+    });
+
+    // 2段目は1段目と同じ3分割にして、注記を左端、表示切り替えを中央に置く。
+    const noteRow = document.createElement("div");
+    noteRow.className = "mma-map-list__footer-row mma-map-list__footer-row--note";
+    noteRow.append(createFootnote(), switchButton);
 
     footerEl = document.createElement("footer");
     footerEl.className = "mma-map-list__footer";
-    footerEl.append(updatesToggleButton);
-
-    for (const selector of [".ctas", ".updates__version", ":scope > p:last-of-type"]) {
-      const node = section.querySelector(selector);
-      if (node && node !== list) {
-        movedFooterNodes.push({ node, parent: node.parentNode, next: node.nextSibling });
-        footerEl.append(node);
-      }
-    }
+    // 1段目はネイティブのリンク類、2段目は拡張機能側の注記と表示切り替え。間はdividerで区切る。
+    footerEl.append(row, noteRow);
 
     // ページ本文の幅制約を受けないよう、bodyの末尾（ページ最下部）に直接配置する。
     document.body.append(footerEl);
 
-    // 移動しきれず残った見出し・変更履歴本文だけの、ほぼ空のセクションを畳む。
+    // 移動しきれず残ったフォルダ・変更履歴本文だけの、ほぼ空のセクションを畳む。
     section.classList.add(UPDATES_HIDDEN_CLASS);
   }
 
   function openUpdatesPopup(list) {
     const modal = openModal("Updates");
+    modal.panel.classList.add("mma-map-list-modal--wide");
     modal.body.append(list.cloneNode(true));
     const version = updatesSectionEl?.querySelector(".updates__version");
     if (version) {
@@ -1261,6 +1385,11 @@
     if (!updatesSectionEl && !footerEl) {
       return;
     }
+
+    for (const icon of injectedFooterIcons) {
+      icon.remove();
+    }
+    injectedFooterIcons = [];
 
     for (const { node, parent, next } of movedFooterNodes) {
       parent.insertBefore(node, next);
@@ -1297,6 +1426,8 @@
     }
     render();
 
+    clearBooting();
+
     nativeListObserver = new MutationObserver(scheduleRefresh);
     nativeListObserver.observe(nativeListEl, { childList: true, subtree: true });
   }
@@ -1329,7 +1460,11 @@
       return;
     }
 
-    const isTargetPage = settingsLoaded && featureEnabled && TARGET_PATH.test(location.pathname);
+    const onTargetPage = TARGET_PATH.test(location.pathname);
+    // マップの一覧データ（#dataブロック）とUpdatesセクションは一覧より後ろにあるため、
+    // HTMLの解析が終わるまでは取り付けない。それまではネイティブ側を隠したまま待つ。
+    const documentParsed = document.readyState !== "loading";
+    const isTargetPage = settingsLoaded && featureEnabled && onTargetPage && documentParsed;
     const nextNativeList = isTargetPage ? document.querySelector(NATIVE_LIST_SELECTOR) : null;
 
     if (nativeListEl && (nativeListEl !== nextNativeList || !nativeListEl.isConnected)) {
@@ -1339,6 +1474,29 @@
     if (!nativeListEl && nextNativeList) {
       attach(nextNativeList);
     }
+
+    // 独自UIを出さないと分かった時点で、隠していたネイティブの表示を戻す。
+    if (settingsLoaded && (!featureEnabled || !onTargetPage || (documentParsed && !nextNativeList))) {
+      clearBooting();
+    }
+  }
+
+  /**
+   * リロード直後は、設定を読み込んで独自UIを描画するまでの数十msだけネイティブの一覧が見えてしまう。
+   * document_startの時点で隠しておき、描画が終わった時点、または対象外と分かった時点で表示に戻す。
+   */
+  function markBooting() {
+    if (!TARGET_PATH.test(location.pathname)) {
+      return;
+    }
+    document.documentElement.classList.add(BOOTING_CLASS);
+    bootingTimer = window.setTimeout(clearBooting, BOOTING_TIMEOUT_MS);
+  }
+
+  function clearBooting() {
+    window.clearTimeout(bootingTimer);
+    bootingTimer = null;
+    document.documentElement.classList.remove(BOOTING_CLASS);
   }
 
   const mutationObserver = new MutationObserver(reconcile);
@@ -1346,6 +1504,12 @@
     childList: true,
     subtree: true
   });
+
+  // document_startで動くため、解析完了を待って取り付けられるよう状態変化も見る。
+  document.addEventListener("readystatechange", reconcile);
+  document.addEventListener("DOMContentLoaded", reconcile);
+
+  markBooting();
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== "local") {
@@ -1356,6 +1520,12 @@
       settingsLoaded = true;
       featureEnabled = changes[FEATURE_KEY].newValue !== false;
       reconcile();
+    }
+
+    // 別タブで開く設定は、開いているページのカードにもすぐ反映する。
+    if (Object.hasOwn(changes, NEW_TAB_KEY)) {
+      openInNewTab = changes[NEW_TAB_KEY].newValue !== false;
+      render();
     }
   });
 

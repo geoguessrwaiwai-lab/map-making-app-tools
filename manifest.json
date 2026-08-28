@@ -31,7 +31,7 @@
       "matches": ["https://map-making.app/"],
       "css": ["map-list.css"],
       "js": ["map-list.js"],
-      "run_at": "document_idle"
+      "run_at": "document_start"
     }
   ]
 }

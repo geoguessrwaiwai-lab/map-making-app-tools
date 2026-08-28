@@ -21,6 +21,11 @@
       key: "mma-feature-map-list-enabled",
       defaultValue: true,
       input: document.querySelector("#map-list-enabled")
+    },
+    mapListNewTab: {
+      key: "mma-map-list-new-tab-enabled",
+      defaultValue: true,
+      input: document.querySelector("#map-list-new-tab")
     }
   };
   const URL_SETTING_PREFIX = "mma-pochipochi-default:";
