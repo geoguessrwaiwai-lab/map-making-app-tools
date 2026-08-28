@@ -1,6 +1,6 @@
 # Chrome Web Store 掲載情報
 
-Map Making App Tools `1.3.0` のChrome Web Store提出用情報です。
+Map Making App Tools `1.4.0` のChrome Web Store提出用情報です。
 
 ホームページはCloudflare Workersで公開しています。
 
@@ -27,7 +27,9 @@ Map Making App Toolsは、Map Making Appのマップ編集画面の幅調整と�
 
 「ぽちぽちモード」をONにすると、現在のマップの保存状態を汚すことなく、新しい地点を連続して選択し、閲覧できます。もとから保存されている地点は保護されるため、既存のロケーションを残したまま、新しく確認した候補を続けて整理できます。
 
-外部通信、広告、分析ツール、Cookie、外部JavaScriptは使用しません。拡張機能専用ストレージには、機能別設定、ぽちぽちモードの全体デフォルト、対象のマップURLとURL別のON／OFFだけを保存します。地点ID、pano ID、座標はページ内で一時的に処理し、保存または外部送信しません。
+トップページのマップ一覧には「見出しビュー」を追加しました。ネイティブの一覧の見た目・機能を変えずに視覚的に隠し、見出し（フォルダ的な役割）でグループ化したカード表示を重ねます。見出しの追加・並び替え、マップのお気に入り・国チップ・タグ付けができ、編集・削除やマップ作成はMap Making App本体の操作に委譲します。右上からいつでもネイティブの表示へ切り替えられます。
+
+外部通信、広告、分析ツール、Cookie、外部JavaScriptは使用しません。拡張機能専用ストレージには、機能別設定、ぽちぽちモードの全体デフォルト、対象のマップURLとURL別のON／OFF、見出しビューの見出し構成・お気に入り・国チップ・タグだけを保存します。地点ID、pano ID、座標はページ内で一時的に処理し、保存または外部送信しません。
 
 本拡張機能は非公式であり、Map Making Appまたはその運営者との提携、承認、関係を示すものではありません。
 ```
@@ -61,7 +63,9 @@ Drag the handle in the center of the editor to adjust the widths of the map and 
 
 Turn on Pochi-pochi mode to continuously select and view new locations without cluttering the current map's saved state. Locations that were already saved remain protected, so you can continue reviewing and organizing new candidates while keeping existing locations intact.
 
-The extension does not use external network requests, advertising, analytics tools, cookies, or remote JavaScript. Extension-local storage contains only feature settings, the global Pochi-pochi mode default, the target map URL, and the URL-specific ON/OFF setting. Location IDs, pano IDs, and coordinates are processed temporarily within the page and are neither stored nor transmitted externally.
+The map list on the home page now has a heading view. It visually hides the native list without changing its behavior, and overlays a card layout grouped by user-defined headings. You can add and reorder headings, favorite maps, assign a country chip and tags to each map, and switching views is available at any time. Editing, deleting, and creating maps still delegate to Map Making App's own controls.
+
+The extension does not use external network requests, advertising, analytics tools, cookies, or remote JavaScript. Extension-local storage contains only feature settings, the global Pochi-pochi mode default, the target map URL, the URL-specific ON/OFF setting, and the heading view's headings, favorites, country chips, and tags. Location IDs, pano IDs, and coordinates are processed temporarily within the page and are neither stored nor transmitted externally.
 
 This is an unofficial extension and is not affiliated with, endorsed by, or otherwise associated with Map Making App or its operators.
 ```
@@ -92,25 +96,25 @@ Allow users to adjust Map Making App editor screen widths and, while explicitly 
 ### サイトアクセスの理由
 
 ```text
-本拡張機能はhttps://map-making.app/maps/*でのみコンテンツスクリプトを実行します。対象ページの編集グリッドとロケーションプレビューを検出し、画面幅を調整し、ぽちぽちモード中の地点変更と削除を処理するために必要です。地点ID、pano ID、座標はページ内で一時的に処理するだけで、収集、保存、送信しません。
+本拡張機能はhttps://map-making.app/maps/*とhttps://map-making.app/でのみコンテンツスクリプトを実行します。対象ページの編集グリッドとロケーションプレビュー、またはトップページのマップ一覧を検出し、画面幅を調整し、ぽちぽちモード中の地点変更と削除を処理し、マップ一覧に見出しビューを重ねるために必要です。地点ID、pano ID、座標、マップ名・ID・地点数はページ内で一時的に処理するだけで、収集、保存、送信しません。
 ```
 
 ### Host access justification (English)
 
 ```text
-The content scripts run only on https://map-making.app/maps/* so they can adjust the editor screen width and detect location changes for Pochi-pochi mode. Location IDs, pano IDs, and coordinates are processed temporarily in page memory and are not collected, stored, or transmitted.
+The content scripts run only on https://map-making.app/maps/* and https://map-making.app/ so they can adjust the editor screen width, detect location changes for Pochi-pochi mode, and overlay the heading view on the map list. Location IDs, pano IDs, coordinates, and map names/IDs/location counts are processed temporarily in page memory and are not collected, stored, or transmitted.
 ```
 
 ### `storage`権限の理由
 
 ```text
-機能別の有効・無効、ぽちぽちモードの全体デフォルト、および現在のマップURLをキーとしたON／OFFを拡張機能専用のローカルストレージへ保存するために使用します。地点ID、pano ID、座標、選択履歴は保存しません。
+機能別の有効・無効、ぽちぽちモードの全体デフォルト、現在のマップURLをキーとしたON／OFF、および見出しビューの見出し構成・お気に入り・国チップ・タグを拡張機能専用のローカルストレージへ保存するために使用します。地点ID、pano ID、座標、選択履歴は保存しません。
 ```
 
 ### `storage` permission justification (English)
 
 ```text
-The storage permission saves feature enable/disable preferences, the global Pochi-pochi default, and the ON/OFF value keyed by the current map URL. It does not store location IDs, pano IDs, coordinates, or selection history.
+The storage permission saves feature enable/disable preferences, the global Pochi-pochi default, the ON/OFF value keyed by the current map URL, and the heading view's headings, favorites, country chips, and tags. It does not store location IDs, pano IDs, coordinates, or selection history.
 ```
 
 ### リモートコード
@@ -130,7 +134,7 @@ The storage permission saves feature enable/disable preferences, the global Poch
 - ユーザーのアクティビティ: `収集しない`
 - ウェブサイトのコンテンツ: `収集しない`
 
-ポインターのX座標、地点ID、pano ID、座標は、幅計算またはぽちぽちモードの判定にだけ一時的に使用し、記録、保存、送信しません。機能別設定、全体デフォルト、対象のマップURLとURLごとのON／OFF設定だけを端末内の拡張機能専用ストレージへ保存し、外部へ送信しません。
+ポインターのX座標、地点ID、pano ID、座標は、幅計算またはぽちぽちモードの判定にだけ一時的に使用し、記録、保存、送信しません。機能別設定、全体デフォルト、対象のマップURLとURLごとのON／OFF設定、見出しビューの見出し構成・お気に入り・国チップ・タグだけを端末内の拡張機能専用ストレージへ保存し、外部へ送信しません。
 
 ### 開示・認証項目
 

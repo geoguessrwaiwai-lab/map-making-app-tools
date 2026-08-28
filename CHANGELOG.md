@@ -4,6 +4,21 @@
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-08-28
+
+### Added
+
+- トップページ（`https://map-making.app/`）のマップ一覧に「見出しビュー」を追加。ネイティブの一覧の見た目・機能は変えずに視覚的に隠し、見出し（フォルダ的な役割）でグループ化したカード表示を重ねる
+- 見出しの追加（プリセット＋自由入力）・名称変更・削除、見出し単位・マップ単位のドラッグ並び替え、カードの「見出しへ移動」プルダウン
+- 見出しを選択した状態での新規マップ作成（ネイティブの作成フローに委譲し、作成後に選択中の見出しへ自動追加）
+- マップごとのお気に入り（常に先頭に表示される専用セクション）、国チップ（ユーザーが手動選択、`Intl.DisplayNames`で国名表示）、複数付与できるタグ（名前・色）
+- ✎・🗑からネイティブの設定ダイアログを開く委譲操作、右上のトグルによるネイティブ表示との切り替え
+- 見出しビューを個別にON／OFFできる拡張機能オプション
+- 見出し（フォルダ）を画面幅801px以上で2カラムのグリッド表示にし、「未分類」は常に右側のカラムへ固定する
+- Updatesの折りたたみに合わせて、ネイティブ側が右カラム用に確保していた幅を「Your Maps」側へ譲るようにし、見出しカードが極端に狭くなって内容が重なって見える不具合を修正
+- 「以前の表示に切り替える」でネイティブ表示に戻したとき、フッターへ移動していたUpdates関連のノードが元の位置へ戻らず、ページが完全には元通りにならなかった不具合を修正
+- ネイティブのUpdates（更新履歴）セクションから、マニュアル・Discordへのリンク、Log out／User settings、バージョンとReAnnaのクレジット表記を、ページ最下部に全幅・薄型で表示する1つのフッターへまとめて移動。変更履歴の本文だけは普段は畳んでおき、アイコンボタンから開くポップアップでのみ表示する
+
 ## [1.3.0] - 2026-08-18
 
 ### Fixed
@@ -54,7 +69,8 @@
 
 - 案内サイトを共通の`browser-extensions-site`リポジトリへ移行
 
-[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.0.0...v1.1.0

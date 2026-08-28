@@ -5,7 +5,9 @@ const REQUIRED_EXTENSION_FILES = [
   "manifest.json",
   "content.js",
   "page.js",
+  "map-list.js",
   "content.css",
+  "map-list.css",
   "options.html",
   "options.css",
   "options.js",
@@ -43,17 +45,25 @@ for (const path of REQUIRED_PROJECT_FILES) {
   assert(fs.existsSync(path), `Missing required file: ${path}`);
 }
 
+const makefileSource = fs.readFileSync("Makefile", "utf8");
+const sourcesMatch = makefileSource.match(/^SOURCES := (.+)$/m);
+assert(sourcesMatch, "Makefile must define a SOURCES variable listing the packaged files");
+const packagedSources = sourcesMatch[1].split(/\s+/);
+for (const path of REQUIRED_EXTENSION_FILES) {
+  assert(packagedSources.includes(path), `Makefile SOURCES must include ${path} so it ships in the packaged extension`);
+}
+
 const manifest = JSON.parse(fs.readFileSync("manifest.json", "utf8"));
 assert(manifest.manifest_version === 3, "manifest_version must be 3");
 assert(/^\d+\.\d+\.\d+$/.test(manifest.version), "manifest version must use MAJOR.MINOR.PATCH");
-assert(manifest.version === "1.3.0", "the release package must remain version 1.3.0");
+assert(manifest.version === "1.4.0", "the release package must remain version 1.4.0");
 assert(JSON.stringify(manifest.permissions) === JSON.stringify(["storage"]), "only the storage permission is allowed");
 assert(manifest.options_ui?.page === "options.html", "the extension management page must link to options.html");
 assert(manifest.options_ui?.open_in_tab === true, "the options page must open in a full tab");
 assert(!Object.hasOwn(manifest, "host_permissions") || manifest.host_permissions.length === 0, "host_permissions must remain empty");
-assert(Array.isArray(manifest.content_scripts) && manifest.content_scripts.length === 2, "exactly two content script definitions are required");
+assert(Array.isArray(manifest.content_scripts) && manifest.content_scripts.length === 3, "exactly three content script definitions are required");
 
-const [contentScript, pageScript] = manifest.content_scripts;
+const [contentScript, pageScript, mapListScript] = manifest.content_scripts;
 assert(JSON.stringify(contentScript.matches) === JSON.stringify(["https://map-making.app/maps/*"]), "content script matches must remain limited to Map Making App map paths");
 assert(JSON.stringify(contentScript.js) === JSON.stringify(["content.js"]), "content script entry point must be content.js");
 assert(JSON.stringify(contentScript.css) === JSON.stringify(["content.css"]), "content stylesheet must be content.css");
@@ -62,6 +72,11 @@ assert(JSON.stringify(pageScript.matches) === JSON.stringify(["https://map-makin
 assert(JSON.stringify(pageScript.js) === JSON.stringify(["page.js"]), "MAIN world script entry point must be page.js");
 assert(pageScript.run_at === "document_idle", "MAIN world script must run at document_idle");
 assert(pageScript.world === "MAIN", "page.js must run in MAIN world to use the editor's location API");
+assert(JSON.stringify(mapListScript.matches) === JSON.stringify(["https://map-making.app/"]), "the top page content script must remain limited to the map list page");
+assert(JSON.stringify(mapListScript.js) === JSON.stringify(["map-list.js"]), "top page content script entry point must be map-list.js");
+assert(JSON.stringify(mapListScript.css) === JSON.stringify(["map-list.css"]), "top page content stylesheet must be map-list.css");
+assert(mapListScript.run_at === "document_idle", "top page content script must run at document_idle");
+assert(!Object.hasOwn(mapListScript, "world"), "map-list.js must run in the isolated world");
 
 for (const path of Object.values(manifest.icons ?? {})) {
   assert(fs.existsSync(path), `Missing icon referenced by manifest: ${path}`);
@@ -69,12 +84,15 @@ for (const path of Object.values(manifest.icons ?? {})) {
 
 const contentSource = fs.readFileSync("content.js", "utf8");
 const pageSource = fs.readFileSync("page.js", "utf8");
+const mapListSource = fs.readFileSync("map-list.js", "utf8");
 const contentStyles = fs.readFileSync("content.css", "utf8");
+const mapListStyles = fs.readFileSync("map-list.css", "utf8");
 const optionsHtml = fs.readFileSync("options.html", "utf8");
 const optionsStyles = fs.readFileSync("options.css", "utf8");
 const optionsSource = fs.readFileSync("options.js", "utf8");
 new vm.Script(contentSource, { filename: "content.js" });
 new vm.Script(pageSource, { filename: "page.js" });
+new vm.Script(mapListSource, { filename: "map-list.js" });
 new vm.Script(optionsSource, { filename: "options.js" });
 
 assert(contentSource.includes("/^\\/maps\\/\\d+\\/?$/"), "runtime path check must remain limited to numeric map IDs");
@@ -168,8 +186,40 @@ const forbiddenPatterns = [
 for (const [name, pattern] of forbiddenPatterns) {
   assert(!pattern.test(contentSource), `content.js must not use ${name}`);
   assert(!pattern.test(pageSource), `page.js must not use ${name}`);
+  assert(!pattern.test(mapListSource), `map-list.js must not use ${name}`);
   assert(!pattern.test(optionsSource), `options.js must not use ${name}`);
 }
+
+assert(mapListSource.includes("const TARGET_PATH = /^\\/$/"), "the top page runtime path check must remain limited to the exact map list path");
+assert(mapListSource.includes('const NATIVE_LIST_SELECTOR = \'[data-replace="InteractiveMapList"]\''), "the heading view must attach only to the site's own map list container");
+assert(mapListSource.includes("HEADINGS_KEY"), "heading definitions must be namespaced in extension storage");
+assert(mapListSource.includes("FAVORITES_KEY"), "favorites must be namespaced in extension storage");
+assert(mapListSource.includes("COUNTRIES_KEY"), "country chips must be namespaced in extension storage");
+assert(mapListSource.includes("TAGS_KEY"), "map tags must be namespaced in extension storage");
+assert(mapListSource.includes("findNativeEditButton"), "edit/delete must be delegated to the site's own settings dialog");
+assert(mapListSource.includes('findNativeActionButton("New map")'), "new map creation must be delegated to the site's own button");
+assert(mapListSource.includes("mma-map-list__native-hidden"), "the native list must only be hidden visually, not removed");
+assert(mapListStyles.includes(".mma-map-list__native-hidden"), "the native-hidden class must be defined in map-list.css");
+assert(mapListSource.includes('const UPDATES_SECTION_SELECTOR = "section.updates"'), "the footer must be built from the site's own updates section");
+assert(mapListSource.includes("attachFooter"), "the footer (Updates toggle, CTAs, logout links, credit) must be assembled on attach");
+assert(mapListSource.includes("movedFooterNodes"), "nodes moved into the footer must be tracked so they can be restored on detach");
+assert(mapListSource.includes("openUpdatesPopup"), "the collapsed Updates changelog must be viewable again through a popup");
+assert(mapListSource.includes("detachFooter"), "the footer must be reverted (native nodes restored) on detach");
+assert(
+  /viewMode === "native"\) \{[\s\S]{0,120}detachFooter\(\)/.test(mapListSource),
+  "switching to the native view must fully restore the footer, not just unhide the native map list"
+);
+assert(mapListSource.includes('".updates__version"') && mapListSource.includes(".ctas"), "the footer must include the ReAnna credit line and the manual/Discord CTAs");
+assert(mapListStyles.includes(".mma-map-list__footer"), "the footer must have its own layout styling");
+assert(
+  mapListStyles.includes(".page-map-list:has(section.updates.mma-map-list-updates-hidden)"),
+  "the Your Maps column must reclaim the width freed up by collapsing the native Updates column"
+);
+assert(mapListStyles.includes("flex: 1 1 100px") && mapListStyles.includes("min-width: 0"), "map card titles must be able to shrink and ellipsize instead of overflowing narrow columns");
+assert(mapListSource.includes("document.body.append(footerEl)"), "the footer must attach to the end of the page, not a width-constrained container");
+assert(mapListStyles.includes(".mma-map-list__board") && mapListStyles.includes("grid-template-columns: 1fr 1fr"), "heading sections must be arranged in a two-column grid");
+assert(mapListStyles.includes(".mma-map-list__section--right"), "the unassigned section must be pinned to the right column of the heading grid");
+assert(mapListSource.includes('unassignedSection.classList.add("mma-map-list__section--right")'), "the unassigned section must always be routed to the right-column class");
 
 assert(pageSource.includes('const PANORAMA_SELECTOR = ".location-preview__panorama"'), "pochi-pochi mode must watch the supplied panorama DOM");
 assert(pageSource.includes('const MAP_SELECTOR = ".map-embed"'), "pochi-pochi mode must capture clicks from the supplied map DOM");
@@ -200,6 +250,7 @@ assert(contentStyles.includes('.mma-pochipochi-control[data-initializing="true"]
 assert(optionsHtml.includes('id="resize-enabled"'), "the options page must show the screen width switch");
 assert(optionsHtml.includes('id="pochipochi-enabled"'), "the options page must show the Pochi-pochi feature switch");
 assert(optionsHtml.includes('id="pochipochi-default-enabled"'), "the options page must show the Pochi-pochi default switch");
+assert(optionsHtml.includes('id="map-list-enabled"'), "the options page must show the heading view switch");
 assert(optionsHtml.includes('id="url-settings-search"'), "the options page must provide partial URL search");
 assert(optionsHtml.includes('id="url-settings-list"'), "the options page must list per-URL settings");
 assert(optionsHtml.includes('id="url-settings-delete-all"'), "the options page must provide bulk deletion for per-URL settings");
@@ -210,6 +261,7 @@ assert(/\.url-settings-list\s*\{[^}]*max-height:\s*320px[^}]*overflow-y:\s*auto/
 assert(optionsSource.includes('key: "mma-feature-screen-resize-enabled"'), "the options page must control screen width adjustment");
 assert(optionsSource.includes('key: "mma-feature-pochipochi-enabled"'), "the options page must control Pochi-pochi mode");
 assert(optionsSource.includes('key: "mma-pochipochi-default-enabled"'), "the options page must control the global Pochi-pochi default");
+assert(optionsSource.includes('key: "mma-feature-map-list-enabled"'), "the options page must control the heading view feature");
 assert(contentSource.includes("SETTINGS_READY_EVENT"), "the isolated-world storage bridge must announce when it is ready");
 assert(pageSource.includes("SETTINGS_READY_EVENT, requestStoredSetting"), "the MAIN-world control must retry after the storage bridge is ready");
 assert(pageSource.includes("requestStoredSetting()"), "the saved URL default must be requested when the control mounts");

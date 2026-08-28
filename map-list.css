@@ -1,0 +1,534 @@
+.mma-map-list-updates-hidden {
+  display: none !important;
+}
+
+/* Updatesセクションを畳んだ状態では、そのために確保されていた右側の余白を
+   「Your Maps」側へ譲り渡す（ネイティブ側のカラム分割を無効化して全幅を使う）。 */
+.page-map-list:has(section.updates.mma-map-list-updates-hidden) {
+  display: block !important;
+}
+
+.page-map-list:has(section.updates.mma-map-list-updates-hidden) > section:first-child {
+  width: 100% !important;
+  max-width: none !important;
+  flex: 1 1 auto !important;
+}
+
+.mma-map-list__footer {
+  display: flex;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 28px;
+  margin: 24px 0 0;
+  padding: 10px 20px;
+  border-top: 1px solid rgb(255 255 255 / 14%);
+  background: rgb(15 23 42 / 70%);
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.mma-map-list__footer .ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.mma-map-list__footer .ctas__icon {
+  width: 18px;
+  height: 18px;
+}
+
+.mma-map-list__footer .ctas__title,
+.mma-map-list__footer .ctas__label {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.mma-map-list__footer .updates__version {
+  margin: 0;
+}
+
+.mma-map-list__updates-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 8%);
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mma-map-list__updates-toggle:hover {
+  background: rgb(255 255 255 / 16%);
+}
+
+.mma-map-list {
+  --mma-ml-surface: rgb(17 24 39 / 88%);
+  --mma-ml-surface-2: rgb(30 41 59 / 88%);
+  --mma-ml-border: rgb(255 255 255 / 14%);
+  --mma-ml-text: #f8fafc;
+  --mma-ml-muted: #94a3b8;
+  --mma-ml-accent: #3b82f6;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+  color: var(--mma-ml-text);
+  font: 14px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.mma-map-list__native-hidden {
+  display: none !important;
+}
+
+.mma-map-list__board {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 801px) {
+  .mma-map-list__board {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: 12px 16px;
+  }
+
+  .mma-map-list__section--span {
+    grid-column: 1 / -1;
+  }
+
+  /* 未分類は見出し（フォルダ）の並びに関わらず、常に右側のカラムへ固定する。 */
+  .mma-map-list__section--right {
+    grid-column: 2;
+  }
+}
+
+.mma-map-list__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.mma-map-list__search {
+  flex: 1 1 220px;
+  min-width: 160px;
+  padding: 9px 12px;
+  border: 1px solid var(--mma-ml-border);
+  border-radius: 10px;
+  background: var(--mma-ml-surface-2);
+  color: var(--mma-ml-text);
+  font: inherit;
+}
+
+.mma-map-list__button {
+  padding: 8px 14px;
+  border: 1px solid var(--mma-ml-border);
+  border-radius: 10px;
+  background: var(--mma-ml-surface-2);
+  color: var(--mma-ml-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mma-map-list__button:hover {
+  border-color: var(--mma-ml-accent);
+}
+
+.mma-map-list__button--ghost {
+  background: transparent;
+}
+
+.mma-map-list__spacer {
+  flex: 1 1 auto;
+}
+
+.mma-map-list__switch-view {
+  color: var(--mma-ml-muted);
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.mma-map-list__switch-view:hover {
+  color: var(--mma-ml-text);
+}
+
+.mma-map-list__section {
+  border: 1px solid var(--mma-ml-border);
+  border-radius: 14px;
+  background: var(--mma-ml-surface);
+  overflow: hidden;
+}
+
+.mma-map-list__section[hidden] {
+  display: none;
+}
+
+.mma-map-list__section.mma-map-list__section--drag-over {
+  outline: 2px solid var(--mma-ml-accent);
+  outline-offset: -2px;
+}
+
+.mma-map-list__section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--mma-ml-border);
+  cursor: grab;
+}
+
+.mma-map-list__section-head[draggable="false"] {
+  cursor: default;
+}
+
+.mma-map-list__section-title {
+  flex: 1 1 auto;
+  overflow: hidden;
+  font-weight: 700;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mma-map-list__section-count {
+  color: var(--mma-ml-muted);
+  font-weight: 400;
+}
+
+.mma-map-list__icon-button {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--mma-ml-muted);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mma-map-list__icon-button:hover {
+  background: rgb(255 255 255 / 10%);
+  color: var(--mma-ml-text);
+}
+
+.mma-map-list__cards {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  gap: 4px;
+  min-height: 8px;
+}
+
+.mma-map-list__cards:empty::after {
+  display: block;
+  padding: 10px;
+  color: var(--mma-ml-muted);
+  font-size: 12px;
+  content: "ここにマップをドラッグ、またはカードの「見出しへ移動」から追加できます";
+}
+
+.mma-map-list__card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  row-gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+
+.mma-map-list__card:hover {
+  background: rgb(255 255 255 / 6%);
+}
+
+.mma-map-list__card.mma-map-list__card--drag-over {
+  border-color: var(--mma-ml-accent);
+}
+
+.mma-map-list__card[data-dragging="true"] {
+  opacity: 0.4;
+}
+
+.mma-map-list__drag-handle {
+  flex: 0 0 auto;
+  color: var(--mma-ml-muted);
+  cursor: grab;
+}
+
+.mma-map-list__heart {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mma-ml-muted);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.mma-map-list__heart[data-active="true"] {
+  color: #f43f5e;
+}
+
+.mma-map-list__country {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 20px;
+  padding: 0 5px;
+  border: 1px solid var(--mma-ml-border);
+  border-radius: 4px;
+  background: var(--mma-ml-surface-2);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mma-map-list__country--empty {
+  color: var(--mma-ml-muted);
+  font-size: 10px;
+}
+
+.mma-map-list__link {
+  overflow: hidden;
+  flex: 1 1 100px;
+  min-width: 0;
+  color: var(--mma-ml-text);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mma-map-list__link:hover {
+  text-decoration: underline;
+}
+
+.mma-map-list__count {
+  flex: 0 0 auto;
+  color: var(--mma-ml-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.mma-map-list__tags {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.mma-map-list__tag-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #0b1220;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mma-map-list__tag-add {
+  padding: 2px 8px;
+  border: 1px dashed var(--mma-ml-border);
+  border-radius: 999px;
+  background: none;
+  color: var(--mma-ml-muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.mma-map-list__actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 2px;
+}
+
+.mma-map-list__move-select {
+  flex: 0 0 auto;
+  max-width: 140px;
+  padding: 4px 6px;
+  border: 1px solid var(--mma-ml-border);
+  border-radius: 8px;
+  background: var(--mma-ml-surface-2);
+  color: var(--mma-ml-text);
+  font-size: 12px;
+}
+
+.mma-map-list__footnote {
+  padding: 4px 2px 0;
+  color: var(--mma-ml-muted);
+  font-size: 12px;
+}
+
+.mma-map-list__footnote a {
+  color: inherit;
+}
+
+/* モーダル（tag-groups.jsのモーダル基盤と共通のクラス命名規則） */
+
+.mma-map-list-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(15 23 42 / 55%);
+}
+
+.mma-map-list-modal {
+  width: min(420px, calc(100% - 32px));
+  max-height: calc(100% - 64px);
+  overflow-y: auto;
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  color: #172033;
+  box-shadow: 0 24px 70px rgb(15 23 42 / 30%);
+  font: 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.mma-map-list-modal__title {
+  margin: 0 0 14px;
+  font-size: 17px;
+}
+
+.mma-map-list-modal__label {
+  display: block;
+  margin-bottom: 12px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.mma-map-list-modal__input {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  color: #172033;
+  font: inherit;
+}
+
+.mma-map-list-modal__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.mma-map-list-modal__preset {
+  padding: 5px 10px;
+  border: 1px solid #d7dee8;
+  border-radius: 999px;
+  background: #f4f7fb;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mma-map-list-modal__preset:hover {
+  border-color: #94a3b8;
+}
+
+.mma-map-list-modal__checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 260px;
+  margin-bottom: 12px;
+  overflow-y: auto;
+}
+
+.mma-map-list-modal__check-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.mma-map-list-modal__check-row:hover {
+  background: #f4f7fb;
+}
+
+.mma-map-list-modal__swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.mma-map-list-modal__message {
+  margin: 0 0 14px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.mma-map-list-modal__footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.mma-map-list-modal__button {
+  padding: 8px 14px;
+  border: 1px solid #d7dee8;
+  border-radius: 9px;
+  background: #fff;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mma-map-list-modal__button--primary {
+  border-color: #2563eb;
+  color: #fff;
+  background: #2563eb;
+}
+
+.mma-map-list-modal__button--danger {
+  border-color: #fecaca;
+  color: #b91c1c;
+  background: #fff7f7;
+}
+
+/* ネイティブの更新履歴（Updates）をポップアップに複製する際、サイト側の配色を継承して
+   読めなくならないよう、この中だけ明示的に配色を上書きする。 */
+.mma-map-list-modal .updates__container,
+.mma-map-list-modal .updates__version {
+  color: #172033;
+}
+
+.mma-map-list-modal .updates__container a,
+.mma-map-list-modal .updates__version a {
+  color: #2563eb;
+}

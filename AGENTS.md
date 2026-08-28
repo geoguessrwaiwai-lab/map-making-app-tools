@@ -5,8 +5,8 @@
 ## 基本方針
 
 1. 外部ライブラリを使わない最小構成を維持する。
-2. 対象URLを`https://map-making.app/maps/数字`に限定する。
-3. `.page-map-editor`以外のグリッドへ介入しない。
+2. 対象URLを`https://map-making.app/maps/数字`（マップ編集画面）と`https://map-making.app/`（トップページのマップ一覧）に限定する。
+3. マップ編集画面では`.page-map-editor`以外のグリッドへ、トップページでは`[data-replace="InteractiveMapList"]`、`section.updates`（フッターへの再配置と更新履歴の折りたたみ）、および`.page-map-list`のレイアウト（Updates折りたたみ時に「Your Maps」列へ幅を譲る調整）以外の要素へ介入しない。
 4. 左側の画面幅を25%〜75%の範囲に保つ。
 5. 既存のグリッドエリアと行構成を変更しない。
 6. 権限、外部通信、データ収集を追加しない。必要な場合は実装前にユーザーへ確認する。

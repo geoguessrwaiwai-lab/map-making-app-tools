@@ -16,6 +16,11 @@
       key: "mma-pochipochi-default-enabled",
       defaultValue: false,
       input: document.querySelector("#pochipochi-default-enabled")
+    },
+    mapList: {
+      key: "mma-feature-map-list-enabled",
+      defaultValue: true,
+      input: document.querySelector("#map-list-enabled")
     }
   };
   const URL_SETTING_PREFIX = "mma-pochipochi-default:";

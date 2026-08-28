@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Map Making App Tools",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Map Making Appの画面幅調整とロケーション整理を使いやすくします。",
   "permissions": ["storage"],
   "options_ui": {
@@ -26,6 +26,12 @@
       "js": ["page.js"],
       "run_at": "document_idle",
       "world": "MAIN"
+    },
+    {
+      "matches": ["https://map-making.app/"],
+      "css": ["map-list.css"],
+      "js": ["map-list.js"],
+      "run_at": "document_idle"
     }
   ]
 }
