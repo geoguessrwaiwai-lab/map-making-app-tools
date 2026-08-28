@@ -266,6 +266,23 @@ assert(optionsSource.includes('key: "mma-feature-pochipochi-enabled"'), "the opt
 assert(optionsSource.includes('key: "mma-pochipochi-default-enabled"'), "the options page must control the global Pochi-pochi default");
 assert(optionsSource.includes('key: "mma-feature-map-list-enabled"'), "the options page must control the folder view feature");
 assert(optionsSource.includes('key: "mma-map-list-new-tab-enabled"'), "the options page must control whether map links open in a new tab");
+assert(optionsHtml.includes('id="language"') && optionsSource.includes('LANGUAGE_KEY = "mma-language"'), "the options page must offer the language switch");
+assert(mapListSource.includes("createLanguageSwitch"), "the folder view footer must offer the language switch");
+assert(
+  mapListSource.includes("defaultLanguage") && optionsSource.includes("defaultLanguage"),
+  "an unset language must fall back to the browser language (Japanese browsers get Japanese, everyone else English)"
+);
+assert(mapListSource.includes('MESSAGES = {') && mapListSource.includes('en: {'), "the folder view must ship Japanese and English strings");
+
+// t("key")とdata-i18n="key"で使う文言が、日本語・英語の両方に定義されているか確認する。
+for (const key of new Set([...mapListSource.matchAll(/\bt\("(\w+)"/g)].map((match) => match[1]))) {
+  const defined = mapListSource.split(`\n      ${key}: `).length - 1;
+  assert(defined >= 2, `the folder view must define "${key}" in both the Japanese and English message tables`);
+}
+for (const key of new Set([...optionsHtml.matchAll(/data-i18n(?:-placeholder)?="(\w+)"/g)].map((match) => match[1]))) {
+  const defined = optionsSource.split(`\n      ${key}: `).length - 1;
+  assert(defined >= 2, `the options page must define "${key}" in both the Japanese and English message tables`);
+}
 assert(
   mapListSource.includes("NEW_TAB_KEY") && mapListSource.includes('link.target = "_blank"'),
   "map cards must open in a new tab when the setting is on"

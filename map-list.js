@@ -11,6 +11,7 @@
   const FEATURE_KEY = "mma-feature-map-list-enabled";
   const VIEW_MODE_KEY = "mma-map-list-view-mode";
   const NEW_TAB_KEY = "mma-map-list-new-tab-enabled";
+  const LANGUAGE_KEY = "mma-language";
   const HEADINGS_KEY = "mma-map-list-headings";
   const FAVORITES_KEY = "mma-map-list-favorites";
   const COUNTRIES_KEY = "mma-map-list-countries";
@@ -30,10 +31,101 @@
     "#f87171", "#fb923c", "#fbbf24", "#a3e635", "#34d399",
     "#22d3ee", "#60a5fa", "#a78bfa", "#f472b6", "#94a3b8"
   ];
-  const PRESET_HEADINGS = [
-    "🌏 アジア", "🌏 中央アジア", "🌍 ヨーロッパ", "🌍 アフリカ",
-    "🌎 北アメリカ", "🌎 中南米", "🌎 南アメリカ", "🌏 オセアニア"
-  ];
+  const PRESET_HEADINGS = {
+    ja: [
+      "🌏 アジア", "🌏 中央アジア", "🌍 ヨーロッパ", "🌍 アフリカ",
+      "🌎 北アメリカ", "🌎 中南米", "🌎 南アメリカ", "🌏 オセアニア"
+    ],
+    en: [
+      "🌏 Asia", "🌏 Central Asia", "🌍 Europe", "🌍 Africa",
+      "🌎 North America", "🌎 Latin America", "🌎 South America", "🌏 Oceania"
+    ]
+  };
+  // 表示言語はフッターと拡張機能のオプションから切り替える。ブラウザのUI言語には追従しない。
+  const MESSAGES = {
+    ja: {
+      cancel: "キャンセル",
+      save: "保存",
+      close: "閉じる",
+      delete: "削除",
+      folderFallback: "フォルダ",
+      folderNameLabel: "フォルダ名（絵文字も入力できます・{max}文字まで）",
+      folderAdd: "フォルダを追加",
+      folderRename: "フォルダ名を変更",
+      folderDeleteTitle: "フォルダを削除しますか？",
+      folderDeleteMessage: "「{label}」を削除します。含まれていたマップは未分類に移動します。",
+      folderAddMap: "このフォルダに新しいマップを作成",
+      folderDelete: "フォルダを削除",
+      countryTitle: "{name} の国チップ",
+      countrySearchLabel: "国を検索",
+      countrySearchPlaceholder: "国名の一部を入力",
+      countryClear: "未設定にする",
+      countrySelect: "国を選択",
+      countryChange: "{name}（クリックで変更）",
+      tagsTitle: "{name} のタグ",
+      tagsEmpty: "まだタグがありません。下の欄から作成できます。",
+      tagsNewLabel: "新しいタグ名",
+      tagsCreate: "＋ タグを作成",
+      tagsAdd: "＋ タグ",
+      favoriteAdd: "お気に入りに追加",
+      favoriteRemove: "お気に入りから外す",
+      cardEdit: "編集/削除（Map Making App本体の設定ダイアログを開きます）",
+      cardMove: "フォルダへ移動",
+      sectionFavorites: "★ お気に入り",
+      sectionUnassigned: "未分類",
+      cardsEmpty: "ここにマップをドラッグ、またはカードの「フォルダへ移動」から追加できます",
+      searchPlaceholder: "マップを検索…",
+      newMap: "＋ 新しいマップ",
+      addFolder: "＋ フォルダを追加",
+      switchToFolders: "フォルダビューに切り替える",
+      switchToNative: "以前の表示に切り替える",
+      footnote: "このUIは拡張機能によって変更されています。 ",
+      footnoteLink: "詳しくはこちら",
+      updatesTitle: "更新情報（Updates）をポップアップで見る",
+      locations: "{count} locations"
+    },
+    en: {
+      cancel: "Cancel",
+      save: "Save",
+      close: "Close",
+      delete: "Delete",
+      folderFallback: "Folder",
+      folderNameLabel: "Folder name (emoji allowed, up to {max} characters)",
+      folderAdd: "Add a folder",
+      folderRename: "Rename folder",
+      folderDeleteTitle: "Delete this folder?",
+      folderDeleteMessage: "“{label}” will be deleted. The maps inside move to Unsorted.",
+      folderAddMap: "Create a new map in this folder",
+      folderDelete: "Delete folder",
+      countryTitle: "Country chip for {name}",
+      countrySearchLabel: "Search countries",
+      countrySearchPlaceholder: "Type part of a country name",
+      countryClear: "Clear",
+      countrySelect: "Choose a country",
+      countryChange: "{name} (click to change)",
+      tagsTitle: "Tags for {name}",
+      tagsEmpty: "No tags yet. Create one in the field below.",
+      tagsNewLabel: "New tag name",
+      tagsCreate: "+ Create tag",
+      tagsAdd: "+ Tag",
+      favoriteAdd: "Add to favourites",
+      favoriteRemove: "Remove from favourites",
+      cardEdit: "Edit or delete (opens Map Making App's own dialog)",
+      cardMove: "Move to folder",
+      sectionFavorites: "★ Favourites",
+      sectionUnassigned: "Unsorted",
+      cardsEmpty: "Drag maps here, or add them with “Move to folder” on a card",
+      searchPlaceholder: "Search maps…",
+      newMap: "+ New map",
+      addFolder: "+ Add folder",
+      switchToFolders: "Switch to the folder view",
+      switchToNative: "Switch back to the original view",
+      footnote: "This page is modified by a browser extension. ",
+      footnoteLink: "Learn more",
+      updatesTitle: "Open the changelog in a popup",
+      locations: "{count} locations"
+    }
+  };
   const REGION_CODES = [
     "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ",
     "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS",
@@ -55,6 +147,7 @@
 
   let featureEnabled = true;
   let openInNewTab = true;
+  let language = "en";
   let settingsLoaded = false;
   let contextInvalidated = false;
   let bootingTimer = null;
@@ -82,9 +175,53 @@
 
   let regionNames = null;
   try {
-    regionNames = new Intl.DisplayNames(["ja"], { type: "region" });
+    regionNames = new Intl.DisplayNames([localeTag()], { type: "region" });
   } catch {
     regionNames = null;
+  }
+
+  /** 言語を切り替えたら、国名表示も同じ言語で作り直す。 */
+  function refreshRegionNames() {
+    try {
+      regionNames = new Intl.DisplayNames([localeTag()], { type: "region" });
+    } catch {
+      regionNames = null;
+    }
+  }
+
+  /**
+   * 保存された言語がなければ、ブラウザの言語設定から決める（日本語なら日本語、それ以外は英語）。
+   * 自動判定の結果は保存しない。ユーザーが明示的に選んだときだけmma-languageへ書き込む。
+   */
+  function defaultLanguage() {
+    const candidates = [];
+    try {
+      candidates.push(chrome.i18n?.getUILanguage?.() ?? "");
+    } catch {
+      // 拡張機能のコンテキストが失われている場合はnavigatorだけで判定する。
+    }
+    candidates.push(...(navigator.languages ?? []), navigator.language ?? "");
+    return candidates.some((tag) => /^ja\b/i.test(tag)) ? "ja" : "en";
+  }
+
+  function normalizeLanguage(value) {
+    if (value === "ja" || value === "en") {
+      return value;
+    }
+    return defaultLanguage();
+  }
+
+  /** 表示言語の文言を取り出す。{name}形式のプレースホルダーだけを差し替える。 */
+  function t(key, params) {
+    const template = MESSAGES[language]?.[key] ?? MESSAGES.ja[key] ?? key;
+    if (!params) {
+      return template;
+    }
+    return template.replace(/\{(\w+)\}/g, (match, name) => (name in params ? String(params[name]) : match));
+  }
+
+  function localeTag() {
+    return language === "en" ? "en" : "ja-JP";
   }
 
   function isContextInvalidatedError(error) {
@@ -176,7 +313,8 @@
         COUNTRIES_KEY,
         TAGS_KEY,
         VIEW_MODE_KEY,
-        NEW_TAB_KEY
+        NEW_TAB_KEY,
+        LANGUAGE_KEY
       ]);
 
       const headings = stored[HEADINGS_KEY];
@@ -219,6 +357,8 @@
 
       viewMode = stored[VIEW_MODE_KEY] === "native" ? "native" : "custom";
       openInNewTab = stored[NEW_TAB_KEY] !== false;
+      language = normalizeLanguage(stored[LANGUAGE_KEY]);
+      refreshRegionNames();
 
       return true;
     } catch (error) {
@@ -233,6 +373,7 @@
       tagsData = defaultTagsData();
       viewMode = "custom";
       openInNewTab = true;
+      language = defaultLanguage();
       return true;
     }
   }
@@ -335,7 +476,7 @@
         const label =
           child.getAttribute("data-folder") ||
           child.querySelector(".map-folder__head strong")?.textContent?.trim() ||
-          "フォルダ";
+          t("folderFallback");
         const ids = [];
         for (const link of child.querySelectorAll("a.map-link[href]")) {
           const match = link.getAttribute("href")?.match(/\/maps\/(\d+)/);
@@ -557,7 +698,7 @@
     if (!initialLabel) {
       const presets = document.createElement("div");
       presets.className = "mma-map-list-modal__presets";
-      for (const preset of PRESET_HEADINGS) {
+      for (const preset of PRESET_HEADINGS[language] ?? PRESET_HEADINGS.ja) {
         presets.append(
           createModalButton(preset, "mma-map-list-modal__preset", () => {
             input.value = preset;
@@ -570,7 +711,7 @@
 
     const label = document.createElement("label");
     label.className = "mma-map-list-modal__label";
-    label.textContent = `フォルダ名（絵文字も入力できます・${LABEL_MAX_LENGTH}文字まで）`;
+    label.textContent = t("folderNameLabel", { max: LABEL_MAX_LENGTH });
     const input = document.createElement("input");
     input.type = "text";
     input.className = "mma-map-list-modal__input";
@@ -594,8 +735,8 @@
 
     onEnterKey(input, submit);
     modal.footer.append(
-      createModalButton("キャンセル", "mma-map-list-modal__button", modal.close),
-      createModalButton("保存", "mma-map-list-modal__button mma-map-list-modal__button--primary", submit)
+      createModalButton(t("cancel"), "mma-map-list-modal__button", modal.close),
+      createModalButton(t("save"), "mma-map-list-modal__button mma-map-list-modal__button--primary", submit)
     );
 
     window.setTimeout(() => {
@@ -605,7 +746,7 @@
   }
 
   function handleAddHeading() {
-    openHeadingFormModal("フォルダを追加", "", (label) => {
+    openHeadingFormModal(t("folderAdd"), "", (label) => {
       headingsData.headings.push({ id: crypto.randomUUID(), label, mapIds: [] });
       persistHeadings();
       render();
@@ -613,7 +754,7 @@
   }
 
   function handleRenameHeading(heading) {
-    openHeadingFormModal("フォルダ名を変更", heading.label, (label) => {
+    openHeadingFormModal(t("folderRename"), heading.label, (label) => {
       heading.label = label;
       persistHeadings();
       render();
@@ -621,10 +762,10 @@
   }
 
   function handleDeleteHeading(heading) {
-    const modal = openModal("フォルダを削除しますか？");
+    const modal = openModal(t("folderDeleteTitle"));
     const message = document.createElement("p");
     message.className = "mma-map-list-modal__message";
-    message.textContent = `「${heading.label}」を削除します。含まれていたマップは未分類に移動します。`;
+    message.textContent = t("folderDeleteMessage", { label: heading.label });
     modal.body.append(message);
 
     function submit() {
@@ -636,8 +777,8 @@
     }
 
     modal.footer.append(
-      createModalButton("キャンセル", "mma-map-list-modal__button", modal.close),
-      createModalButton("削除", "mma-map-list-modal__button mma-map-list-modal__button--danger", submit)
+      createModalButton(t("cancel"), "mma-map-list-modal__button", modal.close),
+      createModalButton(t("delete"), "mma-map-list-modal__button mma-map-list-modal__button--danger", submit)
     );
   }
 
@@ -653,15 +794,15 @@
   /* ---------- 国選択モーダル ---------- */
 
   function openCountryModal(map) {
-    const modal = openModal(`${map.name} の国チップ`);
+    const modal = openModal(t("countryTitle", { name: map.name }));
 
     const searchLabel = document.createElement("label");
     searchLabel.className = "mma-map-list-modal__label";
-    searchLabel.textContent = "国を検索";
+    searchLabel.textContent = t("countrySearchLabel");
     const searchInput = document.createElement("input");
     searchInput.type = "text";
     searchInput.className = "mma-map-list-modal__input";
-    searchInput.placeholder = "国名の一部を入力";
+    searchInput.placeholder = t("countrySearchPlaceholder");
     searchLabel.append(searchInput);
     modal.body.append(searchLabel);
 
@@ -701,13 +842,13 @@
     });
 
     modal.footer.append(
-      createModalButton("未設定にする", "mma-map-list-modal__button", () => {
+      createModalButton(t("countryClear"), "mma-map-list-modal__button", () => {
         delete countries[map.id];
         persistCountries();
         render();
         modal.close();
       }),
-      createModalButton("閉じる", "mma-map-list-modal__button", modal.close)
+      createModalButton(t("close"), "mma-map-list-modal__button", modal.close)
     );
 
     window.setTimeout(() => searchInput.focus(), 0);
@@ -716,7 +857,7 @@
   /* ---------- タグ付けモーダル ---------- */
 
   function openTagsModal(map) {
-    const modal = openModal(`${map.name} のタグ`);
+    const modal = openModal(t("tagsTitle", { name: map.name }));
     const currentTagIds = new Set(tagsData.mapTagIds[map.id] || []);
 
     const list = document.createElement("div");
@@ -727,7 +868,7 @@
       if (tagsData.tags.length === 0) {
         const empty = document.createElement("p");
         empty.className = "mma-map-list-modal__message";
-        empty.textContent = "まだタグがありません。下の欄から作成できます。";
+        empty.textContent = t("tagsEmpty");
         list.append(empty);
         return;
       }
@@ -760,7 +901,7 @@
 
     const newTagLabel = document.createElement("label");
     newTagLabel.className = "mma-map-list-modal__label";
-    newTagLabel.textContent = "新しいタグ名";
+    newTagLabel.textContent = t("tagsNewLabel");
     const newTagInput = document.createElement("input");
     newTagInput.type = "text";
     newTagInput.className = "mma-map-list-modal__input";
@@ -783,7 +924,7 @@
 
     onEnterKey(newTagInput, addTag);
     modal.body.append(
-      createModalButton("＋ タグを作成", "mma-map-list-modal__button", addTag)
+      createModalButton(t("tagsCreate"), "mma-map-list-modal__button", addTag)
     );
 
     function submit() {
@@ -794,8 +935,8 @@
     }
 
     modal.footer.append(
-      createModalButton("キャンセル", "mma-map-list-modal__button", modal.close),
-      createModalButton("保存", "mma-map-list-modal__button mma-map-list-modal__button--primary", submit)
+      createModalButton(t("cancel"), "mma-map-list-modal__button", modal.close),
+      createModalButton(t("save"), "mma-map-list-modal__button mma-map-list-modal__button--primary", submit)
     );
   }
 
@@ -810,7 +951,7 @@
 
   function allSectionOptions() {
     return [
-      { id: UNASSIGNED_ID, label: "未分類" },
+      { id: UNASSIGNED_ID, label: t("sectionUnassigned") },
       ...headingsData.headings.map((heading) => ({ id: heading.id, label: heading.label }))
     ];
   }
@@ -867,7 +1008,7 @@
     const isFavorite = Boolean(favorites[map.id]);
     heart.dataset.active = String(isFavorite);
     heart.textContent = isFavorite ? "♥" : "♡";
-    heart.title = isFavorite ? "お気に入りから外す" : "お気に入りに追加";
+    heart.title = isFavorite ? t("favoriteRemove") : t("favoriteAdd");
     heart.addEventListener("click", () => {
       if (favorites[map.id]) {
         delete favorites[map.id];
@@ -884,7 +1025,7 @@
     country.type = "button";
     country.className = "mma-map-list__country" + (countryCode ? "" : " mma-map-list__country--empty");
     country.textContent = countryCode ? flagFromCode(countryCode) : "＋";
-    country.title = countryCode ? `${nameForCode(countryCode)}（クリックで変更）` : "国を選択";
+    country.title = countryCode ? t("countryChange", { name: nameForCode(countryCode) }) : t("countrySelect");
     country.addEventListener("click", () => openCountryModal(map));
     card.append(country);
 
@@ -900,7 +1041,7 @@
 
     const count = document.createElement("span");
     count.className = "mma-map-list__count";
-    count.textContent = `${map.locationCount.toLocaleString("ja-JP")} locations`;
+    count.textContent = t("locations", { count: map.locationCount.toLocaleString(localeTag()) });
     card.append(count);
 
     const tags = document.createElement("div");
@@ -920,7 +1061,7 @@
     const tagAdd = document.createElement("button");
     tagAdd.type = "button";
     tagAdd.className = "mma-map-list__tag-add";
-    tagAdd.textContent = "＋ タグ";
+    tagAdd.textContent = t("tagsAdd");
     tagAdd.addEventListener("click", () => openTagsModal(map));
     tags.append(tagAdd);
     card.append(tags);
@@ -931,13 +1072,13 @@
     editButton.type = "button";
     editButton.className = "mma-map-list__icon-button";
     editButton.textContent = "✎";
-    editButton.title = "編集/削除（Map Making App本体の設定ダイアログを開きます）";
+    editButton.title = t("cardEdit");
     editButton.addEventListener("click", () => findNativeEditButton(map.id)?.click());
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
     deleteButton.className = "mma-map-list__icon-button";
     deleteButton.textContent = "🗑";
-    deleteButton.title = "編集/削除（Map Making App本体の設定ダイアログを開きます）";
+    deleteButton.title = t("cardEdit");
     deleteButton.addEventListener("click", () => findNativeEditButton(map.id)?.click());
     actions.append(editButton, deleteButton);
     card.append(actions);
@@ -945,7 +1086,7 @@
     if (movable) {
       const moveSelect = document.createElement("select");
       moveSelect.className = "mma-map-list__move-select";
-      moveSelect.title = "フォルダへ移動";
+      moveSelect.title = t("cardMove");
       for (const option of allSectionOptions()) {
         const optionEl = document.createElement("option");
         optionEl.value = option.id;
@@ -1024,19 +1165,19 @@
       addButton.type = "button";
       addButton.className = "mma-map-list__icon-button";
       addButton.textContent = "＋";
-      addButton.title = "このフォルダに新しいマップを作成";
+      addButton.title = t("folderAddMap");
       addButton.addEventListener("click", () => handleAddMapToHeading(heading));
       const renameButton = document.createElement("button");
       renameButton.type = "button";
       renameButton.className = "mma-map-list__icon-button";
       renameButton.textContent = "✎";
-      renameButton.title = "フォルダ名を変更";
+      renameButton.title = t("folderRename");
       renameButton.addEventListener("click", () => handleRenameHeading(heading));
       const deleteButton = document.createElement("button");
       deleteButton.type = "button";
       deleteButton.className = "mma-map-list__icon-button";
       deleteButton.textContent = "×";
-      deleteButton.title = "フォルダを削除";
+      deleteButton.title = t("folderDelete");
       deleteButton.addEventListener("click", () => handleDeleteHeading(heading));
       head.append(addButton, renameButton, deleteButton);
     }
@@ -1080,6 +1221,8 @@
     }
 
     root.replaceChildren();
+    // 空フォルダのプレースホルダーはCSSのcontentで描くため、文言だけ変数で渡す。
+    root.style.setProperty("--mma-ml-cards-empty", JSON.stringify(t("cardsEmpty")));
 
     if (viewMode === "native") {
       // フッターへ移動していたUpdates関連のノードを含め、ページを完全に元の状態へ戻す。
@@ -1091,7 +1234,7 @@
       const switchButton = document.createElement("button");
       switchButton.type = "button";
       switchButton.className = "mma-map-list__switch-view";
-      switchButton.textContent = "フォルダビューに切り替える";
+      switchButton.textContent = t("switchToFolders");
       switchButton.addEventListener("click", () => {
         viewMode = "custom";
         persistViewMode();
@@ -1111,7 +1254,7 @@
     const search = document.createElement("input");
     search.type = "search";
     search.className = "mma-map-list__search";
-    search.placeholder = "マップを検索…";
+    search.placeholder = t("searchPlaceholder");
     search.value = searchQuery;
     search.addEventListener("input", () => {
       searchQuery = search.value;
@@ -1127,7 +1270,7 @@
     const newMapButton = document.createElement("button");
     newMapButton.type = "button";
     newMapButton.className = "mma-map-list__button";
-    newMapButton.textContent = "＋ 新しいマップ";
+    newMapButton.textContent = t("newMap");
     newMapButton.addEventListener("click", () => {
       pendingNewMapHeadingId = null;
       findNativeActionButton("New map")?.click();
@@ -1140,7 +1283,7 @@
     const addHeadingButton = document.createElement("button");
     addHeadingButton.type = "button";
     addHeadingButton.className = "mma-map-list__button mma-map-list__button--ghost";
-    addHeadingButton.textContent = "＋ フォルダを追加";
+    addHeadingButton.textContent = t("addFolder");
     addHeadingButton.addEventListener("click", handleAddHeading);
     actions.append(addHeadingButton);
     toolbar.append(actions);
@@ -1166,7 +1309,7 @@
     if (favoriteIds.length > 0) {
       const favoritesSection = createSection({
         id: FAVORITES_ID,
-        label: "★ お気に入り",
+        label: t("sectionFavorites"),
         mapIds: favoriteIds,
         kind: "favorites"
       });
@@ -1191,7 +1334,7 @@
 
     const unassignedSection = createSection({
       id: UNASSIGNED_ID,
-      label: "未分類",
+      label: t("sectionUnassigned"),
       mapIds: headingsData.unassignedOrder,
       kind: "unassigned"
     });
@@ -1211,17 +1354,46 @@
   function createFootnote() {
     const footnote = document.createElement("p");
     footnote.className = "mma-map-list__footnote";
-    footnote.append("このUIは拡張機能によって変更されています。 ");
+    footnote.append(t("footnote"));
     const link = document.createElement("a");
     link.href = PRODUCT_URL;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
-    link.textContent = "詳しくはこちら";
+    link.textContent = t("footnoteLink");
     footnote.append(link);
     return footnote;
   }
 
   /* ---------- フッターの作成 ---------- */
+
+  /** フッター右下の言語切り替え。押した言語は拡張機能のオプションとも共有する。 */
+  function createLanguageSwitch() {
+    const wrap = document.createElement("div");
+    wrap.className = "mma-map-list__lang";
+    for (const [code, label] of [["ja", "日本語"], ["en", "English"]]) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "mma-map-list__lang-button";
+      button.textContent = label;
+      button.lang = code;
+      button.setAttribute("aria-pressed", String(language === code));
+      button.addEventListener("click", () => setLanguage(code));
+      wrap.append(button);
+    }
+    return wrap;
+  }
+
+  function setLanguage(nextLanguage) {
+    if (language === nextLanguage) {
+      return;
+    }
+    language = nextLanguage;
+    refreshRegionNames();
+    persistKey(LANGUAGE_KEY, language);
+    // フッターは取り付け時に1度だけ組み立てるため、作り直して文言を反映する。
+    detachFooter();
+    render();
+  }
 
   /** 検索フォームの虫眼鏡アイコン（MaterialDesignIconsのmagnify）。 */
   function createSearchIcon() {
@@ -1312,7 +1484,7 @@
     updatesToggleButton = document.createElement("button");
     updatesToggleButton.type = "button";
     updatesToggleButton.className = "mma-map-list__footer-link";
-    updatesToggleButton.title = "更新情報（Updates）をポップアップで見る";
+    updatesToggleButton.title = t("updatesTitle");
     updatesToggleButton.append(createFooterIcon("🕘"), document.createTextNode("Updates"));
     updatesToggleButton.addEventListener("click", () => openUpdatesPopup(list));
     slots.center.append(updatesToggleButton);
@@ -1346,7 +1518,7 @@
     const switchButton = document.createElement("button");
     switchButton.type = "button";
     switchButton.className = "mma-map-list__switch-view";
-    switchButton.textContent = "以前の表示に切り替える";
+    switchButton.textContent = t("switchToNative");
     switchButton.addEventListener("click", () => {
       viewMode = "native";
       persistViewMode();
@@ -1356,7 +1528,7 @@
     // 2段目は1段目と同じ3分割にして、注記を左端、表示切り替えを中央に置く。
     const noteRow = document.createElement("div");
     noteRow.className = "mma-map-list__footer-row mma-map-list__footer-row--note";
-    noteRow.append(createFootnote(), switchButton);
+    noteRow.append(createFootnote(), switchButton, createLanguageSwitch());
 
     footerEl = document.createElement("footer");
     footerEl.className = "mma-map-list__footer";
@@ -1378,7 +1550,7 @@
     if (version) {
       modal.body.append(version.cloneNode(true));
     }
-    modal.footer.append(createModalButton("閉じる", "mma-map-list-modal__button", modal.close));
+    modal.footer.append(createModalButton(t("close"), "mma-map-list-modal__button", modal.close));
   }
 
   function detachFooter() {
@@ -1526,6 +1698,17 @@
     if (Object.hasOwn(changes, NEW_TAB_KEY)) {
       openInNewTab = changes[NEW_TAB_KEY].newValue !== false;
       render();
+    }
+
+    // 設定画面から言語を変えたときも、開いているページへ反映する。
+    if (Object.hasOwn(changes, LANGUAGE_KEY)) {
+      const nextLanguage = normalizeLanguage(changes[LANGUAGE_KEY].newValue);
+      if (nextLanguage !== language) {
+        language = nextLanguage;
+        refreshRegionNames();
+        detachFooter();
+        render();
+      }
     }
   });
 

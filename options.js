@@ -29,7 +29,149 @@
     }
   };
   const URL_SETTING_PREFIX = "mma-pochipochi-default:";
+  const LANGUAGE_KEY = "mma-language";
+  // 表示言語はトップページのフッターと共有する。ブラウザのUI言語には追従しない。
+  const MESSAGES = {
+    ja: {
+      documentTitle: "Map Making App Tools 設定",
+      pageTitle: "拡張機能の設定",
+      languageTitle: "表示言語",
+      languageName: "言語",
+      languageDescription: "拡張機能が表示する文言の言語です。トップページのフッター右下からも切り替えられます。",
+      featuresTitle: "使用する機能",
+      featuresDescription: "機能ごとに有効・無効を切り替えられます。変更は開いているMap Making Appにも反映されます。",
+      resizeName: "画面幅調整",
+      resizeDescription: "左右の画面領域の境界線をドラッグして幅を変更します。",
+      pochiName: "ぽちぽちモード",
+      pochiDescription: "新しく確認したロケーションを、次の選択時に削除します。",
+      folderViewName: "フォルダビュー",
+      folderViewDescription: "トップページのマップ一覧を、フォルダ・お気に入り・タグ・国チップつきのカード表示に切り替えます。",
+      mapListTitle: "フォルダビューの動作",
+      newTabName: "マップを別タブで開く",
+      newTabDescription: "フォルダビューのマップ名をクリックしたとき、新しいタブで開きます。OFFにすると同じタブで開きます。",
+      mapListNote: "フォルダビュー自体をやめる場合は、上の「フォルダビュー」をOFFにしてください。",
+      defaultsTitle: "ぽちぽちモードの初期状態",
+      defaultOnName: "ONをデフォルトにする",
+      defaultOnDescription: "URL別の設定がまだないマップでは、ぽちぽちモードをONで開始します。",
+      defaultsNote: "Map Making App上で切り替えたURLには、そのURL専用のON／OFFが保存され、こちらのデフォルトより優先されます。",
+      urlSettingsTitle: "URLごとの設定",
+      urlSettingsDescription: "保存済みのURL別設定を変更したり、全体デフォルトへ戻したりできます。",
+      urlSearchLabel: "URLを検索",
+      urlSearchPlaceholder: "URLの一部を入力して検索",
+      urlSettingsEmpty: "該当するURL別設定はありません。",
+      urlDeleteAll: "URLごとの設定をすべて削除",
+      helpLink: "使い方とプライバシーについて",
+      deleteAllTitle: "URLごとの設定をすべて削除しますか？",
+      deleteAllMessage: "保存されているすべてのURL別ON／OFFを削除します。各マップには、ぽちぽちモードの全体デフォルトが適用されるようになります。",
+      cancel: "キャンセル",
+      deleteAllConfirm: "すべて削除",
+      urlToggleLabel: "{url}のぽちぽちモードをON",
+      urlReset: "全体デフォルトに戻す",
+      urlResetLabel: "{url}のURL別設定を削除",
+      countAll: "{total}件",
+      countFiltered: "{shown} / {total}件",
+      savedSettings: "設定を保存しました。Map Making Appにも反映されます。",
+      saveFailed: "設定を保存できませんでした。",
+      loadFailed: "設定を読み込めませんでした。",
+      savedUrl: "{url}の設定を保存しました。",
+      saveUrlFailed: "URL別設定を保存できませんでした。",
+      resetUrl: "{url}を全体デフォルトへ戻しました。",
+      deleteUrlFailed: "URL別設定を削除できませんでした。",
+      loadUrlFailed: "URL別設定を読み込めませんでした。",
+      deletedAll: "URLごとの設定をすべて削除しました。",
+      deleteAllFailed: "URLごとの設定を削除できませんでした。"
+    },
+    en: {
+      documentTitle: "Map Making App Tools settings",
+      pageTitle: "Extension settings",
+      languageTitle: "Language",
+      languageName: "Language",
+      languageDescription: "The language this extension displays. You can also switch it from the bottom right of the footer on the home page.",
+      featuresTitle: "Features",
+      featuresDescription: "Turn each feature on or off. Changes apply to any open Map Making App tab.",
+      resizeName: "Screen width adjustment",
+      resizeDescription: "Drag the divider between the two panes to change their widths.",
+      pochiName: "Pochi-pochi mode",
+      pochiDescription: "Deletes a newly reviewed location when you select the next one.",
+      folderViewName: "Folder view",
+      folderViewDescription: "Turns the map list on the home page into cards grouped by folder, with favourites, tags and country chips.",
+      mapListTitle: "Folder view behaviour",
+      newTabName: "Open maps in a new tab",
+      newTabDescription: "Opens a map in a new tab when you click its name in the folder view. Turn this off to open it in the same tab.",
+      mapListNote: "To stop using the folder view entirely, turn off “Folder view” above.",
+      defaultsTitle: "Pochi-pochi mode default",
+      defaultOnName: "Start with it on",
+      defaultOnDescription: "Starts Pochi-pochi mode on for maps that have no per-URL setting yet.",
+      defaultsNote: "A URL you toggle inside Map Making App keeps its own ON/OFF value, which wins over this default.",
+      urlSettingsTitle: "Per-URL settings",
+      urlSettingsDescription: "Change a saved per-URL setting or reset it to the global default.",
+      urlSearchLabel: "Search URLs",
+      urlSearchPlaceholder: "Type part of a URL to search",
+      urlSettingsEmpty: "No per-URL settings match.",
+      urlDeleteAll: "Delete every per-URL setting",
+      helpLink: "How it works and privacy",
+      deleteAllTitle: "Delete every per-URL setting?",
+      deleteAllMessage: "This deletes every saved per-URL ON/OFF value. Each map then follows the global Pochi-pochi default.",
+      cancel: "Cancel",
+      deleteAllConfirm: "Delete all",
+      urlToggleLabel: "Turn on Pochi-pochi mode for {url}",
+      urlReset: "Reset to the default",
+      urlResetLabel: "Delete the per-URL setting for {url}",
+      countAll: "{total}",
+      countFiltered: "{shown} / {total}",
+      savedSettings: "Saved. Any open Map Making App tab is updated too.",
+      saveFailed: "Could not save the setting.",
+      loadFailed: "Could not load the settings.",
+      savedUrl: "Saved the setting for {url}.",
+      saveUrlFailed: "Could not save the per-URL setting.",
+      resetUrl: "Reset {url} to the global default.",
+      deleteUrlFailed: "Could not delete the per-URL setting.",
+      loadUrlFailed: "Could not load the per-URL settings.",
+      deletedAll: "Deleted every per-URL setting.",
+      deleteAllFailed: "Could not delete the per-URL settings."
+    }
+  };
+  let language = "en";
+
+  /**
+   * 保存された言語がなければ、ブラウザの言語設定から決める（日本語なら日本語、それ以外は英語）。
+   * 自動判定の結果は保存せず、この画面かフッターで選んだときだけmma-languageへ書き込む。
+   */
+  function defaultLanguage() {
+    const candidates = [chrome.i18n?.getUILanguage?.() ?? "", ...(navigator.languages ?? []), navigator.language ?? ""];
+    return candidates.some((tag) => /^ja\b/i.test(tag)) ? "ja" : "en";
+  }
+
+  function normalizeLanguage(value) {
+    if (value === "ja" || value === "en") {
+      return value;
+    }
+    return defaultLanguage();
+  }
+
+  function t(key, params) {
+    const template = MESSAGES[language]?.[key] ?? MESSAGES.ja[key] ?? key;
+    if (!params) {
+      return template;
+    }
+    return template.replace(/\{(\w+)\}/g, (match, name) => (name in params ? String(params[name]) : match));
+  }
+
+  /** data-i18n（本文）とdata-i18n-placeholder（入力欄）を今の言語で塗り直す。 */
+  function applyLanguage() {
+    document.documentElement.lang = language;
+    document.title = t("documentTitle");
+    for (const element of document.querySelectorAll("[data-i18n]")) {
+      element.textContent = t(element.dataset.i18n);
+    }
+    for (const element of document.querySelectorAll("[data-i18n-placeholder]")) {
+      element.placeholder = t(element.dataset.i18nPlaceholder);
+    }
+    languageSelect.value = language;
+    renderUrlSettings();
+  }
   const status = document.querySelector("#status");
+  const languageSelect = document.querySelector("#language");
   const urlSettingsSearch = document.querySelector("#url-settings-search");
   const urlSettingsList = document.querySelector("#url-settings-list");
   const urlSettingsEmpty = document.querySelector("#url-settings-empty");
@@ -61,7 +203,7 @@
         input.checked = stored[key] === true;
       }
     } catch {
-      showStatus("設定を読み込めませんでした。", true);
+      showStatus(t("loadFailed"), true);
     }
   }
 
@@ -83,7 +225,7 @@
     const input = document.createElement("input");
     input.type = "checkbox";
     input.checked = setting.enabled;
-    input.setAttribute("aria-label", `${setting.url}のぽちぽちモードをON`);
+    input.setAttribute("aria-label", t("urlToggleLabel", { url: setting.url }));
     const track = document.createElement("span");
     track.setAttribute("aria-hidden", "true");
     switchLabel.append(input, track);
@@ -91,24 +233,24 @@
     input.addEventListener("change", async () => {
       try {
         await chrome.storage.local.set({ [setting.key]: input.checked });
-        showStatus(`${setting.url}の設定を保存しました。`);
+        showStatus(t("savedUrl", { url: setting.url }));
       } catch {
         input.checked = !input.checked;
-        showStatus("URL別設定を保存できませんでした。", true);
+        showStatus(t("saveUrlFailed"), true);
       }
     });
 
     const removeButton = document.createElement("button");
     removeButton.type = "button";
     removeButton.className = "url-setting-remove";
-    removeButton.textContent = "全体デフォルトに戻す";
-    removeButton.setAttribute("aria-label", `${setting.url}のURL別設定を削除`);
+    removeButton.textContent = t("urlReset");
+    removeButton.setAttribute("aria-label", t("urlResetLabel", { url: setting.url }));
     removeButton.addEventListener("click", async () => {
       try {
         await chrome.storage.local.remove(setting.key);
-        showStatus(`${setting.url}を全体デフォルトへ戻しました。`);
+        showStatus(t("resetUrl", { url: setting.url }));
       } catch {
-        showStatus("URL別設定を削除できませんでした。", true);
+        showStatus(t("deleteUrlFailed"), true);
       }
     });
 
@@ -128,8 +270,8 @@
     urlSettingsList.hidden = filtered.length === 0;
     urlSettingsEmpty.hidden = filtered.length !== 0;
     urlSettingsCount.textContent = query
-      ? `${filtered.length} / ${urlSettings.length}件`
-      : `${urlSettings.length}件`;
+      ? t("countFiltered", { shown: filtered.length, total: urlSettings.length })
+      : t("countAll", { total: urlSettings.length });
     deleteAllButton.disabled = urlSettings.length === 0;
   }
 
@@ -146,11 +288,11 @@
           url: key.slice(URL_SETTING_PREFIX.length)
         }))
         .sort((left, right) =>
-          left.url.localeCompare(right.url, "ja", { numeric: true })
+          left.url.localeCompare(right.url, language, { numeric: true })
         );
       renderUrlSettings();
     } catch {
-      showStatus("URL別設定を読み込めませんでした。", true);
+      showStatus(t("loadUrlFailed"), true);
     }
   }
 
@@ -158,9 +300,9 @@
     input.addEventListener("change", async () => {
       try {
         await chrome.storage.local.set({ [key]: input.checked });
-        showStatus("設定を保存しました。Map Making Appにも反映されます。");
+        showStatus(t("savedSettings"));
       } catch {
-        showStatus("設定を保存できませんでした。", true);
+        showStatus(t("saveFailed"), true);
       }
     });
   }
@@ -190,22 +332,54 @@
     try {
       await chrome.storage.local.remove(keys);
       deleteAllDialog.close();
-      showStatus("URLごとの設定をすべて削除しました。");
+      showStatus(t("deletedAll"));
     } catch {
-      showStatus("URLごとの設定を削除できませんでした。", true);
+      showStatus(t("deleteAllFailed"), true);
     } finally {
       deleteAllConfirm.disabled = false;
     }
   });
-  chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (
-      areaName === "local" &&
-      Object.keys(changes).some((key) => key.startsWith(URL_SETTING_PREFIX))
-    ) {
-      restoreUrlSettings();
+  languageSelect.addEventListener("change", async () => {
+    language = languageSelect.value === "en" ? "en" : "ja";
+    applyLanguage();
+    try {
+      await chrome.storage.local.set({ [LANGUAGE_KEY]: language });
+      showStatus(t("savedSettings"));
+    } catch {
+      showStatus(t("saveFailed"), true);
     }
   });
 
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== "local") {
+      return;
+    }
+
+    if (Object.keys(changes).some((key) => key.startsWith(URL_SETTING_PREFIX))) {
+      restoreUrlSettings();
+    }
+
+    // トップページのフッターから言語を切り替えたときも、この画面へ反映する。
+    if (Object.hasOwn(changes, LANGUAGE_KEY)) {
+      const nextLanguage = normalizeLanguage(changes[LANGUAGE_KEY].newValue);
+      if (nextLanguage !== language) {
+        language = nextLanguage;
+        applyLanguage();
+      }
+    }
+  });
+
+  async function restoreLanguage() {
+    try {
+      const stored = await chrome.storage.local.get(LANGUAGE_KEY);
+      language = normalizeLanguage(stored[LANGUAGE_KEY]);
+    } catch {
+      language = defaultLanguage();
+    }
+    applyLanguage();
+  }
+
+  restoreLanguage();
   restoreSettings();
   restoreUrlSettings();
 })();

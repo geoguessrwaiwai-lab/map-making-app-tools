@@ -137,6 +137,36 @@
   line-height: 1;
 }
 
+/* フッター右下の言語切り替え。 */
+.mma-map-list__lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: end;
+}
+
+.mma-map-list__lang-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.mma-map-list__lang-button:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.mma-map-list__lang-button[aria-pressed="true"] {
+  font-weight: 700;
+  opacity: 1;
+  cursor: default;
+}
+
 /* 中央の項目はボタンではなくテキストとして見せる。 */
 .mma-map-list__footer-link {
   display: inline-flex;
@@ -362,7 +392,8 @@
   padding: 10px;
   color: var(--mma-ml-muted);
   font-size: 12px;
-  content: "ここにマップをドラッグ、またはカードの「フォルダへ移動」から追加できます";
+  /* 文言は表示言語によって変わるため、JS側から--mma-ml-cards-emptyで渡す。 */
+  content: var(--mma-ml-cards-empty, "");
 }
 
 .mma-map-list__card {
