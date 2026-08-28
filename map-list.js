@@ -172,6 +172,9 @@
   let pendingNewMapHeadingId = null;
   let draggingSectionId = null;
   let draggingCard = null;
+  let searchInputEl = null;
+  let boardEl = null;
+  let searchRenderTimer = null;
 
   let regionNames = null;
   try {
@@ -1220,6 +1223,14 @@
       return;
     }
 
+    // ネイティブ一覧の更新などで作り直すときも、検索欄の入力位置を引き継げるよう控えておく。
+    const searchFocus =
+      searchInputEl && document.activeElement === searchInputEl
+        ? { start: searchInputEl.selectionStart, end: searchInputEl.selectionEnd }
+        : null;
+    searchInputEl = null;
+    boardEl = null;
+
     root.replaceChildren();
     // 空フォルダのプレースホルダーはCSSのcontentで描くため、文言だけ変数で渡す。
     root.style.setProperty("--mma-ml-cards-empty", JSON.stringify(t("cardsEmpty")));
@@ -1256,10 +1267,16 @@
     search.className = "mma-map-list__search";
     search.placeholder = t("searchPlaceholder");
     search.value = searchQuery;
+    searchInputEl = search;
     search.addEventListener("input", () => {
       searchQuery = search.value;
-      render();
-      search.focus();
+      // 全体をrender()すると入力中の検索欄ごと作り直してしまい、フォーカスとIMEの変換が切れる。
+      // 入力のたびに全カードを組み立てると重くもなるため、少し待ってから一覧だけ描き直す。
+      window.clearTimeout(searchRenderTimer);
+      searchRenderTimer = window.setTimeout(() => {
+        searchRenderTimer = null;
+        renderBoard();
+      }, 120);
     });
 
     const searchField = document.createElement("label");
@@ -1290,8 +1307,34 @@
 
     root.append(toolbar);
 
-    const board = document.createElement("div");
-    board.className = "mma-map-list__board";
+    boardEl = document.createElement("div");
+    boardEl.className = "mma-map-list__board";
+    renderBoard();
+    root.append(boardEl);
+
+    // 注記はフッターの2段目に置く。フッターを作れなかったときだけ一覧の末尾に出す。
+    if (!footerEl) {
+      root.append(createFootnote());
+    }
+
+    // 作り直した検索欄へフォーカスとキャレット位置を戻し、続けて入力できるようにする。
+    if (searchFocus && searchInputEl) {
+      searchInputEl.focus();
+      try {
+        searchInputEl.setSelectionRange(searchFocus.start, searchFocus.end);
+      } catch {
+        // 選択範囲を扱えない入力欄では位置の復元だけ諦める。
+      }
+    }
+  }
+
+  /** 検索やお気に入りの変更で作り直すのは一覧部分だけにして、ツールバーの入力状態を保つ。 */
+  function renderBoard() {
+    if (!boardEl) {
+      return;
+    }
+
+    boardEl.replaceChildren();
 
     const favoriteIds = [];
     for (const heading of headingsData.headings) {
@@ -1315,7 +1358,7 @@
       });
       if (favoritesSection) {
         favoritesSection.classList.add("mma-map-list__section--span");
-        board.append(favoritesSection);
+        boardEl.append(favoritesSection);
       }
     }
 
@@ -1328,7 +1371,7 @@
         kind: "heading"
       });
       if (section) {
-        board.append(section);
+        boardEl.append(section);
       }
     }
 
@@ -1340,14 +1383,7 @@
     });
     if (unassignedSection) {
       unassignedSection.classList.add("mma-map-list__section--right");
-      board.append(unassignedSection);
-    }
-
-    root.append(board);
-
-    // 注記はフッターの2段目に置く。フッターを作れなかったときだけ一覧の末尾に出す。
-    if (!footerEl) {
-      root.append(createFootnote());
+      boardEl.append(unassignedSection);
     }
   }
 
@@ -1609,6 +1645,8 @@
     nativeListObserver = null;
     window.clearTimeout(refreshTimer);
     refreshTimer = null;
+    window.clearTimeout(searchRenderTimer);
+    searchRenderTimer = null;
 
     detachFooter();
 
@@ -1622,6 +1660,8 @@
     countries = null;
     tagsData = null;
     searchQuery = "";
+    searchInputEl = null;
+    boardEl = null;
     pendingNewMapHeadingId = null;
     draggingSectionId = null;
     draggingCard = null;
