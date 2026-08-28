@@ -66,7 +66,7 @@
       tagsEmpty: "まだタグがありません。下の欄から作成できます。",
       tagsNewLabel: "新しいタグ名",
       tagsCreate: "＋ タグを作成",
-      tagsAdd: "＋ タグ",
+      menuTags: "タグを編集",
       favoriteAdd: "お気に入りにマーク",
       favoriteRemove: "お気に入りのマークを外す",
       favoriteMarked: "お気に入り",
@@ -113,7 +113,7 @@
       tagsEmpty: "No tags yet. Create one in the field below.",
       tagsNewLabel: "New tag name",
       tagsCreate: "+ Create tag",
-      tagsAdd: "+ Tag",
+      menuTags: "Edit tags",
       favoriteAdd: "Mark as favourite",
       favoriteRemove: "Remove favourite mark",
       favoriteMarked: "Favourite",
@@ -1051,6 +1051,7 @@
     count.textContent = t("locations", { count: map.locationCount.toLocaleString(localeTag()) });
     card.append(count);
 
+    // 付与済みのタグだけを表示する。タグの付け外しは「⋯」メニューから行う。
     const tags = document.createElement("div");
     tags.className = "mma-map-list__tags";
     const mapTagIds = tagsData.mapTagIds[map.id] || [];
@@ -1065,15 +1066,11 @@
       chip.textContent = tag.name;
       tags.append(chip);
     }
-    const tagAdd = document.createElement("button");
-    tagAdd.type = "button";
-    tagAdd.className = "mma-map-list__tag-add";
-    tagAdd.textContent = t("tagsAdd");
-    tagAdd.addEventListener("click", () => openTagsModal(map));
-    tags.append(tagAdd);
-    card.append(tags);
+    if (tags.childElementCount > 0) {
+      card.append(tags);
+    }
 
-    // 編集・お気に入り・フォルダ移動・削除は、カード右端の「⋯」メニューへまとめる。
+    // 編集・タグ・フォルダ移動・お気に入り・削除は、カード右端の「⋯」メニューへまとめる。
     // カード本体の要素を減らして、マップ名を表示できる幅をできるだけ広く取る。
     const menuButton = document.createElement("button");
     menuButton.type = "button";
@@ -1169,6 +1166,7 @@
 
     // 編集と削除はネイティブの設定ダイアログへ委譲する（拡張機能側では削除しない）。
     addItem(t("menuEdit"), t("cardEdit"), () => findNativeEditButton(map.id)?.click());
+    addItem(t("menuTags"), "", () => openTagsModal(map));
     if (movable) {
       addItem(t("cardMove"), "", () => openMoveModal(map, sectionId));
     }

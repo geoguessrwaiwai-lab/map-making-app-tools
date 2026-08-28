@@ -491,16 +491,6 @@
   white-space: nowrap;
 }
 
-.mma-map-list__tag-add {
-  padding: 2px 8px;
-  border: 1px dashed var(--mma-ml-border);
-  border-radius: 999px;
-  background: none;
-  color: var(--mma-ml-muted);
-  font-size: 11px;
-  cursor: pointer;
-}
-
 .mma-map-list__menu-button {
   display: inline-flex;
   flex: 0 0 auto;
