@@ -67,13 +67,19 @@
       tagsNewLabel: "新しいタグ名",
       tagsCreate: "＋ タグを作成",
       tagsAdd: "＋ タグ",
-      favoriteAdd: "お気に入りに追加",
-      favoriteRemove: "お気に入りから外す",
-      cardEdit: "編集/削除（Map Making App本体の設定ダイアログを開きます）",
+      favoriteAdd: "お気に入りにマーク",
+      favoriteRemove: "お気に入りのマークを外す",
+      favoriteMarked: "お気に入り",
+      cardEdit: "Map Making App本体の設定ダイアログを開きます",
+      cardMenu: "その他の操作",
+      menuEdit: "編集する",
+      menuDelete: "削除する",
       cardMove: "フォルダへ移動",
+      moveTitle: "「{name}」の移動先",
+      moveCurrent: "（現在のフォルダ）",
       sectionFavorites: "★ お気に入り",
       sectionUnassigned: "未分類",
-      cardsEmpty: "ここにマップをドラッグ、またはカードの「フォルダへ移動」から追加できます",
+      cardsEmpty: "ここにマップをドラッグ、またはカードの「⋯」→「フォルダへ移動」から追加できます",
       searchPlaceholder: "マップを検索…",
       newMap: "＋ 新しいマップ",
       addFolder: "＋ フォルダを追加",
@@ -82,7 +88,7 @@
       footnote: "このUIは拡張機能によって変更されています。 ",
       footnoteLink: "詳しくはこちら",
       updatesTitle: "更新情報（Updates）をポップアップで見る",
-      locations: "{count} locations"
+      locations: "{count} locs"
     },
     en: {
       cancel: "Cancel",
@@ -108,13 +114,19 @@
       tagsNewLabel: "New tag name",
       tagsCreate: "+ Create tag",
       tagsAdd: "+ Tag",
-      favoriteAdd: "Add to favourites",
-      favoriteRemove: "Remove from favourites",
-      cardEdit: "Edit or delete (opens Map Making App's own dialog)",
+      favoriteAdd: "Mark as favourite",
+      favoriteRemove: "Remove favourite mark",
+      favoriteMarked: "Favourite",
+      cardEdit: "Opens Map Making App's own dialog",
+      cardMenu: "More actions",
+      menuEdit: "Edit",
+      menuDelete: "Delete",
       cardMove: "Move to folder",
+      moveTitle: "Move “{name}” to",
+      moveCurrent: "(current folder)",
       sectionFavorites: "★ Favourites",
       sectionUnassigned: "Unsorted",
-      cardsEmpty: "Drag maps here, or add them with “Move to folder” on a card",
+      cardsEmpty: "Drag maps here, or add them with “⋯” → “Move to folder” on a card",
       searchPlaceholder: "Search maps…",
       newMap: "+ New map",
       addFolder: "+ Add folder",
@@ -123,7 +135,7 @@
       footnote: "This page is modified by a browser extension. ",
       footnoteLink: "Learn more",
       updatesTitle: "Open the changelog in a popup",
-      locations: "{count} locations"
+      locations: "{count} locs"
     }
   };
   const REGION_CODES = [
@@ -172,6 +184,7 @@
   let pendingNewMapHeadingId = null;
   let draggingSectionId = null;
   let draggingCard = null;
+  let cardMenuState = null;
   let searchInputEl = null;
   let boardEl = null;
   let searchRenderTimer = null;
@@ -1005,24 +1018,6 @@
       });
     }
 
-    const heart = document.createElement("button");
-    heart.type = "button";
-    heart.className = "mma-map-list__heart";
-    const isFavorite = Boolean(favorites[map.id]);
-    heart.dataset.active = String(isFavorite);
-    heart.textContent = isFavorite ? "♥" : "♡";
-    heart.title = isFavorite ? t("favoriteRemove") : t("favoriteAdd");
-    heart.addEventListener("click", () => {
-      if (favorites[map.id]) {
-        delete favorites[map.id];
-      } else {
-        favorites[map.id] = true;
-      }
-      persistFavorites();
-      render();
-    });
-    card.append(heart);
-
     const countryCode = countries[map.id];
     const country = document.createElement("button");
     country.type = "button";
@@ -1031,6 +1026,15 @@
     country.title = countryCode ? t("countryChange", { name: nameForCode(countryCode) }) : t("countrySelect");
     country.addEventListener("click", () => openCountryModal(map));
     card.append(country);
+
+    if (favorites[map.id]) {
+      const mark = document.createElement("span");
+      mark.className = "mma-map-list__favorite-mark";
+      mark.textContent = "♥";
+      mark.title = t("favoriteMarked");
+      mark.setAttribute("aria-label", t("favoriteMarked"));
+      card.append(mark);
+    }
 
     const link = document.createElement("a");
     link.className = "mma-map-list__link";
@@ -1069,42 +1073,159 @@
     tags.append(tagAdd);
     card.append(tags);
 
-    const actions = document.createElement("div");
-    actions.className = "mma-map-list__actions";
-    const editButton = document.createElement("button");
-    editButton.type = "button";
-    editButton.className = "mma-map-list__icon-button";
-    editButton.textContent = "✎";
-    editButton.title = t("cardEdit");
-    editButton.addEventListener("click", () => findNativeEditButton(map.id)?.click());
-    const deleteButton = document.createElement("button");
-    deleteButton.type = "button";
-    deleteButton.className = "mma-map-list__icon-button";
-    deleteButton.textContent = "🗑";
-    deleteButton.title = t("cardEdit");
-    deleteButton.addEventListener("click", () => findNativeEditButton(map.id)?.click());
-    actions.append(editButton, deleteButton);
-    card.append(actions);
-
-    if (movable) {
-      const moveSelect = document.createElement("select");
-      moveSelect.className = "mma-map-list__move-select";
-      moveSelect.title = t("cardMove");
-      for (const option of allSectionOptions()) {
-        const optionEl = document.createElement("option");
-        optionEl.value = option.id;
-        optionEl.textContent = option.label;
-        optionEl.selected = option.id === sectionId;
-        moveSelect.append(optionEl);
+    // 編集・お気に入り・フォルダ移動・削除は、カード右端の「⋯」メニューへまとめる。
+    // カード本体の要素を減らして、マップ名を表示できる幅をできるだけ広く取る。
+    const menuButton = document.createElement("button");
+    menuButton.type = "button";
+    menuButton.className = "mma-map-list__menu-button";
+    menuButton.textContent = "⋯";
+    menuButton.title = t("cardMenu");
+    menuButton.setAttribute("aria-label", t("cardMenu"));
+    menuButton.setAttribute("aria-haspopup", "menu");
+    menuButton.setAttribute("aria-expanded", "false");
+    menuButton.addEventListener("click", () => {
+      if (cardMenuState?.button === menuButton) {
+        closeCardMenu();
+        return;
       }
-      moveSelect.addEventListener("change", () => {
-        const target = findSectionArray(moveSelect.value);
-        moveMapTo(map.id, moveSelect.value, target ? target.length : 0);
-      });
-      card.append(moveSelect);
-    }
+      openCardMenu(menuButton, map, sectionId, movable);
+    });
+    card.append(menuButton);
 
     return card;
+  }
+
+  /* ---------- カードの「⋯」メニュー ---------- */
+
+  function closeCardMenu() {
+    cardMenuState?.close();
+  }
+
+  function openCardMenu(button, map, sectionId, movable) {
+    closeCardMenu();
+
+    const menu = document.createElement("div");
+    menu.className = "mma-map-list__menu";
+    menu.setAttribute("role", "menu");
+    const items = [];
+
+    function close() {
+      if (cardMenuState?.menu !== menu) {
+        return;
+      }
+      cardMenuState = null;
+      menu.remove();
+      button.setAttribute("aria-expanded", "false");
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+      document.removeEventListener("keydown", handleKeydown, true);
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    }
+
+    function handlePointerDown(event) {
+      // ボタン自身の押下はクリック側で開閉を切り替えるため、ここでは閉じない。
+      if (!menu.contains(event.target) && !button.contains(event.target)) {
+        close();
+      }
+    }
+
+    // マウスを使わなくても項目を選べるよう、上下キーで移動できるようにする。
+    function handleKeydown(event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+        button.focus();
+        return;
+      }
+      if (event.key !== "ArrowDown" && event.key !== "ArrowUp") {
+        return;
+      }
+      event.preventDefault();
+      const index = items.indexOf(document.activeElement);
+      if (index < 0) {
+        items[event.key === "ArrowDown" ? 0 : items.length - 1].focus();
+        return;
+      }
+      const step = event.key === "ArrowDown" ? 1 : -1;
+      items[(index + step + items.length) % items.length].focus();
+    }
+
+    function addItem(label, title, onSelect) {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "mma-map-list__menu-item";
+      item.setAttribute("role", "menuitem");
+      item.textContent = label;
+      if (title) {
+        item.title = title;
+      }
+      item.addEventListener("click", () => {
+        close();
+        onSelect();
+      });
+      items.push(item);
+      menu.append(item);
+    }
+
+    // 編集と削除はネイティブの設定ダイアログへ委譲する（拡張機能側では削除しない）。
+    addItem(t("menuEdit"), t("cardEdit"), () => findNativeEditButton(map.id)?.click());
+    if (movable) {
+      addItem(t("cardMove"), "", () => openMoveModal(map, sectionId));
+    }
+    addItem(favorites[map.id] ? t("favoriteRemove") : t("favoriteAdd"), "", () => {
+      if (favorites[map.id]) {
+        delete favorites[map.id];
+      } else {
+        favorites[map.id] = true;
+      }
+      persistFavorites();
+      renderBoard();
+    });
+    addItem(t("menuDelete"), t("cardEdit"), () => findNativeEditButton(map.id)?.click());
+
+    // カードは折り返しやスクロールの影響を受けるため、bodyへ固定配置して画面内へ収める。
+    document.body.append(menu);
+    const anchor = button.getBoundingClientRect();
+    const size = menu.getBoundingClientRect();
+    const left = Math.max(8, Math.min(anchor.right - size.width, window.innerWidth - size.width - 8));
+    const below = anchor.bottom + 4;
+    const top = below + size.height > window.innerHeight - 8 ? Math.max(8, anchor.top - size.height - 4) : below;
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+
+    button.setAttribute("aria-expanded", "true");
+    cardMenuState = { menu, button, close };
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    document.addEventListener("keydown", handleKeydown, true);
+    // スクロールで閉じるため、フォーカス移動が起こしうるスクロールより後に登録する。
+    items[0]?.focus();
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+  }
+
+  /** 「⋯」→「フォルダへ移動」。ドラッグ＆ドロップを使わずに移動先を選べるようにする。 */
+  function openMoveModal(map, currentSectionId) {
+    const modal = openModal(t("moveTitle", { name: map.name }));
+
+    const list = document.createElement("div");
+    list.className = "mma-map-list-modal__checklist";
+    for (const option of allSectionOptions()) {
+      const isCurrent = option.id === currentSectionId;
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "mma-map-list-modal__check-row mma-map-list-modal__check-row--action";
+      row.textContent = isCurrent ? `${option.label} ${t("moveCurrent")}` : option.label;
+      row.disabled = isCurrent;
+      row.addEventListener("click", () => {
+        const target = findSectionArray(option.id);
+        moveMapTo(map.id, option.id, target ? target.length : 0);
+        modal.close();
+      });
+      list.append(row);
+    }
+    modal.body.append(list);
+
+    modal.footer.append(createModalButton(t("close"), "mma-map-list-modal__button", modal.close));
   }
 
   function createSection({ id, label, mapIds, kind }) {
@@ -1223,6 +1344,9 @@
       return;
     }
 
+    // 開いたままの「⋯」メニューは、元のカードが消えると宙に浮くので閉じる。
+    closeCardMenu();
+
     // ネイティブ一覧の更新などで作り直すときも、検索欄の入力位置を引き継げるよう控えておく。
     const searchFocus =
       searchInputEl && document.activeElement === searchInputEl
@@ -1334,6 +1458,7 @@
       return;
     }
 
+    closeCardMenu();
     boardEl.replaceChildren();
 
     const favoriteIds = [];
@@ -1647,6 +1772,7 @@
     refreshTimer = null;
     window.clearTimeout(searchRenderTimer);
     searchRenderTimer = null;
+    closeCardMenu();
 
     detachFooter();
 

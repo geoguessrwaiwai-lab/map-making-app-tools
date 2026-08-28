@@ -425,18 +425,10 @@
   cursor: grab;
 }
 
-.mma-map-list__heart {
+.mma-map-list__favorite-mark {
   flex: 0 0 auto;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--mma-ml-muted);
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.mma-map-list__heart[data-active="true"] {
   color: #f43f5e;
+  font-size: 12px;
 }
 
 .mma-map-list__country {
@@ -480,9 +472,10 @@
   white-space: nowrap;
 }
 
+/* マップ名をできるだけ長く見せるため、余った幅はタグではなくリンクへ配る。 */
 .mma-map-list__tags {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   flex-wrap: wrap;
   gap: 4px;
   justify-content: flex-end;
@@ -508,21 +501,64 @@
   cursor: pointer;
 }
 
-.mma-map-list__actions {
-  display: flex;
+.mma-map-list__menu-button {
+  display: inline-flex;
   flex: 0 0 auto;
-  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--mma-ml-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
 }
 
-.mma-map-list__move-select {
-  flex: 0 0 auto;
-  max-width: 140px;
-  padding: 4px 6px;
-  border: 1px solid var(--mma-ml-border);
-  border-radius: 8px;
+.mma-map-list__menu-button:hover,
+.mma-map-list__menu-button[aria-expanded="true"] {
   background: var(--mma-ml-surface-2);
   color: var(--mma-ml-text);
-  font-size: 12px;
+}
+
+/*
+ * メニューはカードの折り返しやスクロールに影響されないよう、bodyへ固定配置する。
+ * .mma-map-listの外に出るため--mma-ml-*は届かない。色とフォントはモーダルと同様に直接指定する。
+ */
+.mma-map-list__menu {
+  position: fixed;
+  z-index: 2147483646;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 4px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 10px;
+  background: #111827;
+  box-shadow: 0 18px 40px rgb(15 23 42 / 55%);
+  color: #f8fafc;
+  font: 13px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.mma-map-list__menu-item {
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mma-map-list__menu-item:hover,
+.mma-map-list__menu-item:focus-visible {
+  background: rgb(255 255 255 / 10%);
+  outline: none;
 }
 
 .mma-map-list__footnote {
@@ -629,6 +665,20 @@
 
 .mma-map-list-modal__check-row:hover {
   background: #f4f7fb;
+}
+
+.mma-map-list-modal__check-row--action {
+  width: 100%;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.mma-map-list-modal__check-row--action:disabled {
+  color: #94a3b8;
+  cursor: default;
 }
 
 .mma-map-list-modal__swatch {
