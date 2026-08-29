@@ -30,6 +30,9 @@
   };
   const URL_SETTING_PREFIX = "mma-pochipochi-default:";
   const LANGUAGE_KEY = "mma-language";
+  const HELP_URL = "https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/";
+  // 案内サイトは言語ごとにページが分かれているため、英語表示のときは英語ページへ送る。
+  const HELP_URL_EN = "https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/en/";
   // 表示言語はトップページのフッターと共有する。ブラウザのUI言語には追従しない。
   const MESSAGES = {
     ja: {
@@ -167,11 +170,13 @@
     for (const element of document.querySelectorAll("[data-i18n-placeholder]")) {
       element.placeholder = t(element.dataset.i18nPlaceholder);
     }
+    helpLink.href = language === "en" ? HELP_URL_EN : HELP_URL;
     languageSelect.value = language;
     renderUrlSettings();
   }
   const status = document.querySelector("#status");
   const languageSelect = document.querySelector("#language");
+  const helpLink = document.querySelector("#help-link");
   const urlSettingsSearch = document.querySelector("#url-settings-search");
   const urlSettingsList = document.querySelector("#url-settings-list");
   const urlSettingsEmpty = document.querySelector("#url-settings-empty");

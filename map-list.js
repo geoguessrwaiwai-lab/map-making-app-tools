@@ -20,6 +20,8 @@
   const FAVORITES_ID = "__favorites__";
   const LABEL_MAX_LENGTH = 24;
   const PRODUCT_URL = "https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/";
+  // 案内サイトは言語ごとにページが分かれているため、英語表示のときは英語ページへ送る。
+  const PRODUCT_URL_EN = "https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/en/";
   // フッターの左右スロットは、ネイティブのノードの文言だけを見て振り分ける。
   const ACCOUNT_TEXT_PATTERN = /log\s*out|sign\s*out|user\s*settings/i;
   const CREDIT_TEXT_PATTERN = /version|reanna|©/i;
@@ -1515,7 +1517,7 @@
     footnote.className = "mma-map-list__footnote";
     footnote.append(t("footnote"));
     const link = document.createElement("a");
-    link.href = PRODUCT_URL;
+    link.href = language === "en" ? PRODUCT_URL_EN : PRODUCT_URL;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
     link.textContent = t("footnoteLink");
