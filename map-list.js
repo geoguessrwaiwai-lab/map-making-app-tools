@@ -198,6 +198,20 @@
     regionNames = null;
   }
 
+  let regionNamesEn = null;
+  try {
+    regionNamesEn = new Intl.DisplayNames(["en"], { type: "region" });
+  } catch {
+    regionNamesEn = null;
+  }
+
+  let regionNamesJa = null;
+  try {
+    regionNamesJa = new Intl.DisplayNames(["ja-JP"], { type: "region" });
+  } catch {
+    regionNamesJa = null;
+  }
+
   /** 言語を切り替えたら、国名表示も同じ言語で作り直す。 */
   function refreshRegionNames() {
     try {
@@ -266,6 +280,14 @@
   function nameForCode(code) {
     try {
       return regionNames ? regionNames.of(code) : code;
+    } catch {
+      return code;
+    }
+  }
+
+  function nameForCodeUsing(code, displayNames) {
+    try {
+      return displayNames ? displayNames.of(code) : code;
     } catch {
       return code;
     }
@@ -830,14 +852,11 @@
 
     const rows = REGION_CODES.map((code) => {
       const label = nameForCode(code);
+      const englishName = nameForCodeUsing(code, regionNamesEn);
+      const japaneseName = nameForCodeUsing(code, regionNamesJa);
       const row = document.createElement("button");
       row.type = "button";
-      row.className = "mma-map-list-modal__check-row";
-      row.style.width = "100%";
-      row.style.border = "0";
-      row.style.background = "none";
-      row.style.textAlign = "left";
-      row.style.cursor = "pointer";
+      row.className = "mma-map-list-modal__check-row mma-map-list-modal__check-row--action";
       row.append(document.createTextNode(`${flagFromCode(code)} ${label} (${code})`));
       row.addEventListener("click", () => {
         countries[map.id] = code;
@@ -846,16 +865,67 @@
         modal.close();
       });
       list.append(row);
-      return { code, label, row };
+      return {
+        code: code.toLocaleLowerCase(),
+        englishName: englishName.toLocaleLowerCase(),
+        japaneseName: japaneseName.toLocaleLowerCase(),
+        row
+      };
     });
 
-    searchInput.addEventListener("input", () => {
+    let selectedEntry = null;
+
+    function visibleEntries() {
+      return rows.filter((entry) => !entry.row.hidden);
+    }
+
+    function selectEntry(entry) {
+      if (selectedEntry) {
+        selectedEntry.row.classList.remove("mma-map-list-modal__check-row--selected");
+      }
+      selectedEntry = entry ?? null;
+      if (selectedEntry) {
+        selectedEntry.row.classList.add("mma-map-list-modal__check-row--selected");
+        selectedEntry.row.scrollIntoView({ block: "nearest" });
+      }
+    }
+
+    function applyFilter() {
       const query = searchInput.value.trim().toLocaleLowerCase();
+      const domainQuery = query.startsWith(".") ? query.slice(1) : query;
+      const displayName = language === "ja" ? "japaneseName" : "englishName";
       for (const entry of rows) {
         entry.row.hidden =
           query.length > 0 &&
-          !entry.label.toLocaleLowerCase().includes(query) &&
-          !entry.code.toLocaleLowerCase().includes(query);
+          !entry[displayName].includes(query) &&
+          !entry.code.includes(domainQuery);
+      }
+      selectEntry(visibleEntries()[0] ?? null);
+    }
+
+    searchInput.addEventListener("input", applyFilter);
+    applyFilter();
+
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        const visible = visibleEntries();
+        if (visible.length === 0) {
+          return;
+        }
+        const currentIndex = selectedEntry ? visible.indexOf(selectedEntry) : -1;
+        const nextIndex =
+          event.key === "ArrowDown"
+            ? Math.min(currentIndex < 0 ? 0 : currentIndex + 1, visible.length - 1)
+            : Math.max(currentIndex < 0 ? 0 : currentIndex - 1, 0);
+        selectEntry(visible[nextIndex]);
+        return;
+      }
+      if (event.key === "Enter") {
+        if (selectedEntry) {
+          event.preventDefault();
+          selectedEntry.row.click();
+        }
       }
     });
 
@@ -988,6 +1058,10 @@
       const handle = document.createElement("span");
       handle.className = "mma-map-list__drag-handle";
       handle.textContent = "⠿";
+      handle.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
       card.append(handle);
       card.draggable = true;
 
@@ -1053,7 +1127,7 @@
     const country = document.createElement("button");
     country.type = "button";
     country.className = "mma-map-list__country" + (countryCode ? "" : " mma-map-list__country--empty");
-    country.textContent = countryCode ? flagFromCode(countryCode) : "＋";
+    country.textContent = countryCode ? flagFromCode(countryCode) : "📄";
     country.title = countryCode ? t("countryChange", { name: nameForCode(countryCode) }) : t("countrySelect");
     country.addEventListener("click", (event) => {
       event.preventDefault();
