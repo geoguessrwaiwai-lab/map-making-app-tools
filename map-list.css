@@ -320,7 +320,6 @@
   border: 1px solid var(--mma-ml-border);
   border-radius: 14px;
   background: var(--mma-ml-surface);
-  overflow: hidden;
 }
 
 .mma-map-list__section[hidden] {
@@ -397,6 +396,7 @@
 }
 
 .mma-map-list__card {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -405,6 +405,7 @@
   padding: 8px 10px;
   border: 1px solid transparent;
   border-radius: 10px;
+  text-decoration: none;
 }
 
 .mma-map-list__card:hover {
@@ -420,9 +421,21 @@
 }
 
 .mma-map-list__drag-handle {
-  flex: 0 0 auto;
+  position: absolute;
+  top: 50%;
+  left: -24px;
+  padding: 6px 8px;
+  transform: translateY(-50%);
+  font-size: 22px;
+  line-height: 1;
   color: var(--mma-ml-muted);
   cursor: grab;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.mma-map-list__card:hover .mma-map-list__drag-handle {
+  opacity: 1;
 }
 
 .mma-map-list__favorite-mark {
@@ -461,7 +474,7 @@
   white-space: nowrap;
 }
 
-.mma-map-list__link:hover {
+.mma-map-list__card:hover .mma-map-list__link {
   text-decoration: underline;
 }
 
@@ -489,6 +502,7 @@
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
+  cursor: default;
 }
 
 .mma-map-list__menu-button {

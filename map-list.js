@@ -975,8 +975,13 @@
   }
 
   function createCard(map, sectionId, movable) {
-    const card = document.createElement("div");
+    const card = document.createElement("a");
     card.className = "mma-map-list__card";
+    card.href = `/maps/${map.id}`;
+    if (openInNewTab) {
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
+    }
     card.dataset.mapId = map.id;
 
     if (movable) {
@@ -1026,7 +1031,11 @@
     country.className = "mma-map-list__country" + (countryCode ? "" : " mma-map-list__country--empty");
     country.textContent = countryCode ? flagFromCode(countryCode) : "＋";
     country.title = countryCode ? t("countryChange", { name: nameForCode(countryCode) }) : t("countrySelect");
-    country.addEventListener("click", () => openCountryModal(map));
+    country.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      openCountryModal(map);
+    });
     card.append(country);
 
     if (favorites[map.id]) {
@@ -1038,14 +1047,9 @@
       card.append(mark);
     }
 
-    const link = document.createElement("a");
+    const link = document.createElement("span");
     link.className = "mma-map-list__link";
-    link.href = `/maps/${map.id}`;
     link.textContent = map.name;
-    if (openInNewTab) {
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-    }
     card.append(link);
 
     const count = document.createElement("span");
@@ -1066,6 +1070,10 @@
       chip.className = "mma-map-list__tag-chip";
       chip.style.background = tag.color;
       chip.textContent = tag.name;
+      chip.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
       tags.append(chip);
     }
     if (tags.childElementCount > 0) {
@@ -1082,7 +1090,9 @@
     menuButton.setAttribute("aria-label", t("cardMenu"));
     menuButton.setAttribute("aria-haspopup", "menu");
     menuButton.setAttribute("aria-expanded", "false");
-    menuButton.addEventListener("click", () => {
+    menuButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       if (cardMenuState?.button === menuButton) {
         closeCardMenu();
         return;
