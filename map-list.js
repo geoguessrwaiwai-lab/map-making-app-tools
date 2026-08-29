@@ -1001,26 +1001,50 @@
         for (const el of document.querySelectorAll(".mma-map-list__card--drag-over")) {
           el.classList.remove("mma-map-list__card--drag-over");
         }
+        for (const el of document.querySelectorAll(".mma-map-list__card--drag-over-after")) {
+          el.classList.remove("mma-map-list__card--drag-over-after");
+        }
+        for (const el of document.querySelectorAll(".mma-map-list__section--drop-target")) {
+          el.classList.remove("mma-map-list__section--drop-target");
+        }
       });
       card.addEventListener("dragover", (event) => {
         if (!draggingCard || draggingCard.mapId === map.id) {
           return;
         }
         event.preventDefault();
-        card.classList.add("mma-map-list__card--drag-over");
+        const rect = card.getBoundingClientRect();
+        const isAfter = event.clientY - rect.top > rect.height / 2;
+        card.classList.toggle("mma-map-list__card--drag-over", !isAfter);
+        card.classList.toggle("mma-map-list__card--drag-over-after", isAfter);
       });
       card.addEventListener("dragleave", () => {
         card.classList.remove("mma-map-list__card--drag-over");
+        card.classList.remove("mma-map-list__card--drag-over-after");
       });
       card.addEventListener("drop", (event) => {
         event.preventDefault();
+        const isAfter = card.classList.contains("mma-map-list__card--drag-over-after");
         card.classList.remove("mma-map-list__card--drag-over");
+        card.classList.remove("mma-map-list__card--drag-over-after");
         if (!draggingCard) {
           return;
         }
         const target = findSectionArray(sectionId);
-        const targetIndex = target ? target.indexOf(map.id) : 0;
-        moveMapTo(draggingCard.mapId, sectionId, targetIndex < 0 ? 0 : targetIndex);
+        let targetIndex = target ? target.indexOf(map.id) : 0;
+        if (targetIndex < 0) {
+          targetIndex = 0;
+        }
+        if (isAfter) {
+          targetIndex += 1;
+        }
+        if (target && draggingCard.fromSectionId === sectionId) {
+          const sourceIndex = target.indexOf(draggingCard.mapId);
+          if (sourceIndex !== -1 && sourceIndex < targetIndex) {
+            targetIndex -= 1;
+          }
+        }
+        moveMapTo(draggingCard.mapId, sectionId, targetIndex);
         draggingCard = null;
       });
     }
@@ -1326,10 +1350,19 @@
       cards.addEventListener("dragover", (event) => {
         if (draggingCard) {
           event.preventDefault();
+          if (event.target === cards) {
+            section.classList.add("mma-map-list__section--drop-target");
+          }
+        }
+      });
+      cards.addEventListener("dragleave", (event) => {
+        if (event.target === cards) {
+          section.classList.remove("mma-map-list__section--drop-target");
         }
       });
       cards.addEventListener("drop", (event) => {
         event.preventDefault();
+        section.classList.remove("mma-map-list__section--drop-target");
         if (!draggingCard) {
           return;
         }
