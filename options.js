@@ -26,6 +26,16 @@
       key: "mma-map-list-new-tab-enabled",
       defaultValue: true,
       input: document.querySelector("#map-list-new-tab")
+    },
+    mapListShowLocationCount: {
+      key: "mma-map-list-show-location-count",
+      defaultValue: true,
+      input: document.querySelector("#map-list-show-location-count")
+    },
+    mapListShowCountry: {
+      key: "mma-map-list-show-country",
+      defaultValue: true,
+      input: document.querySelector("#map-list-show-country")
     }
   };
   const URL_SETTING_PREFIX = "mma-pochipochi-default:";
@@ -52,6 +62,10 @@
       mapListTitle: "フォルダビューの動作",
       newTabName: "マップを別タブで開く",
       newTabDescription: "フォルダビューのマップ名をクリックしたとき、新しいタブで開きます。OFFにすると同じタブで開きます。",
+      showLocationCountName: "ロケーション数を表示",
+      showLocationCountDescription: "各マップカードに「{N} locs」のように収録ロケーション数を表示します。",
+      showCountryName: "国チップアイコンを表示",
+      showCountryDescription: "各マップカードに国旗（または未設定アイコン）を表示します。",
       mapListNote: "フォルダビュー自体をやめる場合は、上の「フォルダビュー」をOFFにしてください。",
       defaultsTitle: "ぽちぽちモードの初期状態",
       defaultOnName: "ONをデフォルトにする",
@@ -101,6 +115,10 @@
       mapListTitle: "Folder view behaviour",
       newTabName: "Open maps in a new tab",
       newTabDescription: "Opens a map in a new tab when you click its name in the folder view. Turn this off to open it in the same tab.",
+      showLocationCountName: "Show location count",
+      showLocationCountDescription: "Shows the number of locations on each map card, like “{N} locs”.",
+      showCountryName: "Show country chip icon",
+      showCountryDescription: "Shows the flag (or placeholder icon) on each map card.",
       mapListNote: "To stop using the folder view entirely, turn off “Folder view” above.",
       defaultsTitle: "Pochi-pochi mode default",
       defaultOnName: "Start with it on",

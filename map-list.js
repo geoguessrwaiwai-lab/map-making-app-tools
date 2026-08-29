@@ -16,6 +16,8 @@
   const FAVORITES_KEY = "mma-map-list-favorites";
   const COUNTRIES_KEY = "mma-map-list-countries";
   const TAGS_KEY = "mma-map-list-tags";
+  const SHOW_LOCATION_COUNT_KEY = "mma-map-list-show-location-count";
+  const SHOW_COUNTRY_KEY = "mma-map-list-show-country";
   const UNASSIGNED_ID = "__unassigned__";
   const FAVORITES_ID = "__favorites__";
   const LABEL_MAX_LENGTH = 24;
@@ -161,6 +163,8 @@
 
   let featureEnabled = true;
   let openInNewTab = true;
+  let showLocationCount = true;
+  let showCountry = true;
   let language = "en";
   let settingsLoaded = false;
   let contextInvalidated = false;
@@ -354,6 +358,8 @@
         TAGS_KEY,
         VIEW_MODE_KEY,
         NEW_TAB_KEY,
+        SHOW_LOCATION_COUNT_KEY,
+        SHOW_COUNTRY_KEY,
         LANGUAGE_KEY
       ]);
 
@@ -397,6 +403,8 @@
 
       viewMode = stored[VIEW_MODE_KEY] === "native" ? "native" : "custom";
       openInNewTab = stored[NEW_TAB_KEY] !== false;
+      showLocationCount = stored[SHOW_LOCATION_COUNT_KEY] !== false;
+      showCountry = stored[SHOW_COUNTRY_KEY] !== false;
       language = normalizeLanguage(stored[LANGUAGE_KEY]);
       refreshRegionNames();
 
@@ -413,6 +421,8 @@
       tagsData = defaultTagsData();
       viewMode = "custom";
       openInNewTab = true;
+      showLocationCount = true;
+      showCountry = true;
       language = defaultLanguage();
       return true;
     }
@@ -1034,7 +1044,16 @@
     if (!searchQuery) {
       return true;
     }
-    return map.name.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase());
+    const query = searchQuery.toLocaleLowerCase();
+    if (map.name.toLocaleLowerCase().includes(query)) {
+      return true;
+    }
+    const countryCode = countries[map.id];
+    if (!countryCode) {
+      return false;
+    }
+    const domainQuery = query.startsWith(".") ? query.slice(1) : query;
+    return countryCode.toLocaleLowerCase() === domainQuery;
   }
 
   function allSectionOptions() {
@@ -1123,18 +1142,20 @@
       });
     }
 
-    const countryCode = countries[map.id];
-    const country = document.createElement("button");
-    country.type = "button";
-    country.className = "mma-map-list__country" + (countryCode ? "" : " mma-map-list__country--empty");
-    country.textContent = countryCode ? flagFromCode(countryCode) : "📄";
-    country.title = countryCode ? t("countryChange", { name: nameForCode(countryCode) }) : t("countrySelect");
-    country.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      openCountryModal(map);
-    });
-    card.append(country);
+    if (showCountry) {
+      const countryCode = countries[map.id];
+      const country = document.createElement("button");
+      country.type = "button";
+      country.className = "mma-map-list__country" + (countryCode ? "" : " mma-map-list__country--empty");
+      country.textContent = countryCode ? flagFromCode(countryCode) : "📄";
+      country.title = countryCode ? t("countryChange", { name: nameForCode(countryCode) }) : t("countrySelect");
+      country.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openCountryModal(map);
+      });
+      card.append(country);
+    }
 
     if (favorites[map.id]) {
       const mark = document.createElement("span");
@@ -1150,10 +1171,12 @@
     link.textContent = map.name;
     card.append(link);
 
-    const count = document.createElement("span");
-    count.className = "mma-map-list__count";
-    count.textContent = t("locations", { count: map.locationCount.toLocaleString(localeTag()) });
-    card.append(count);
+    if (showLocationCount) {
+      const count = document.createElement("span");
+      count.className = "mma-map-list__count";
+      count.textContent = t("locations", { count: map.locationCount.toLocaleString(localeTag()) });
+      card.append(count);
+    }
 
     // 付与済みのタグだけを表示する。タグの付け外しは「⋯」メニューから行う。
     const tags = document.createElement("div");
@@ -1980,6 +2003,16 @@
     // 別タブで開く設定は、開いているページのカードにもすぐ反映する。
     if (Object.hasOwn(changes, NEW_TAB_KEY)) {
       openInNewTab = changes[NEW_TAB_KEY].newValue !== false;
+      render();
+    }
+
+    if (Object.hasOwn(changes, SHOW_LOCATION_COUNT_KEY)) {
+      showLocationCount = changes[SHOW_LOCATION_COUNT_KEY].newValue !== false;
+      render();
+    }
+
+    if (Object.hasOwn(changes, SHOW_COUNTRY_KEY)) {
+      showCountry = changes[SHOW_COUNTRY_KEY].newValue !== false;
       render();
     }
 
