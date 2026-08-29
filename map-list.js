@@ -485,7 +485,20 @@
   }
 
   function computeMapsSnapshot() {
-    return readMapsFromJsonBlock() ?? readMapsFromDom();
+    const fromJson = readMapsFromJsonBlock();
+    const fromDom = readMapsFromDom();
+    if (!fromJson) {
+      return fromDom;
+    }
+
+    // JSONブロックはフォルダ内のマップを含まないことがあるため、DOM側で見つかったが
+    // JSONブロックに無いマップ（フォルダ内のマップなど）を補完する。
+    for (const [id, map] of fromDom) {
+      if (!fromJson.has(id)) {
+        fromJson.set(id, map);
+      }
+    }
+    return fromJson;
   }
 
   /** マップIDから、ネイティブ一覧内の対応する編集ボタン（設定ダイアログを開く✎）を探す。 */
@@ -512,6 +525,56 @@
     return null;
   }
 
+  /** ネイティブのフォルダ要素からフォルダ名を読み取る。マークアップの揺れに対応するため複数の方法を試す。 */
+  function readNativeFolderLabel(folderEl) {
+    const attrLabel = folderEl.getAttribute("data-folder")?.trim();
+    if (attrLabel) {
+      return attrLabel;
+    }
+
+    const headEl = folderEl.querySelector(".map-folder__head");
+    const strongLabel = headEl?.querySelector("strong")?.textContent?.trim();
+    if (strongLabel) {
+      return strongLabel;
+    }
+
+    const labelEl = headEl?.querySelector("label");
+    if (labelEl) {
+      const countText = labelEl.querySelector(".map-list__folder-count")?.textContent ?? "";
+      const fullText = labelEl.textContent ?? "";
+      const stripped = countText ? fullText.slice(0, fullText.length - countText.length) : fullText;
+      const trimmed = stripped.trim();
+      if (trimmed) {
+        return trimmed;
+      }
+    }
+
+    return t("folderFallback");
+  }
+
+  /**
+   * ネイティブ側でフォルダのマップ(a.map-link)は即座に描画されるが、フォルダ名(data-folder等)の
+   * 反映がそれよりわずかに遅れることがあるため、初回のフォルダ取得を確定する前に
+   * 全フォルダの名前が読み取れる状態になるまで少し待つ。
+   */
+  async function waitForNativeFolderLabels() {
+    for (let attempt = 0; attempt < 15; attempt++) {
+      const rootList = nativeListEl?.querySelector("ul.map-list");
+      if (!rootList) {
+        return;
+      }
+      const folders = [...rootList.children].filter((child) => child.matches?.(".map-folder"));
+      if (folders.length === 0) {
+        return;
+      }
+      const allResolved = folders.every((folder) => readNativeFolderLabel(folder) !== t("folderFallback"));
+      if (allResolved) {
+        return;
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 200));
+    }
+  }
+
   /** 拡張機能側フォルダの初回自動生成用に、ネイティブのフォルダ構造を1回だけ読み取る。 */
   function readNativeFolderSeed() {
     const groups = [];
@@ -523,10 +586,7 @@
 
     for (const child of rootList.children) {
       if (child.matches?.(".map-folder")) {
-        const label =
-          child.getAttribute("data-folder") ||
-          child.querySelector(".map-folder__head strong")?.textContent?.trim() ||
-          t("folderFallback");
+        const label = readNativeFolderLabel(child);
         const ids = [];
         for (const link of child.querySelectorAll("a.map-link[href]")) {
           const match = link.getAttribute("href")?.match(/\/maps\/(\d+)/);
@@ -1888,6 +1948,13 @@
     const loaded = await loadAllData();
     if (!loaded || nativeListEl !== nextNativeList) {
       return;
+    }
+
+    if (!headingsData.initialized) {
+      await waitForNativeFolderLabels();
+      if (nativeListEl !== nextNativeList) {
+        return;
+      }
     }
 
     mapsById = computeMapsSnapshot();
