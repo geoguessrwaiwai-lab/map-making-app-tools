@@ -2,7 +2,17 @@
 
 このプロジェクトの主な変更はこのファイルに記録します。バージョン番号は`manifest.json`に合わせます。
 
-## [Unreleased]
+## [1.4.0] - 2026-08-30
+
+### Added
+
+- トップページ（`https://map-making.app/`）のマップ一覧に「フォルダビュー」を追加。ネイティブの一覧はそのまま保持し、フォルダでグループ化したカード表示を重ねる
+- フォルダの追加・名称変更・削除と、フォルダ・マップカードのドラッグ並び替え（自動スクロール対応）、フォルダを選択した状態での新規マップ作成
+- マップごとのお気に入り、国チップ（手動選択、`Intl.DisplayNames`表示。マップ名から一意に判定できる場合は自動設定）、複数付与できる色つきタグによる整理
+- カードの「⋯」メニューから、名前・フォルダ・タグをまとめて編集、GeoGuessrマップへのリンク設定、削除（取り消せない旨を明記した確認モーダルつき）
+- ネイティブのUpdates関連リンク・Log out／User settings・バージョン表記を1つのフッターへ統合し、変更履歴本文はポップアップでのみ表示
+- 表示言語の日本語／英語切り替え（初期値はブラウザの言語設定から判定、フォルダビューのフッターとオプション画面のどちらからでも変更可能）
+- フォルダビューの個別ON／OFF、マップ名を別タブで開くかどうか、マップカードにロケーション数と国チップアイコンを表示するかどうか（いずれも既定はON）の拡張機能オプション、いつでもネイティブ表示へ戻せるボタン
 
 ## [1.3.0] - 2026-08-18
 
@@ -54,7 +64,8 @@
 
 - 案内サイトを共通の`browser-extensions-site`リポジトリへ移行
 
-[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.0.0...v1.1.0
