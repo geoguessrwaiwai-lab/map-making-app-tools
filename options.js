@@ -37,6 +37,11 @@
       defaultValue: true,
       input: document.querySelector("#map-list-show-country"),
     },
+    tagGroups: {
+      key: "mma-feature-tag-groups-enabled",
+      defaultValue: true,
+      input: document.querySelector("#tag-groups-enabled"),
+    },
   };
   const URL_SETTING_PREFIX = "mma-pochipochi-default:";
   const LANGUAGE_KEY = "mma-language";
@@ -65,6 +70,9 @@
       folderViewName: "フォルダビュー",
       folderViewDescription:
         "トップページのマップ一覧を、フォルダ・お気に入り・タグ・国チップつきのカード表示に切り替えます。",
+      tagGroupsName: "タググループ",
+      tagGroupsDescription:
+        "Tagsパネルの見た目はそのままに、タグをグループ単位で絞り込めるようにします。",
       mapListTitle: "フォルダビューの動作",
       newTabName: "マップを別タブで開く",
       newTabDescription:
@@ -131,6 +139,9 @@
       folderViewName: "Folder view",
       folderViewDescription:
         "Turns the map list on the home page into cards grouped by folder, with favourites, tags and country chips.",
+      tagGroupsName: "Tag groups",
+      tagGroupsDescription:
+        "Lets you filter tags by group while leaving the Tags panel looking the same.",
       mapListTitle: "Folder view behaviour",
       newTabName: "Open maps in a new tab",
       newTabDescription:

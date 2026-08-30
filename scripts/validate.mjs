@@ -7,9 +7,11 @@ const REQUIRED_EXTENSION_FILES = [
   "pochipochi-bridge.js",
   "pochipochi.js",
   "map-list.js",
+  "tag-groups.js",
   "resize.css",
   "pochipochi.css",
   "map-list.css",
+  "tag-groups.css",
   "options.html",
   "options.css",
   "options.js",
@@ -79,8 +81,8 @@ assert(
   "manifest version must use MAJOR.MINOR.PATCH"
 );
 assert(
-  manifest.version === "1.4.0",
-  "the release package must remain version 1.4.0"
+  manifest.version === "1.5.0",
+  "the release package must remain version 1.5.0"
 );
 assert(
   manifest.default_locale === "ja",
@@ -135,12 +137,17 @@ assert(
 );
 assert(
   Array.isArray(manifest.content_scripts) &&
-    manifest.content_scripts.length === 4,
-  "exactly four content script definitions are required"
+    manifest.content_scripts.length === 5,
+  "exactly five content script definitions are required"
 );
 
-const [resizeScript, pochipochiBridgeScript, pochipochiScript, mapListScript] =
-  manifest.content_scripts;
+const [
+  resizeScript,
+  pochipochiBridgeScript,
+  pochipochiScript,
+  mapListScript,
+  tagGroupsScript,
+] = manifest.content_scripts;
 assert(
   JSON.stringify(resizeScript.matches) ===
     JSON.stringify(["https://map-making.app/maps/*"]),
@@ -223,6 +230,27 @@ assert(
   !Object.hasOwn(mapListScript, "world"),
   "map-list.js must run in the isolated world"
 );
+assert(
+  JSON.stringify(tagGroupsScript.matches) ===
+    JSON.stringify(["https://map-making.app/maps/*"]),
+  "the tag groups content script matches must remain limited to Map Making App map paths"
+);
+assert(
+  JSON.stringify(tagGroupsScript.js) === JSON.stringify(["tag-groups.js"]),
+  "the tag groups content script entry point must be tag-groups.js"
+);
+assert(
+  JSON.stringify(tagGroupsScript.css) === JSON.stringify(["tag-groups.css"]),
+  "the tag groups stylesheet must be tag-groups.css"
+);
+assert(
+  tagGroupsScript.run_at === "document_idle",
+  "the tag groups content script must run at document_idle"
+);
+assert(
+  !Object.hasOwn(tagGroupsScript, "world"),
+  "tag-groups.js must run in the isolated world"
+);
 
 for (const path of Object.values(manifest.icons ?? {})) {
   assert(fs.existsSync(path), `Missing icon referenced by manifest: ${path}`);
@@ -232,6 +260,7 @@ const resizeSource = fs.readFileSync("resize.js", "utf8");
 const pochipochiBridgeSource = fs.readFileSync("pochipochi-bridge.js", "utf8");
 const pochipochiSource = fs.readFileSync("pochipochi.js", "utf8");
 const mapListSource = fs.readFileSync("map-list.js", "utf8");
+const tagGroupsSource = fs.readFileSync("tag-groups.js", "utf8");
 const resizeStyles = fs.readFileSync("resize.css", "utf8");
 const pochipochiStyles = fs.readFileSync("pochipochi.css", "utf8");
 const mapListStyles = fs.readFileSync("map-list.css", "utf8");
@@ -350,6 +379,24 @@ assert(
   "map count breakpoint offset must apply to both map metadata controls"
 );
 
+new vm.Script(tagGroupsSource, { filename: "tag-groups.js" });
+assert(
+  tagGroupsSource.includes("/^\\/maps\\/\\d+\\/?$/"),
+  "tag group runtime path check must remain limited to numeric map IDs"
+);
+assert(
+  tagGroupsSource.includes('const EDITOR_SELECTOR = ".page-map-editor"'),
+  "tag groups must only attach inside the map editor"
+);
+assert(
+  tagGroupsSource.includes('const TAG_MANAGER_SELECTOR = ".tag-manager"'),
+  "tag groups must attach to the site's own Tags panel"
+);
+assert(
+  tagGroupsSource.includes("GROUPS_KEY_PREFIX"),
+  "tag group definitions must be namespaced per map URL"
+);
+
 const forbiddenPatterns = [
   ["fetch", /\bfetch\s*\(/],
   ["XMLHttpRequest", /\bXMLHttpRequest\b/],
@@ -367,6 +414,7 @@ for (const [name, pattern] of forbiddenPatterns) {
   );
   assert(!pattern.test(pochipochiSource), `pochipochi.js must not use ${name}`);
   assert(!pattern.test(mapListSource), `map-list.js must not use ${name}`);
+  assert(!pattern.test(tagGroupsSource), `tag-groups.js must not use ${name}`);
   assert(!pattern.test(optionsSource), `options.js must not use ${name}`);
 }
 
@@ -618,6 +666,10 @@ assert(
   "the options page must show the folder view switch"
 );
 assert(
+  optionsHtml.includes('id="tag-groups-enabled"'),
+  "the options page must show the tag groups feature switch"
+);
+assert(
   optionsHtml.includes('id="map-list-new-tab"'),
   "the options page must show the open-in-new-tab switch"
 );
@@ -666,6 +718,10 @@ assert(
 assert(
   optionsSource.includes('key: "mma-feature-map-list-enabled"'),
   "the options page must control the folder view feature"
+);
+assert(
+  optionsSource.includes('key: "mma-feature-tag-groups-enabled"'),
+  "the options page must control the tag groups feature"
 );
 assert(
   optionsSource.includes('key: "mma-map-list-new-tab-enabled"'),

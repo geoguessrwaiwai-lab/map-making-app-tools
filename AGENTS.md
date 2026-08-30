@@ -6,7 +6,7 @@
 
 1. 外部ライブラリを使わない最小構成を維持する。
 2. 対象URLを`https://map-making.app/maps/数字`（マップ編集画面）と`https://map-making.app/`（トップページのマップ一覧）に限定する。
-3. マップ編集画面では`.page-map-editor`以外のグリッドへ、トップページでは`[data-replace="InteractiveMapList"]`、`section.updates`（フッターへの再配置と更新履歴の折りたたみ）、および`.page-map-list`のレイアウト（Updates折りたたみ時に「Your Maps」列へ幅を譲る調整）以外の要素へ介入しない。
+3. マップ編集画面では`.page-map-editor`以外のグリッドとTagsパネル（`.tag-manager`）以外の要素へ、トップページでは`[data-replace="InteractiveMapList"]`、`section.updates`（フッターへの再配置と更新履歴の折りたたみ）、および`.page-map-list`のレイアウト（Updates折りたたみ時に「Your Maps」列へ幅を譲る調整）以外の要素へ介入しない。
 4. 既存のグリッドエリアと行構成を変更しない。
 5. 権限、外部通信、データ収集を追加しない。必要な場合は実装前にユーザーへ確認する。
 6. Map Making Appの公式製品と誤認させる名称、説明、画像を追加しない。
@@ -21,6 +21,7 @@ resize.js / resize.css                  画面幅リサイズ（ISOLATED world, 
 pochipochi.js                           ぽちぽちモード本体（MAIN world, /maps/数字）
 pochipochi-bridge.js / pochipochi.css   ぽちぽちモードの設定を分離ストレージへ橋渡し（ISOLATED world, /maps/数字）
 map-list.js / map-list.css              トップページのフォルダビュー（ISOLATED world, /）
+tag-groups.js / tag-groups.css          Tagsパネルのタググループ（ISOLATED world, /maps/数字）
 options.html / options.css / options.js 拡張機能の設定画面
 _locales/ja/messages.json               ストア掲載用の商品名・概要（日本語、default_locale）
 _locales/en/messages.json               ストア掲載用の商品名・概要（英語）
@@ -76,6 +77,17 @@ MAIN worldとISOLATED worldに分かれているのは、Map Making App本体の
 - フォルダ・並び順・お気に入り・国・タグは、マップURLに紐づかないアカウント単位の設定として保存する
 - 文言は`t("key")`/`data-i18n`で参照し、`MESSAGES`に日本語（`ja`）・英語（`en`）の両方を必ず定義する（`scripts/validate.mjs`が検証する）
 
+### タググループ（tag-groups.js / tag-groups.css）
+
+マップ編集画面のTagsパネル（`.tag-manager`）の見た目・構造は変更せず、グループ単位の絞り込みUIを追加する。
+
+- 対象URLは`/^\/maps\/\d+\/?$/`にだけ限定し、`.page-map-editor`（`EDITOR_SELECTOR`）の内側でのみ取り付ける
+- グループの定義（グループ名とタグの所属）はマップURLをキーに保存する（`GROUPS_KEY_PREFIX`）
+- 常時表示の「未分類」フィルター、部分一致検索と一括選択つきのタグ紐づけモーダル、既存タグをグループチップへドラッグ&ドロップして紐づける操作に対応する
+- 各グループのチェックボックスは、そのグループのタグをMap Making App本来の選択状態（`is-selected`）へ一括で切り替える（解除も可能）
+- タブを開いた直後などTagsパネルがまだ読み込み中で一覧が空の間は、グループ所属を消去しない。一覧から消えたタグは2回続けて見当たらないことを確認してから登録簿とグループ所属から外す
+- 拡張機能の設定でOFFにできる（`mma-feature-tag-groups-enabled`）
+
 ## 実装と文言
 
 - 実装のコメントは日本語で記載する。
@@ -121,9 +133,15 @@ MAIN worldとISOLATED worldに分かれているのは、Map Making App本体の
 15. マップ名のクリックで別タブが開き、オプション画面でOFFにすると同じタブで開く
 16. フッター右下とオプション画面のどちらで言語を変えても、両方の表示が日本語／英語に切り替わる
 
+**タググループ**
+
+17. Tagsパネルでグループの作成・編集・削除ができ、グループ単位でタグを絞り込める
+18. グループのチェックボックスで、そのグループのタグをまとめて選択・解除できる
+19. タブを開いた直後にタグ一覧が空の状態から復帰しても、グループ所属が消えない
+
 **共通**
 
-17. オプション画面で各機能を個別に無効化できる
+20. オプション画面で各機能を個別に無効化できる
 
 ## リリース
 
