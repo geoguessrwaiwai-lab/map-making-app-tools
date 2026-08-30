@@ -1069,57 +1069,158 @@
     input.dispatchEvent(new Event("input", { bubbles: true }));
   }
 
-  /** マップ名の入力欄に値を書き込み、その場でネイティブの保存ボタンを押す。 */
-  function submitNativeRenameForm(dialog, name) {
-    const input = dialog.querySelector(".edit-map-modal__rename input.input");
-    const submitButton = dialog.querySelector(
-      '.edit-map-modal__rename button[type="submit"]'
-    );
-    if (!input || !submitButton) {
+  function findNativeRenameInput(dialog) {
+    return dialog.querySelector(".edit-map-modal__rename input.input");
+  }
+
+  /** リンクURL欄には専用のclassが無いため、URL用のpattern属性を持つ入力欄を目印に探す。 */
+  function findNativeGeoLinkInput(dialog) {
+    return dialog.querySelector('input[pattern*="geoguessr"]');
+  }
+
+  /** 再描画でノードが差し替わるため、ダイアログは操作の直前に取り直す。 */
+  function currentNativeEditDialog(fallback) {
+    return findNativeEditDialog() || fallback;
+  }
+
+  function wait(ms) {
+    return new Promise((resolve) => window.setTimeout(resolve, ms));
+  }
+
+  function ensureNativeInputValue(input, value) {
+    if (!input || value === undefined || input.value === value) {
+      return;
+    }
+    setNativeInputValue(input, value);
+  }
+
+  /** 入力欄が属するフォームを送信する。保存ボタンが無効な場合はフォーム自体の送信で代替する。 */
+  function submitNativeForm(input) {
+    const form = input?.closest("form");
+    if (!form) {
       return false;
     }
-    setNativeInputValue(input, name);
-    submitButton.click();
-    return true;
+    const submitButton = form.querySelector('button[type="submit"]');
+    if (submitButton && !submitButton.disabled) {
+      submitButton.click();
+      return true;
+    }
+    if (typeof form.requestSubmit === "function") {
+      form.requestSubmit();
+      return true;
+    }
+    return false;
+  }
+
+  /** ダイアログがDOMから消えるまで待つ（開き直す前に、閉じかけの古いダイアログを掴まないため）。 */
+  function waitForNativeEditDialogGone(timeoutMs = 2000) {
+    if (!findNativeEditDialog()) {
+      return Promise.resolve(true);
+    }
+    return new Promise((resolve) => {
+      const observer = new MutationObserver(() => {
+        if (!findNativeEditDialog()) {
+          observer.disconnect();
+          window.clearTimeout(timer);
+          resolve(true);
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      const timer = window.setTimeout(() => {
+        observer.disconnect();
+        resolve(false);
+      }, timeoutMs);
+    });
+  }
+
+  /** 名前の保存がサイト側のデータへ反映されるのを待つ間隔（合計約2秒まで様子を見る）。 */
+  const NATIVE_SAVE_SETTLE_DELAYS_MS = [200, 400, 800, 1600];
+
+  /** ダイアログを開いて入力欄を1つだけ書き換え、その場で保存する。 */
+  async function submitNativeDialogField(revealed, findInput, value) {
+    ensureNativeInputValue(
+      findInput(currentNativeEditDialog(revealed.dialog)),
+      value
+    );
+    // 書き込みによる再描画を挟んでから、保存ボタンを取り直して押す。
+    await wait(0);
+    ensureNativeInputValue(
+      findInput(currentNativeEditDialog(revealed.dialog)),
+      value
+    );
+    return submitNativeForm(
+      findInput(currentNativeEditDialog(revealed.dialog))
+    );
+  }
+
+  async function closeNativeEditDialogAndWait(revealed) {
+    closeNativeEditDialog(
+      currentNativeEditDialog(revealed.dialog),
+      revealed.stopGuarding
+    );
+    await waitForNativeEditDialogGone();
   }
 
   /**
-   * GeoGuessrマップへのリンクURL欄に値を書き込み、その場でネイティブの保存ボタンを押す。
-   * このフォームには専用のclassが無いため、URL用のpattern属性を持つ入力欄を目印に探す。
+   * 名前・GeoGuessrリンクの変更を、ネイティブの設定ダイアログへ委譲する。
+   *
+   * 旧UIの保存は、送信したフォーム自身の入力欄以外の項目を、ダイアログを開いた時点で読み込んで
+   * いたデータから組み立てて送る。そのため1回の保存で両方を反映することはできず、名前を保存 →
+   * サイト側のデータが新しい名前へ更新されるのを待つ → ダイアログを開き直してリンクを保存、と
+   * 1項目ずつ順番に進める。開き直したダイアログの名前入力欄が新しい名前になっていることが、
+   * 更新が届いた確証になる（この入力欄も同じデータから作られるため）。確証が得られないまま
+   * リンクを保存すると名前が古い値へ巻き戻るので、その場合はリンクの保存を見送る。
    */
-  function submitNativeGeoLinkForm(dialog, url) {
-    const input = dialog.querySelector('input[pattern*="geoguessr"]');
-    const submitButton = input
-      ?.closest("form")
-      ?.querySelector('button[type="submit"]');
-    if (!input || !submitButton) {
-      return false;
-    }
-    setNativeInputValue(input, url);
-    submitButton.click();
-    return true;
-  }
-
-  /** 名前・GeoGuessrリンクの変更を、同じネイティブの設定ダイアログへまとめて委譲する。 */
   async function applyMapEditsViaNativeDialog(
     mapId,
     { name, geoguessrUrl } = {}
   ) {
-    const revealed = await revealNativeEditDialog(mapId);
-    if (!revealed) {
-      return { renamed: false, linked: false };
+    let renamed = false;
+
+    if (name !== undefined) {
+      const revealed = await revealNativeEditDialog(mapId);
+      if (!revealed) {
+        return { renamed: false, linked: false };
+      }
+      renamed = await submitNativeDialogField(
+        revealed,
+        findNativeRenameInput,
+        name
+      );
+      await closeNativeEditDialogAndWait(revealed);
     }
-    const { dialog, stopGuarding } = revealed;
 
-    const renamed =
-      name !== undefined ? submitNativeRenameForm(dialog, name) : false;
-    const linked =
-      geoguessrUrl !== undefined
-        ? submitNativeGeoLinkForm(dialog, geoguessrUrl)
-        : false;
+    if (geoguessrUrl === undefined) {
+      return { renamed, linked: false };
+    }
 
-    closeNativeEditDialog(dialog, stopGuarding);
-    return { renamed, linked };
+    // 名前を保存した直後だけ、新しい名前が読み込まれるのを待ってからリンクを保存する。
+    const settleDelays = renamed ? NATIVE_SAVE_SETTLE_DELAYS_MS : [0];
+    for (const settleMs of settleDelays) {
+      await wait(settleMs);
+      const revealed = await revealNativeEditDialog(mapId);
+      if (!revealed) {
+        break;
+      }
+      const dialog = currentNativeEditDialog(revealed.dialog);
+      if (renamed && findNativeRenameInput(dialog)?.value !== name) {
+        // まだ古い名前のまま。ここで保存すると名前が巻き戻るため、閉じてもう一度待つ。
+        await closeNativeEditDialogAndWait(revealed);
+        continue;
+      }
+      const linked = await submitNativeDialogField(
+        revealed,
+        findNativeGeoLinkInput,
+        geoguessrUrl
+      );
+      closeNativeEditDialog(
+        currentNativeEditDialog(revealed.dialog),
+        revealed.stopGuarding
+      );
+      return { renamed, linked };
+    }
+
+    return { renamed, linked: false };
   }
 
   /**
