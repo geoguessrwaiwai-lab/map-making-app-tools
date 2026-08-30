@@ -4,6 +4,7 @@ VERSION := $(shell node -p "require('./manifest.json').version")
 DIST_DIR := dist
 PACKAGE := $(DIST_DIR)/map-making-app-tools-$(VERSION).zip
 UNPACKED_DIR := $(DIST_DIR)/map-making-app-tools-unpacked
+LOCALES := _locales/ja/messages.json _locales/en/messages.json
 SOURCES := manifest.json resize.js pochipochi-bridge.js pochipochi.js map-list.js tag-groups.js resize.css pochipochi.css map-list.css tag-groups.css options.html options.css options.js icon16.png icon32.png icon48.png icon128.png
 
 .PHONY: package unpacked validate format format-check clean
@@ -17,6 +18,10 @@ unpacked: validate
 	@rm -rf "$(UNPACKED_DIR)"
 	@mkdir -p "$(UNPACKED_DIR)"
 	@cp $(SOURCES) "$(UNPACKED_DIR)/"
+	@for locale in $(LOCALES); do \
+		mkdir -p "$(UNPACKED_DIR)/$$(dirname $$locale)"; \
+		cp "$$locale" "$(UNPACKED_DIR)/$$locale"; \
+	done
 	@echo "Created: $(UNPACKED_DIR)"
 
 # プロジェクト構造、JavaScript、Manifest、プライバシー上の不変条件、フォーマットを検証する。
@@ -31,10 +36,11 @@ format:
 format-check:
 	@npx prettier --check .
 
-$(PACKAGE): $(SOURCES)
+$(PACKAGE): $(SOURCES) $(LOCALES)
 	@mkdir -p "$(DIST_DIR)"
 	@rm -f "$(PACKAGE)"
 	@zip -j -q "$(PACKAGE)" $(SOURCES)
+	@zip -q "$(PACKAGE)" $(LOCALES)
 
 clean:
 	@rm -rf "$(UNPACKED_DIR)"

@@ -4,7 +4,81 @@ Map Making App Tools `1.4.0` のChrome Web Store提出用情報です。
 
 ホームページはCloudflare Workersで公開しています。
 
+## 提出フォームに貼り付ける項目
+
+Chrome Web Storeのダッシュボードで入力する4項目です。項目名はダッシュボードの表記に合わせています。
+
+### 商品の詳細（日本語・デフォルト）
+
+```text
+Map Making App Toolsは、Map Making Appのマップ編集画面の幅調整、ロケーションの連続確認、トップページのマップ一覧の整理を支援するChrome拡張機能です。
+
+編集画面の中央に表示されるハンドルをドラッグすると、地図と作業エリアの幅を25%〜75%の範囲で変更できます。タグ編集などで右側を広く使いたい場合や、地図を大きく確認したい場合に、作業内容に合った幅へすぐに調整できます。
+
+「ぽちぽちモード」をONにすると、現在のマップの保存状態を汚すことなく、新しい地点を連続して選択し、閲覧できます。もとから保存されている地点は保護されるため、既存のロケーションを残したまま、新しく確認した候補を続けて整理できます。
+
+トップページのマップ一覧には「フォルダビュー」を追加しました。ネイティブの一覧の見た目・機能を変えずに視覚的に隠し、フォルダでグループ化したカード表示を重ねます。フォルダの追加・並び替え、マップのお気に入り・国チップ・タグ付けができ、編集・削除やマップ作成はMap Making App本体の操作に委譲します。表示言語（日本語／英語）や、マップカードのロケーション数・国チップアイコンの表示は設定で切り替えられます。フッターからいつでもネイティブの表示へ戻せます。
+
+外部通信、広告、分析ツール、Cookie、外部JavaScriptは使用しません。拡張機能専用ストレージには、機能別設定、ぽちぽちモードの全体デフォルト、対象のマップURLとURL別のON／OFF、フォルダビューのフォルダ構成・フォルダとマップの並び順・お気に入り・国チップ・タグ・表示言語・表示設定だけを保存します。地点ID、pano ID、座標はページ内で一時的に処理し、保存または外部送信しません。
+
+本拡張機能は非公式であり、Map Making Appまたはその運営者との提携、承認、関係を示すものではありません。
+```
+
+### 商品の詳細（English）
+
+```text
+Map Making App Tools is a Chrome extension that helps you adjust the Map Making App editor width, review locations in sequence, and organize the map list on the home page.
+
+Drag the handle in the center of the editor to adjust the widths of the map and work area within a range of 25% to 75%. Whether you need more room on the right for tasks such as editing tags or a larger map for closer inspection, you can quickly resize the screen to suit your work. The import control is automatically hidden below 500 px and the total display below 300 px; each reappears when the map returns to its respective threshold or wider. When the location count is present, these thresholds increase to 560 px and 360 px, respectively.
+
+Turn on Pochi-pochi mode to continuously select and view new locations without cluttering the current map's saved state. Locations that were already saved remain protected, so you can continue reviewing and organizing new candidates while keeping existing locations intact.
+
+The map list on the home page now has a folder view. It visually hides the native list without changing its behavior, and overlays a card layout grouped by user-defined folders. You can add and reorder folders, favorite maps, and assign a country chip and tags to each map, while editing, deleting, and creating maps still delegate to Map Making App's own controls. Settings let you switch the display language (Japanese or English) and choose whether map cards show location counts and country chip icons. You can return to the native list from the footer at any time.
+
+The extension does not use external network requests, advertising, analytics tools, cookies, or remote JavaScript. Extension-local storage contains only feature settings, the global Pochi-pochi mode default, the target map URL, the URL-specific ON/OFF setting, and the folder view's folders, the order of folders and maps, favorites, country chips, tags, display language, and display preferences. Location IDs, pano IDs, and coordinates are processed temporarily within the page and are neither stored nor transmitted externally.
+
+This is an unofficial extension and is not affiliated with, endorsed by, or otherwise associated with Map Making App or its operators.
+```
+
+### 単一用途
+
+```text
+Map Making Appの自分のマップを扱う画面の表示を、利用者が扱いやすいように調整できるようにすること。具体的には、編集画面で左右の画面幅を調整すること、利用者が明示的に有効化した間だけ新しく確認したロケーションを次の選択時に削除すること、トップページのマップ一覧を利用者が決めたフォルダで分類して表示することです。
+```
+
+### 単一用途（English）
+
+```text
+Let users adjust how their own Map Making App maps are presented: resize the editor screen widths, delete each newly reviewed location when selecting the next one while the mode is explicitly enabled, and group the home page map list into folders the user defines.
+```
+
+### 権限が必要な理由（`storage`が必要な理由）
+
+```text
+機能別の有効・無効、ぽちぽちモードの全体デフォルト、現在のマップURLをキーとしたON／OFF、およびフォルダビューのフォルダ構成・フォルダとマップの並び順・お気に入り・国チップ・タグ・表示言語・表示設定を拡張機能専用のローカルストレージへ保存するために使用します。地点ID、pano ID、座標、選択履歴、マップ名は保存しません。
+```
+
+### 権限が必要な理由（`storage`が必要な理由・English）
+
+```text
+The storage permission saves feature enable/disable preferences, the global Pochi-pochi default, the ON/OFF value keyed by the current map URL, and the folder view's folders, the order of folders and maps, favorites, country chips, tags, display language, and display preferences. It does not store location IDs, pano IDs, coordinates, selection history, or map names.
+```
+
+### 権限が必要な理由（ホスト権限が必要な理由）
+
+```text
+本拡張機能はhttps://map-making.app/maps/*とhttps://map-making.app/でのみコンテンツスクリプトを実行します。対象ページの編集グリッドとロケーションプレビュー、またはトップページのマップ一覧を検出し、画面幅を調整し、ぽちぽちモード中の地点変更と削除を処理し、マップ一覧にフォルダビューを重ねるために必要です。地点ID、pano ID、座標、マップ名・ID・地点数はページ内で一時的に処理するだけで、収集、保存、送信しません。
+```
+
+### 権限が必要な理由（ホスト権限が必要な理由・English）
+
+```text
+The content scripts run only on https://map-making.app/maps/* and https://map-making.app/ so they can adjust the editor screen width, detect location changes for Pochi-pochi mode, and overlay the folder view on the map list. Location IDs, pano IDs, coordinates, and map names/IDs/location counts are processed temporarily in page memory and are not collected, stored, or transmitted.
+```
+
 ## 基本情報（日本語・デフォルト）
+
+商品名と概要は`_locales/ja/messages.json`・`_locales/en/messages.json`の`extName`／`extDescription`から配信されるため、ダッシュボードでは入力しません。以下は同梱している文面です。ダッシュボードの言語ドロップダウンには`_locales`に含めたロケール（日本語・英語）だけが並び、選んだ言語ごとに詳細な説明・スクリーンショット・プロモーション動画を入力します。
 
 ### 商品名
 
@@ -16,22 +90,6 @@ Map Making App Tools
 
 ```text
 Map Making Appの画面幅調整、ロケーション整理、マップ一覧のフォルダ分けを使いやすくします。
-```
-
-### 詳細な説明
-
-```text
-Map Making App Toolsは、Map Making Appのマップ編集画面の幅調整、ロケーションの連続確認、トップページのマップ一覧の整理を支援するChrome拡張機能です。
-
-編集画面の中央に表示されるハンドルをドラッグすると、地図と作業エリアの幅を25%〜75%の範囲で変更できます。タグ編集などで右側を広く使いたい場合や、地図を大きく確認したい場合に、作業内容に合った幅へすぐに調整できます。地図が500px未満になるとインポート操作を、300px未満になると合計表示を自動的に隠し、それぞれの幅以上に戻ると再表示します。地点数表示がある場合の境界は、それぞれ560pxと360pxです。
-
-「ぽちぽちモード」をONにすると、現在のマップの保存状態を汚すことなく、新しい地点を連続して選択し、閲覧できます。もとから保存されている地点は保護されるため、既存のロケーションを残したまま、新しく確認した候補を続けて整理できます。
-
-トップページのマップ一覧には「フォルダビュー」を追加しました。ネイティブの一覧の見た目・機能を変えずに視覚的に隠し、フォルダでグループ化したカード表示を重ねます。フォルダの追加・並び替え、マップのお気に入り・国チップ・タグ付けができ、編集・削除やマップ作成はMap Making App本体の操作に委譲します。表示言語（日本語／英語）や、マップカードのロケーション数・国チップアイコンの表示は設定で切り替えられます。フッターからいつでもネイティブの表示へ戻せます。
-
-外部通信、広告、分析ツール、Cookie、外部JavaScriptは使用しません。拡張機能専用ストレージには、機能別設定、ぽちぽちモードの全体デフォルト、対象のマップURLとURL別のON／OFF、フォルダビューのフォルダ構成・フォルダとマップの並び順・お気に入り・国チップ・タグ・表示言語・表示設定だけを保存します。地点ID、pano ID、座標はページ内で一時的に処理し、保存または外部送信しません。
-
-本拡張機能は非公式であり、Map Making Appまたはその運営者との提携、承認、関係を示すものではありません。
 ```
 
 ### カテゴリと言語
@@ -54,22 +112,6 @@ Map Making App Tools
 Adjust the editor screen width, streamline location cleanup, and group your map list into folders in Map Making App.
 ```
 
-### Detailed description
-
-```text
-Map Making App Tools is a Chrome extension that helps you adjust the Map Making App editor width, review locations in sequence, and organize the map list on the home page.
-
-Drag the handle in the center of the editor to adjust the widths of the map and work area within a range of 25% to 75%. Whether you need more room on the right for tasks such as editing tags or a larger map for closer inspection, you can quickly resize the screen to suit your work. The import control is automatically hidden below 500 px and the total display below 300 px; each reappears when the map returns to its respective threshold or wider. When the location count is present, these thresholds increase to 560 px and 360 px, respectively.
-
-Turn on Pochi-pochi mode to continuously select and view new locations without cluttering the current map's saved state. Locations that were already saved remain protected, so you can continue reviewing and organizing new candidates while keeping existing locations intact.
-
-The map list on the home page now has a folder view. It visually hides the native list without changing its behavior, and overlays a card layout grouped by user-defined folders. You can add and reorder folders, favorite maps, and assign a country chip and tags to each map, while editing, deleting, and creating maps still delegate to Map Making App's own controls. Settings let you switch the display language (Japanese or English) and choose whether map cards show location counts and country chip icons. You can return to the native list from the footer at any time.
-
-The extension does not use external network requests, advertising, analytics tools, cookies, or remote JavaScript. Extension-local storage contains only feature settings, the global Pochi-pochi mode default, the target map URL, the URL-specific ON/OFF setting, and the folder view's folders, the order of folders and maps, favorites, country chips, tags, display language, and display preferences. Location IDs, pano IDs, and coordinates are processed temporarily within the page and are neither stored nor transmitted externally.
-
-This is an unofficial extension and is not affiliated with, endorsed by, or otherwise associated with Map Making App or its operators.
-```
-
 ## URL
 
 - Chrome Web Store: `https://chromewebstore.google.com/detail/flhepjgbbcielemfkkkfimcfhgfomofj?utm_source=item-share-cb`
@@ -80,42 +122,6 @@ This is an unofficial extension and is not affiliated with, endorsed by, or othe
 - サポート: `https://github.com/geoguessrwaiwai-lab/map-making-app-tools/issues`
 
 ## プライバシーに関する取り組み
-
-### 単一用途
-
-```text
-Map Making Appの自分のマップを扱う画面の表示を、利用者が扱いやすいように調整できるようにすること。具体的には、編集画面で左右の画面幅を調整すること、利用者が明示的に有効化した間だけ新しく確認したロケーションを次の選択時に削除すること、トップページのマップ一覧を利用者が決めたフォルダで分類して表示することです。
-```
-
-### Single purpose (English)
-
-```text
-Let users adjust how their own Map Making App maps are presented: resize the editor screen widths, delete each newly reviewed location when selecting the next one while the mode is explicitly enabled, and group the home page map list into folders the user defines.
-```
-
-### サイトアクセスの理由
-
-```text
-本拡張機能はhttps://map-making.app/maps/*とhttps://map-making.app/でのみコンテンツスクリプトを実行します。対象ページの編集グリッドとロケーションプレビュー、またはトップページのマップ一覧を検出し、画面幅を調整し、ぽちぽちモード中の地点変更と削除を処理し、マップ一覧にフォルダビューを重ねるために必要です。地点ID、pano ID、座標、マップ名・ID・地点数はページ内で一時的に処理するだけで、収集、保存、送信しません。
-```
-
-### Host access justification (English)
-
-```text
-The content scripts run only on https://map-making.app/maps/* and https://map-making.app/ so they can adjust the editor screen width, detect location changes for Pochi-pochi mode, and overlay the folder view on the map list. Location IDs, pano IDs, coordinates, and map names/IDs/location counts are processed temporarily in page memory and are not collected, stored, or transmitted.
-```
-
-### `storage`権限の理由
-
-```text
-機能別の有効・無効、ぽちぽちモードの全体デフォルト、現在のマップURLをキーとしたON／OFF、およびフォルダビューのフォルダ構成・フォルダとマップの並び順・お気に入り・国チップ・タグ・表示言語・表示設定を拡張機能専用のローカルストレージへ保存するために使用します。地点ID、pano ID、座標、選択履歴、マップ名は保存しません。
-```
-
-### `storage` permission justification (English)
-
-```text
-The storage permission saves feature enable/disable preferences, the global Pochi-pochi default, the ON/OFF value keyed by the current map URL, and the folder view's folders, the order of folders and maps, favorites, country chips, tags, display language, and display preferences. It does not store location IDs, pano IDs, coordinates, selection history, or map names.
-```
 
 ### リモートコード
 

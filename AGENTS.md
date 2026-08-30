@@ -23,6 +23,8 @@ pochipochi-bridge.js / pochipochi.css   ぽちぽちモードの設定を分離�
 map-list.js / map-list.css              トップページのフォルダビュー（ISOLATED world, /）
 tag-groups.js / tag-groups.css          Tagsパネルのタググループ（ISOLATED world, /maps/数字）
 options.html / options.css / options.js 拡張機能の設定画面
+_locales/ja/messages.json               ストア掲載用の商品名・概要（日本語、default_locale）
+_locales/en/messages.json               ストア掲載用の商品名・概要（英語）
 scripts/validate.mjs                    構造・構文・安全性の検証（機能ごとにファイルを読み分けて検証する）
 Makefile                                検証・ZIP生成
 ```
@@ -98,6 +100,8 @@ MAIN worldとISOLATED worldに分かれているのは、Map Making App本体の
 - **指示された作業（タスク）が完了するたびに、コミット・pushの前に必ず`make unpacked`を実行し、`dist/map-making-app-tools-unpacked`を最新の状態にする。実行したことをユーザーへの返信で明示的に伝える。**
 - JavaScript/CSS/HTMLはPrettierで統一している。手で整形せず`make format`を使い、`make validate`（内部で`make format-check`を実行）が通ることを確認する。Prettierは`devDependencies`のみで、拡張機能本体にはバンドルされないため「外部ライブラリを使わない」方針には反しない。
 - `scripts/validate.mjs`で検証している対象URL、権限なし、外部通信なしの不変条件を弱めない。ファイルを分割・改名した場合は、`REQUIRED_EXTENSION_FILES`・`content_scripts`の対応・各アサーションの参照ファイルを機能ごとに揃える。
+- `_locales`はChrome ウェブストアの商品名・概要のためだけに使う（`extName`／`extDescription`）。拡張機能内部の文言は`t()`／`MESSAGES`のままにし、`chrome.i18n`へ寄せない（`chrome.i18n`はブラウザのUI言語に固定されるため、フッターとオプション画面の言語切り替えが機能しなくなる）。
+- `_locales`はディレクトリ構造を保ったまま同梱する必要があるため、`Makefile`では`SOURCES`（フラットに詰める）ではなく`LOCALES`で扱う。
 - `dist/`内のZIPや展開済みファイルをソース管理に追加しない。
 
 ## 動作確認

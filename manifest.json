@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Map Making App Tools",
+  "name": "__MSG_extName__",
   "version": "1.5.0",
-  "description": "Map Making Appの画面幅調整とロケーション整理を使いやすくします。",
+  "description": "__MSG_extDescription__",
+  "default_locale": "ja",
   "permissions": ["storage"],
   "options_ui": {
     "page": "options.html",
