@@ -22,29 +22,52 @@
   const UNASSIGNED_ID = "__unassigned__";
   const FAVORITES_ID = "__favorites__";
   const LABEL_MAX_LENGTH = 24;
-  const PRODUCT_URL = "https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/";
+  // ネイティブの「GeoGuessr Map URL」欄が受け付ける形式と同じにする（サイト側のinput[pattern]と同一）。
+  const GEOGUESSR_URL_PATTERN =
+    /^https?:\/\/(?:www\.)?geoguessr\.com\/(?:[a-z]{2}\/)?(?:maps|map-maker)\/[0-9a-fA-F]+$/;
+  const PRODUCT_URL =
+    "https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/";
   // 案内サイトは言語ごとにページが分かれているため、英語表示のときは英語ページへ送る。
-  const PRODUCT_URL_EN = "https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/en/";
+  const PRODUCT_URL_EN =
+    "https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/en/";
   // フッターの左右スロットは、ネイティブのノードの文言だけを見て振り分ける。
   const ACCOUNT_TEXT_PATTERN = /log\s*out|sign\s*out|user\s*settings/i;
   const CREDIT_TEXT_PATTERN = /version|reanna|©/i;
   const FOOTER_ICONS = [
     { pattern: /manual|マニュアル/i, icon: "📘" },
-    { pattern: /discord/i, icon: "💬" }
+    { pattern: /discord/i, icon: "💬" },
   ];
   const TAG_PALETTE = [
-    "#f87171", "#fb923c", "#fbbf24", "#a3e635", "#34d399",
-    "#22d3ee", "#60a5fa", "#a78bfa", "#f472b6", "#94a3b8"
+    "#f87171",
+    "#fb923c",
+    "#fbbf24",
+    "#a3e635",
+    "#34d399",
+    "#22d3ee",
+    "#60a5fa",
+    "#a78bfa",
+    "#f472b6",
+    "#94a3b8",
   ];
   const PRESET_HEADINGS = {
     ja: [
-      "🌏 アジア", "🌍 ヨーロッパ", "🌍 アフリカ",
-      "🌎 北アメリカ", "🌎 中南米", "🌎 南アメリカ", "🌏 オセアニア"
+      "🌏 アジア",
+      "🌍 ヨーロッパ",
+      "🌍 アフリカ",
+      "🌎 北アメリカ",
+      "🌎 中南米",
+      "🌎 南アメリカ",
+      "🌏 オセアニア",
     ],
     en: [
-      "🌏 Asia", "🌍 Europe", "🌍 Africa",
-      "🌎 North America", "🌎 Latin America", "🌎 South America", "🌏 Oceania"
-    ]
+      "🌏 Asia",
+      "🌍 Europe",
+      "🌍 Africa",
+      "🌎 North America",
+      "🌎 Latin America",
+      "🌎 South America",
+      "🌏 Oceania",
+    ],
   };
   // 表示言語はフッターと拡張機能のオプションから切り替える。ブラウザのUI言語には追従しない。
   const MESSAGES = {
@@ -68,9 +91,14 @@
       countrySelect: "国を選択",
       countryChange: "{name}（クリックで変更）",
       tagsEmpty: "まだタグがありません。下の欄から作成できます。",
-      tagsNewLabel: "新しいタグ名",
-      tagsCreate: "＋ タグを作成",
+      tagsNewLabel: "新しいタグを追加",
+      tagsCreate: "＋",
       tagsColorPicker: "色を選択",
+      tagsDelete: "タグを削除",
+      tagsDeleteAria: "「{name}」タグを削除",
+      deleteTagTitle: "タグを削除しますか？",
+      deleteTagMessage: "「{name}」タグを削除します。付与していたすべてのマップから外れます。",
+      deleteTagWarning: "この操作は取り消せません。",
       favoriteAdd: "お気に入りにマーク",
       favoriteRemove: "お気に入りのマークを外す",
       favoriteMarked: "お気に入り",
@@ -79,7 +107,8 @@
       menuDelete: "削除する",
       sectionFavorites: "★ お気に入り",
       sectionUnassigned: "未分類",
-      cardsEmpty: "ここにマップをドラッグ、またはカードの「⋯」→「編集する」から追加できます",
+      cardsEmpty:
+        "ここにマップをドラッグ、またはカードの「⋯」→「編集する」から追加できます",
       searchPlaceholder: "マップを検索…",
       newMap: "＋ 新しいマップ",
       createMapTitle: "新しいマップを作成",
@@ -88,16 +117,25 @@
       createMapSubmit: "作成",
       editMapTitle: "マップを編集",
       editMapTagsLabel: "タグ",
+      editMapAdvanced: "詳細設定",
+      editMapGeoUrlLabel: "GeoGuessr Map URL",
+      editMapGeoUrlInvalid:
+        "GeoGuessrのマップまたはMap MakerのURLを入力してください。",
       deleteMapTitle: "マップを削除しますか？",
       deleteMapMessage: "「{name}」を削除します。",
-      deleteMapWarning: "この操作は取り消せません。削除後は一覧に表示されなくなります。",
+      deleteMapWarning:
+        "この操作は取り消せません。削除後は一覧に表示されなくなります。",
+      geoOpenMap: "GeoGuessrで開く",
+      geoOpenMapMaker: "GeoGuessr Map Makerで開く",
       addFolder: "＋ フォルダを追加",
       switchToFolders: "フォルダビューに切り替える",
       switchToNative: "以前の表示に切り替える",
-      footnote: "このUIは拡張機能によって変更されています。 ",
-      footnoteLink: "詳しくはこちら",
+      footnoteVersion: "拡張機能バージョン: {version}・by WaiWai　",
+      footnotePrefix: "このUIは",
+      footnoteLink: "拡張機能によって変更されています",
+      footnoteSuffix: "。",
       updatesTitle: "更新情報（Updates）をポップアップで見る",
-      locations: "{count} locs"
+      locations: "{count} locs",
     },
     en: {
       cancel: "Cancel",
@@ -119,9 +157,14 @@
       countrySelect: "Choose a country",
       countryChange: "{name} (click to change)",
       tagsEmpty: "No tags yet. Create one in the field below.",
-      tagsNewLabel: "New tag name",
-      tagsCreate: "+ Create tag",
+      tagsNewLabel: "Add a new tag",
+      tagsCreate: "+",
       tagsColorPicker: "Choose a color",
+      tagsDelete: "Delete tag",
+      tagsDeleteAria: "Delete “{name}” tag",
+      deleteTagTitle: "Delete this tag?",
+      deleteTagMessage: "“{name}” will be deleted and removed from every map it's attached to.",
+      deleteTagWarning: "This can't be undone.",
       favoriteAdd: "Mark as favourite",
       favoriteRemove: "Remove favourite mark",
       favoriteMarked: "Favourite",
@@ -139,35 +182,276 @@
       createMapSubmit: "Create",
       editMapTitle: "Edit map",
       editMapTagsLabel: "Tags",
+      editMapAdvanced: "Advanced settings",
+      editMapGeoUrlLabel: "GeoGuessr Map URL",
+      editMapGeoUrlInvalid: "Enter a GeoGuessr map or Map Maker URL.",
       deleteMapTitle: "Delete this map?",
       deleteMapMessage: "“{name}” will be deleted.",
-      deleteMapWarning: "This can't be undone. Once deleted, it will no longer appear in the list.",
+      deleteMapWarning:
+        "This can't be undone. Once deleted, it will no longer appear in the list.",
+      geoOpenMap: "Open on GeoGuessr",
+      geoOpenMapMaker: "Open in GeoGuessr Map Maker",
       addFolder: "+ Add folder",
       switchToFolders: "Switch to the folder view",
       switchToNative: "Switch back to the original view",
-      footnote: "This page is modified by a browser extension. ",
-      footnoteLink: "Learn more",
+      footnoteVersion: "Extension version: {version} · by WaiWai　",
+      footnotePrefix: "This page is ",
+      footnoteLink: "modified by a browser extension",
+      footnoteSuffix: ".",
       updatesTitle: "Open the changelog in a popup",
-      locations: "{count} locs"
-    }
+      locations: "{count} locs",
+    },
   };
   const REGION_CODES = [
-    "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ",
-    "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS",
-    "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN",
-    "CO", "CR", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE",
-    "EG", "EH", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GF",
-    "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM",
-    "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM",
-    "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC",
-    "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK",
-    "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA",
-    "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG",
-    "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW",
-    "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS",
-    "ST", "SV", "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO",
-    "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI",
-    "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW"
+    "AD",
+    "AE",
+    "AF",
+    "AG",
+    "AI",
+    "AL",
+    "AM",
+    "AO",
+    "AQ",
+    "AR",
+    "AS",
+    "AT",
+    "AU",
+    "AW",
+    "AX",
+    "AZ",
+    "BA",
+    "BB",
+    "BD",
+    "BE",
+    "BF",
+    "BG",
+    "BH",
+    "BI",
+    "BJ",
+    "BL",
+    "BM",
+    "BN",
+    "BO",
+    "BQ",
+    "BR",
+    "BS",
+    "BT",
+    "BV",
+    "BW",
+    "BY",
+    "BZ",
+    "CA",
+    "CC",
+    "CD",
+    "CF",
+    "CG",
+    "CH",
+    "CI",
+    "CK",
+    "CL",
+    "CM",
+    "CN",
+    "CO",
+    "CR",
+    "CU",
+    "CV",
+    "CW",
+    "CX",
+    "CY",
+    "CZ",
+    "DE",
+    "DJ",
+    "DK",
+    "DM",
+    "DO",
+    "DZ",
+    "EC",
+    "EE",
+    "EG",
+    "EH",
+    "ER",
+    "ES",
+    "ET",
+    "FI",
+    "FJ",
+    "FK",
+    "FM",
+    "FO",
+    "FR",
+    "GA",
+    "GB",
+    "GD",
+    "GE",
+    "GF",
+    "GG",
+    "GH",
+    "GI",
+    "GL",
+    "GM",
+    "GN",
+    "GP",
+    "GQ",
+    "GR",
+    "GS",
+    "GT",
+    "GU",
+    "GW",
+    "GY",
+    "HK",
+    "HM",
+    "HN",
+    "HR",
+    "HT",
+    "HU",
+    "ID",
+    "IE",
+    "IL",
+    "IM",
+    "IN",
+    "IO",
+    "IQ",
+    "IR",
+    "IS",
+    "IT",
+    "JE",
+    "JM",
+    "JO",
+    "JP",
+    "KE",
+    "KG",
+    "KH",
+    "KI",
+    "KM",
+    "KN",
+    "KP",
+    "KR",
+    "KW",
+    "KY",
+    "KZ",
+    "LA",
+    "LB",
+    "LC",
+    "LI",
+    "LK",
+    "LR",
+    "LS",
+    "LT",
+    "LU",
+    "LV",
+    "LY",
+    "MA",
+    "MC",
+    "MD",
+    "ME",
+    "MF",
+    "MG",
+    "MH",
+    "MK",
+    "ML",
+    "MM",
+    "MN",
+    "MO",
+    "MP",
+    "MQ",
+    "MR",
+    "MS",
+    "MT",
+    "MU",
+    "MV",
+    "MW",
+    "MX",
+    "MY",
+    "MZ",
+    "NA",
+    "NC",
+    "NE",
+    "NF",
+    "NG",
+    "NI",
+    "NL",
+    "NO",
+    "NP",
+    "NR",
+    "NU",
+    "NZ",
+    "OM",
+    "PA",
+    "PE",
+    "PF",
+    "PG",
+    "PH",
+    "PK",
+    "PL",
+    "PM",
+    "PN",
+    "PR",
+    "PS",
+    "PT",
+    "PW",
+    "PY",
+    "QA",
+    "RE",
+    "RO",
+    "RS",
+    "RU",
+    "RW",
+    "SA",
+    "SB",
+    "SC",
+    "SD",
+    "SE",
+    "SG",
+    "SH",
+    "SI",
+    "SJ",
+    "SK",
+    "SL",
+    "SM",
+    "SN",
+    "SO",
+    "SR",
+    "SS",
+    "ST",
+    "SV",
+    "SX",
+    "SY",
+    "SZ",
+    "TC",
+    "TD",
+    "TF",
+    "TG",
+    "TH",
+    "TJ",
+    "TK",
+    "TL",
+    "TM",
+    "TN",
+    "TO",
+    "TR",
+    "TT",
+    "TV",
+    "TW",
+    "TZ",
+    "UA",
+    "UG",
+    "UM",
+    "US",
+    "UY",
+    "UZ",
+    "VA",
+    "VC",
+    "VE",
+    "VG",
+    "VI",
+    "VN",
+    "VU",
+    "WF",
+    "WS",
+    "YE",
+    "YT",
+    "ZA",
+    "ZM",
+    "ZW",
   ];
 
   let featureEnabled = true;
@@ -263,7 +547,9 @@
     if (!params) {
       return template;
     }
-    return template.replace(/\{(\w+)\}/g, (match, name) => (name in params ? String(params[name]) : match));
+    return template.replace(/\{(\w+)\}/g, (match, name) =>
+      name in params ? String(params[name]) : match,
+    );
   }
 
   function localeTag() {
@@ -271,7 +557,10 @@
   }
 
   function isContextInvalidatedError(error) {
-    return error instanceof Error && /Extension context invalidated/.test(error.message);
+    return (
+      error instanceof Error &&
+      /Extension context invalidated/.test(error.message)
+    );
   }
 
   function handleContextInvalidated() {
@@ -371,44 +660,66 @@
         SHOW_LOCATION_COUNT_KEY,
         SHOW_COUNTRY_KEY,
         LANGUAGE_KEY,
-        PENDING_HEADING_KEY
+        PENDING_HEADING_KEY,
       ]);
 
       const headings = stored[HEADINGS_KEY];
       headingsData =
-        headings && Array.isArray(headings.headings) && Array.isArray(headings.unassignedOrder)
+        headings &&
+        Array.isArray(headings.headings) &&
+        Array.isArray(headings.unassignedOrder)
           ? {
               initialized: headings.initialized === true,
               headings: headings.headings
-                .filter((h) => h && typeof h.id === "string" && typeof h.label === "string")
+                .filter(
+                  (h) =>
+                    h &&
+                    typeof h.id === "string" &&
+                    typeof h.label === "string",
+                )
                 .map((h) => ({
                   id: h.id,
                   label: h.label,
-                  mapIds: Array.isArray(h.mapIds) ? h.mapIds.map(String) : []
+                  mapIds: Array.isArray(h.mapIds) ? h.mapIds.map(String) : [],
                 })),
-              unassignedOrder: headings.unassignedOrder.map(String)
+              unassignedOrder: headings.unassignedOrder.map(String),
             }
           : defaultHeadingsData();
 
       const storedFavorites = stored[FAVORITES_KEY];
-      favorites = storedFavorites && typeof storedFavorites === "object" ? { ...storedFavorites } : {};
+      favorites =
+        storedFavorites && typeof storedFavorites === "object"
+          ? { ...storedFavorites }
+          : {};
 
       const storedCountries = stored[COUNTRIES_KEY];
-      countries = storedCountries && typeof storedCountries === "object" ? { ...storedCountries } : {};
+      countries =
+        storedCountries && typeof storedCountries === "object"
+          ? { ...storedCountries }
+          : {};
 
       const storedTags = stored[TAGS_KEY];
       tagsData =
         storedTags && Array.isArray(storedTags.tags) && storedTags.mapTagIds
           ? {
               tags: storedTags.tags
-                .filter((t) => t && typeof t.id === "string" && typeof t.name === "string")
-                .map((t) => ({ id: t.id, name: t.name, color: typeof t.color === "string" ? t.color : TAG_PALETTE[0] })),
+                .filter(
+                  (t) =>
+                    t && typeof t.id === "string" && typeof t.name === "string",
+                )
+                .map((t) => ({
+                  id: t.id,
+                  name: t.name,
+                  color: typeof t.color === "string" ? t.color : TAG_PALETTE[0],
+                })),
               mapTagIds: Object.fromEntries(
                 Object.entries(storedTags.mapTagIds).map(([id, tagIds]) => [
                   id,
-                  Array.isArray(tagIds) ? tagIds.filter((tagId) => typeof tagId === "string") : []
-                ])
-              )
+                  Array.isArray(tagIds)
+                    ? tagIds.filter((tagId) => typeof tagId === "string")
+                    : [],
+                ]),
+              ),
             }
           : defaultTagsData();
 
@@ -420,7 +731,8 @@
       refreshRegionNames();
 
       const storedPendingHeading = stored[PENDING_HEADING_KEY];
-      pendingNewMapHeadingId = typeof storedPendingHeading === "string" ? storedPendingHeading : null;
+      pendingNewMapHeadingId =
+        typeof storedPendingHeading === "string" ? storedPendingHeading : null;
 
       return true;
     } catch (error) {
@@ -445,7 +757,9 @@
   /* ---------- ネイティブ一覧の読み取り ---------- */
 
   function readMapsFromJsonBlock() {
-    const script = document.querySelector('script#data[type="application/json"]');
+    const script = document.querySelector(
+      'script#data[type="application/json"]',
+    );
     if (!script) {
       return null;
     }
@@ -458,21 +772,61 @@
 
       const result = new Map();
       for (const entry of parsed.maps) {
-        if (!entry || entry.storage !== "active" || entry.id === undefined || entry.id === null) {
+        if (
+          !entry ||
+          entry.storage !== "active" ||
+          entry.id === undefined ||
+          entry.id === null
+        ) {
           continue;
         }
 
         const id = String(entry.id);
         result.set(id, {
           id,
-          name: typeof entry.name === "string" && entry.name ? entry.name : `(map ${id})`,
-          locationCount: Number.isFinite(entry.locationCount) ? entry.locationCount : 0
+          name:
+            typeof entry.name === "string" && entry.name
+              ? entry.name
+              : `(map ${id})`,
+          locationCount: Number.isFinite(entry.locationCount)
+            ? entry.locationCount
+            : 0,
         });
       }
       return result;
     } catch {
       return null;
     }
+  }
+
+  /**
+   * ネイティブが表示している2つのGeoGuessrリンク（アイコン画像つき）をそのまま読み取る。
+   * アイコンは自前で用意せず、旧UIと同じ見た目になるようネイティブの<img src>をそのまま使う。
+   */
+  function readGeoLinksFromLi(li) {
+    if (!li) {
+      return null;
+    }
+    let mapLink = null;
+    let makerLink = null;
+    for (const a of li.querySelectorAll(".geoguessr-links a[href]")) {
+      const label = a.getAttribute("aria-label") || "";
+      if (label === "Open in GeoGuessr map maker") {
+        makerLink = a;
+      } else if (label === "Open on GeoGuessr") {
+        mapLink = a;
+      }
+    }
+    if (!mapLink && !makerLink) {
+      return null;
+    }
+    return {
+      mapHref: mapLink?.getAttribute("href") || null,
+      mapIconSrc: mapLink?.querySelector("img")?.getAttribute("src") || null,
+      makerHref: makerLink?.getAttribute("href") || null,
+      makerIconSrc:
+        makerLink?.querySelector("img")?.getAttribute("src") || null,
+    };
   }
 
   function readMapsFromDom() {
@@ -490,9 +844,20 @@
       const id = match[1];
       const name = link.textContent.trim() || `(map ${id})`;
       const li = link.closest("li.map-list__entry");
-      const countMatch = li ? li.textContent.match(/([\d,]+)\s*locations?/i) : null;
-      const locationCount = countMatch ? Number.parseInt(countMatch[1].replace(/,/g, ""), 10) || 0 : 0;
-      result.set(id, { id, name, locationCount });
+      const countMatch = li
+        ? li.textContent.match(/([\d,]+)\s*locations?/i)
+        : null;
+      const locationCount = countMatch
+        ? Number.parseInt(countMatch[1].replace(/,/g, ""), 10) || 0
+        : 0;
+      const geoLink = readGeoLinksFromLi(li);
+      result.set(id, {
+        id,
+        name,
+        locationCount,
+        geoLink,
+        geoguessrUrl: geoLink?.mapHref || undefined,
+      });
     }
 
     return result;
@@ -501,18 +866,20 @@
   function computeMapsSnapshot() {
     const fromJson = readMapsFromJsonBlock();
     const fromDom = readMapsFromDom();
-    if (!fromJson) {
-      return fromDom;
-    }
+    const merged = fromJson ?? fromDom;
 
-    // JSONブロックはフォルダ内のマップを含まないことがあるため、DOM側で見つかったが
-    // JSONブロックに無いマップ（フォルダ内のマップなど）を補完する。
-    for (const [id, map] of fromDom) {
-      if (!fromJson.has(id)) {
-        fromJson.set(id, map);
+    // JSONブロックはフォルダ内のマップを含まないこと、GeoGuessrへのリンクURLを含まないことがあるため、
+    // DOM側の情報で補う。
+    for (const [id, domMap] of fromDom) {
+      const existing = merged.get(id);
+      if (!existing) {
+        merged.set(id, domMap);
+      } else if (domMap.geoguessrUrl) {
+        existing.geoguessrUrl = domMap.geoguessrUrl;
+        existing.geoLink = domMap.geoLink;
       }
     }
-    return fromJson;
+    return merged;
   }
 
   /** マップIDから、ネイティブ一覧内の対応する編集ボタン（設定ダイアログを開く✎）を探す。 */
@@ -521,7 +888,9 @@
       return null;
     }
 
-    const link = nativeListEl.querySelector(`a.map-link[href*="/maps/${mapId}"]`);
+    const link = nativeListEl.querySelector(
+      `a.map-link[href*="/maps/${mapId}"]`,
+    );
     const li = link?.closest("li.map-list__entry");
     return li ? li.querySelector("button.map-list__edit") : null;
   }
@@ -596,30 +965,65 @@
 
   /** Reactの管理下にある入力欄は`.value`の代入だけでは内部状態が更新されないため、ネイティブのsetterを使う。 */
   function setNativeInputValue(input, value) {
-    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
+    const setter = Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype,
+      "value",
+    )?.set;
     setter?.call(input, value);
     input.dispatchEvent(new Event("input", { bubbles: true }));
   }
 
-  /** マップ名の変更を、ネイティブの設定ダイアログのフォーム送信に委譲する。 */
-  async function renameMapViaNativeDialog(mapId, name) {
+  /** マップ名の入力欄に値を書き込み、その場でネイティブの保存ボタンを押す。 */
+  function submitNativeRenameForm(dialog, name) {
+    const input = dialog.querySelector(".edit-map-modal__rename input.input");
+    const submitButton = dialog.querySelector(
+      '.edit-map-modal__rename button[type="submit"]',
+    );
+    if (!input || !submitButton) {
+      return false;
+    }
+    setNativeInputValue(input, name);
+    submitButton.click();
+    return true;
+  }
+
+  /**
+   * GeoGuessrマップへのリンクURL欄に値を書き込み、その場でネイティブの保存ボタンを押す。
+   * このフォームには専用のclassが無いため、URL用のpattern属性を持つ入力欄を目印に探す。
+   */
+  function submitNativeGeoLinkForm(dialog, url) {
+    const input = dialog.querySelector('input[pattern*="geoguessr"]');
+    const submitButton = input
+      ?.closest("form")
+      ?.querySelector('button[type="submit"]');
+    if (!input || !submitButton) {
+      return false;
+    }
+    setNativeInputValue(input, url);
+    submitButton.click();
+    return true;
+  }
+
+  /** 名前・GeoGuessrリンクの変更を、同じネイティブの設定ダイアログへまとめて委譲する。 */
+  async function applyMapEditsViaNativeDialog(
+    mapId,
+    { name, geoguessrUrl } = {},
+  ) {
     const revealed = await revealNativeEditDialog(mapId);
     if (!revealed) {
-      return false;
+      return { renamed: false, linked: false };
     }
     const { dialog, stopGuarding } = revealed;
 
-    const input = dialog.querySelector(".edit-map-modal__rename input.input");
-    const submitButton = dialog.querySelector('.edit-map-modal__rename button[type="submit"]');
-    if (!input || !submitButton) {
-      closeNativeEditDialog(dialog, stopGuarding);
-      return false;
-    }
+    const renamed =
+      name !== undefined ? submitNativeRenameForm(dialog, name) : false;
+    const linked =
+      geoguessrUrl !== undefined
+        ? submitNativeGeoLinkForm(dialog, geoguessrUrl)
+        : false;
 
-    setNativeInputValue(input, name);
-    submitButton.click();
     closeNativeEditDialog(dialog, stopGuarding);
-    return true;
+    return { renamed, linked };
   }
 
   /**
@@ -633,7 +1037,9 @@
     }
     const { dialog, stopGuarding } = revealed;
 
-    const deleteButton = dialog.querySelector(".edit-map-modal__delete button.button--destructive");
+    const deleteButton = dialog.querySelector(
+      ".edit-map-modal__delete button.button--destructive",
+    );
     deleteButton?.click();
     closeNativeEditDialog(dialog, stopGuarding);
   }
@@ -653,9 +1059,12 @@
 
     const labelEl = headEl?.querySelector("label");
     if (labelEl) {
-      const countText = labelEl.querySelector(".map-list__folder-count")?.textContent ?? "";
+      const countText =
+        labelEl.querySelector(".map-list__folder-count")?.textContent ?? "";
       const fullText = labelEl.textContent ?? "";
-      const stripped = countText ? fullText.slice(0, fullText.length - countText.length) : fullText;
+      const stripped = countText
+        ? fullText.slice(0, fullText.length - countText.length)
+        : fullText;
       const trimmed = stripped.trim();
       if (trimmed) {
         return trimmed;
@@ -676,11 +1085,15 @@
       if (!rootList) {
         return;
       }
-      const folders = [...rootList.children].filter((child) => child.matches?.(".map-folder"));
+      const folders = [...rootList.children].filter((child) =>
+        child.matches?.(".map-folder"),
+      );
       if (folders.length === 0) {
         return;
       }
-      const allResolved = folders.every((folder) => readNativeFolderLabel(folder) !== t("folderFallback"));
+      const allResolved = folders.every(
+        (folder) => readNativeFolderLabel(folder) !== t("folderFallback"),
+      );
       if (allResolved) {
         return;
       }
@@ -759,7 +1172,9 @@
     }
 
     const beforeUnassigned = headingsData.unassignedOrder.length;
-    headingsData.unassignedOrder = headingsData.unassignedOrder.filter((id) => currentIds.has(id));
+    headingsData.unassignedOrder = headingsData.unassignedOrder.filter((id) =>
+      currentIds.has(id),
+    );
     if (headingsData.unassignedOrder.length !== beforeUnassigned) {
       changed = true;
     }
@@ -771,7 +1186,9 @@
     if (newIds.length > 0) {
       changed = true;
       const targetHeading = pendingNewMapHeadingId
-        ? headingsData.headings.find((heading) => heading.id === pendingNewMapHeadingId)
+        ? headingsData.headings.find(
+            (heading) => heading.id === pendingNewMapHeadingId,
+          )
         : null;
       if (targetHeading) {
         targetHeading.mapIds.unshift(...newIds);
@@ -829,17 +1246,24 @@
     if (sectionId === UNASSIGNED_ID) {
       return headingsData.unassignedOrder;
     }
-    return headingsData.headings.find((heading) => heading.id === sectionId)?.mapIds ?? null;
+    return (
+      headingsData.headings.find((heading) => heading.id === sectionId)
+        ?.mapIds ?? null
+    );
   }
 
   /** お気に入り一覧など、実際の保存場所と異なるビューから開いた場合でも本来の所属フォルダを返す。 */
   function findCurrentSectionId(mapId) {
-    const heading = headingsData.headings.find((candidate) => candidate.mapIds.includes(mapId));
+    const heading = headingsData.headings.find((candidate) =>
+      candidate.mapIds.includes(mapId),
+    );
     return heading ? heading.id : UNASSIGNED_ID;
   }
 
   function removeMapIdEverywhere(mapId) {
-    headingsData.unassignedOrder = headingsData.unassignedOrder.filter((id) => id !== mapId);
+    headingsData.unassignedOrder = headingsData.unassignedOrder.filter(
+      (id) => id !== mapId,
+    );
     for (const heading of headingsData.headings) {
       heading.mapIds = heading.mapIds.filter((id) => id !== mapId);
     }
@@ -893,10 +1317,13 @@
     const viewportHeight = window.innerHeight;
     if (clientY < AUTO_SCROLL_EDGE_PX) {
       autoScrollDirection = -1;
-      autoScrollSpeed = AUTO_SCROLL_MAX_SPEED_PX * (1 - clientY / AUTO_SCROLL_EDGE_PX);
+      autoScrollSpeed =
+        AUTO_SCROLL_MAX_SPEED_PX * (1 - clientY / AUTO_SCROLL_EDGE_PX);
     } else if (clientY > viewportHeight - AUTO_SCROLL_EDGE_PX) {
       autoScrollDirection = 1;
-      autoScrollSpeed = AUTO_SCROLL_MAX_SPEED_PX * (1 - (viewportHeight - clientY) / AUTO_SCROLL_EDGE_PX);
+      autoScrollSpeed =
+        AUTO_SCROLL_MAX_SPEED_PX *
+        (1 - (viewportHeight - clientY) / AUTO_SCROLL_EDGE_PX);
     } else {
       stopAutoScroll();
       return;
@@ -907,7 +1334,9 @@
     }
   }
 
-  document.addEventListener("dragover", (event) => updateAutoScroll(event.clientY));
+  document.addEventListener("dragover", (event) =>
+    updateAutoScroll(event.clientY),
+  );
   document.addEventListener("dragend", stopAutoScroll);
   document.addEventListener("drop", stopAutoScroll);
 
@@ -1002,7 +1431,10 @@
     }
 
     function handlePointerDown(event) {
-      if (!popup.contains(event.target) && !anchorButton.contains(event.target)) {
+      if (
+        !popup.contains(event.target) &&
+        !anchorButton.contains(event.target)
+      ) {
         close();
       }
     }
@@ -1020,7 +1452,9 @@
       swatchButton.type = "button";
       swatchButton.className = "mma-map-list__color-picker-swatch";
       if (color === currentColor) {
-        swatchButton.classList.add("mma-map-list__color-picker-swatch--selected");
+        swatchButton.classList.add(
+          "mma-map-list__color-picker-swatch--selected",
+        );
       }
       swatchButton.style.background = color;
       swatchButton.setAttribute("aria-label", color);
@@ -1034,9 +1468,15 @@
     document.body.append(popup);
     const anchor = anchorButton.getBoundingClientRect();
     const size = popup.getBoundingClientRect();
-    const left = Math.max(8, Math.min(anchor.left, window.innerWidth - size.width - 8));
+    const left = Math.max(
+      8,
+      Math.min(anchor.left, window.innerWidth - size.width - 8),
+    );
     const below = anchor.bottom + 4;
-    const top = below + size.height > window.innerHeight - 8 ? Math.max(8, anchor.top - size.height - 4) : below;
+    const top =
+      below + size.height > window.innerHeight - 8
+        ? Math.max(8, anchor.top - size.height - 4)
+        : below;
     popup.style.left = `${left}px`;
     popup.style.top = `${top}px`;
 
@@ -1061,7 +1501,7 @@
           createModalButton(preset, "mma-map-list-modal__preset", () => {
             input.value = preset;
             input.focus();
-          })
+          }),
         );
       }
       modal.body.append(presets);
@@ -1094,7 +1534,11 @@
     onEnterKey(input, submit);
     modal.footer.append(
       createModalButton(t("cancel"), "mma-map-list-modal__button", modal.close),
-      createModalButton(t("save"), "mma-map-list-modal__button mma-map-list-modal__button--primary", submit)
+      createModalButton(
+        t("save"),
+        "mma-map-list-modal__button mma-map-list-modal__button--primary",
+        submit,
+      ),
     );
 
     window.setTimeout(() => {
@@ -1105,7 +1549,11 @@
 
   function handleAddHeading() {
     openHeadingFormModal(t("folderAdd"), "", (label) => {
-      headingsData.headings.push({ id: crypto.randomUUID(), label, mapIds: [] });
+      headingsData.headings.push({
+        id: crypto.randomUUID(),
+        label,
+        mapIds: [],
+      });
       persistHeadings();
       render();
     });
@@ -1127,7 +1575,9 @@
     modal.body.append(message);
 
     function submit() {
-      headingsData.headings = headingsData.headings.filter((candidate) => candidate.id !== heading.id);
+      headingsData.headings = headingsData.headings.filter(
+        (candidate) => candidate.id !== heading.id,
+      );
       headingsData.unassignedOrder.push(...heading.mapIds);
       persistHeadings();
       render();
@@ -1136,7 +1586,11 @@
 
     modal.footer.append(
       createModalButton(t("cancel"), "mma-map-list-modal__button", modal.close),
-      createModalButton(t("delete"), "mma-map-list-modal__button mma-map-list-modal__button--danger", submit)
+      createModalButton(
+        t("delete"),
+        "mma-map-list-modal__button mma-map-list-modal__button--danger",
+        submit,
+      ),
     );
   }
 
@@ -1152,7 +1606,9 @@
     if (!nativeListEl) {
       return null;
     }
-    for (const button of nativeListEl.querySelectorAll("p.map-list-head button")) {
+    for (const button of nativeListEl.querySelectorAll(
+      "p.map-list-head button",
+    )) {
       if (button.textContent.trim() === "New map") {
         return button;
       }
@@ -1241,7 +1697,11 @@
 
     modal.footer.append(
       createModalButton(t("cancel"), "mma-map-list-modal__button", modal.close),
-      createModalButton(t("createMapSubmit"), "mma-map-list-modal__button mma-map-list-modal__button--primary", submit)
+      createModalButton(
+        t("createMapSubmit"),
+        "mma-map-list-modal__button mma-map-list-modal__button--primary",
+        submit,
+      ),
     );
   }
 
@@ -1274,8 +1734,11 @@
       const japaneseName = nameForCodeUsing(code, regionNamesJa);
       const row = document.createElement("button");
       row.type = "button";
-      row.className = "mma-map-list-modal__check-row mma-map-list-modal__check-row--action";
-      row.append(document.createTextNode(`${flagFromCode(code)} ${label} (${code})`));
+      row.className =
+        "mma-map-list-modal__check-row mma-map-list-modal__check-row--action";
+      row.append(
+        document.createTextNode(`${flagFromCode(code)} ${label} (${code})`),
+      );
       row.addEventListener("click", () => {
         countries[map.id] = code;
         persistCountries();
@@ -1287,7 +1750,7 @@
         code: code.toLocaleLowerCase(),
         englishName: englishName.toLocaleLowerCase(),
         japaneseName: japaneseName.toLocaleLowerCase(),
-        row
+        row,
       };
     });
 
@@ -1299,11 +1762,15 @@
 
     function selectEntry(entry) {
       if (selectedEntry) {
-        selectedEntry.row.classList.remove("mma-map-list-modal__check-row--selected");
+        selectedEntry.row.classList.remove(
+          "mma-map-list-modal__check-row--selected",
+        );
       }
       selectedEntry = entry ?? null;
       if (selectedEntry) {
-        selectedEntry.row.classList.add("mma-map-list-modal__check-row--selected");
+        selectedEntry.row.classList.add(
+          "mma-map-list-modal__check-row--selected",
+        );
         selectedEntry.row.scrollIntoView({ block: "nearest" });
       }
     }
@@ -1331,10 +1798,15 @@
         if (visible.length === 0) {
           return;
         }
-        const currentIndex = selectedEntry ? visible.indexOf(selectedEntry) : -1;
+        const currentIndex = selectedEntry
+          ? visible.indexOf(selectedEntry)
+          : -1;
         const nextIndex =
           event.key === "ArrowDown"
-            ? Math.min(currentIndex < 0 ? 0 : currentIndex + 1, visible.length - 1)
+            ? Math.min(
+                currentIndex < 0 ? 0 : currentIndex + 1,
+                visible.length - 1,
+              )
             : Math.max(currentIndex < 0 ? 0 : currentIndex - 1, 0);
         selectEntry(visible[nextIndex]);
         return;
@@ -1354,7 +1826,7 @@
         render();
         modal.close();
       }),
-      createModalButton(t("close"), "mma-map-list-modal__button", modal.close)
+      createModalButton(t("close"), "mma-map-list-modal__button", modal.close),
     );
 
     window.setTimeout(() => searchInput.focus(), 0);
@@ -1392,7 +1864,7 @@
     modal.body.append(folderLabel);
 
     const tagsLabel = document.createElement("p");
-    tagsLabel.className = "mma-map-list-modal__label";
+    tagsLabel.className = "mma-map-list-modal__label mma-map-list-modal__label--flush";
     tagsLabel.textContent = t("editMapTagsLabel");
     modal.body.append(tagsLabel);
 
@@ -1442,23 +1914,74 @@
         });
         const text = document.createElement("span");
         text.textContent = tag.name;
-        row.append(checkbox, swatch, text);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "mma-map-list-modal__tag-delete";
+        deleteButton.textContent = "−";
+        deleteButton.title = t("tagsDelete");
+        deleteButton.setAttribute("aria-label", t("tagsDeleteAria", { name: tag.name }));
+        deleteButton.addEventListener("click", (event) => {
+          // <label>直下のボタンなので、既定動作のままだとチェックボックスまで切り替わってしまう。
+          event.preventDefault();
+          event.stopPropagation();
+          openDeleteTagModal(tag);
+        });
+
+        row.append(checkbox, swatch, text, deleteButton);
         list.append(row);
       }
+    }
+
+    /** タグを削除すると全マップから外れるため、確認モーダルを挟む。 */
+    function openDeleteTagModal(tag) {
+      const deleteModal = openModal(t("deleteTagTitle"));
+
+      const message = document.createElement("p");
+      message.className = "mma-map-list-modal__message";
+      message.textContent = t("deleteTagMessage", { name: tag.name });
+      deleteModal.body.append(message);
+
+      const warning = document.createElement("p");
+      warning.className = "mma-map-list-modal__message mma-map-list-modal__message--danger";
+      warning.textContent = t("deleteTagWarning");
+      deleteModal.body.append(warning);
+
+      function submitDelete() {
+        tagsData.tags = tagsData.tags.filter((candidate) => candidate.id !== tag.id);
+        currentTagIds.delete(tag.id);
+        for (const mapId of Object.keys(tagsData.mapTagIds)) {
+          tagsData.mapTagIds[mapId] = tagsData.mapTagIds[mapId].filter((id) => id !== tag.id);
+        }
+        persistTags();
+        renderTagList();
+        render();
+        deleteModal.close();
+      }
+
+      deleteModal.footer.append(
+        createModalButton(t("cancel"), "mma-map-list-modal__button", deleteModal.close),
+        createModalButton(t("delete"), "mma-map-list-modal__button mma-map-list-modal__button--danger", submitDelete)
+      );
     }
 
     renderTagList();
     modal.body.append(list);
 
     const newTagLabel = document.createElement("label");
-    newTagLabel.className = "mma-map-list-modal__label";
+    newTagLabel.className = "mma-map-list-modal__label mma-map-list-modal__label--tight";
+    newTagLabel.htmlFor = "mma-new-tag-input";
     newTagLabel.textContent = t("tagsNewLabel");
+    modal.body.append(newTagLabel);
+
+    const newTagRow = document.createElement("div");
+    newTagRow.className = "mma-map-list-modal__inline-row";
     const newTagInput = document.createElement("input");
+    newTagInput.id = "mma-new-tag-input";
     newTagInput.type = "text";
     newTagInput.className = "mma-map-list-modal__input";
     newTagInput.maxLength = 20;
-    newTagLabel.append(newTagInput);
-    modal.body.append(newTagLabel);
+    newTagRow.append(newTagInput);
 
     function addTag() {
       const trimmed = newTagInput.value.trim();
@@ -1474,7 +1997,59 @@
     }
 
     onEnterKey(newTagInput, addTag);
-    modal.body.append(createModalButton(t("tagsCreate"), "mma-map-list-modal__button", addTag));
+    newTagRow.append(
+      createModalButton(t("tagsCreate"), "mma-map-list-modal__button", addTag),
+    );
+    modal.body.append(newTagRow);
+
+    const advancedDividerTop = document.createElement("hr");
+    advancedDividerTop.className =
+      "mma-map-list-modal__divider mma-map-list-modal__divider--top";
+    modal.body.append(advancedDividerTop);
+
+    const advancedDetails = document.createElement("details");
+    advancedDetails.className = "mma-map-list-modal__details";
+    advancedDetails.open = Boolean(map.geoguessrUrl);
+    const advancedSummary = document.createElement("summary");
+    advancedSummary.className = "mma-map-list-modal__details-summary";
+    advancedSummary.textContent = t("editMapAdvanced");
+    advancedDetails.append(advancedSummary);
+
+    const geoUrlLabel = document.createElement("label");
+    geoUrlLabel.className = "mma-map-list-modal__label";
+    geoUrlLabel.textContent = t("editMapGeoUrlLabel");
+    const geoUrlInput = document.createElement("input");
+    geoUrlInput.type = "text";
+    geoUrlInput.className = "mma-map-list-modal__input";
+    geoUrlInput.placeholder = "https://www.geoguessr.com/maps/...";
+    geoUrlInput.value = map.geoguessrUrl || "";
+    geoUrlLabel.append(geoUrlInput);
+    advancedDetails.append(geoUrlLabel);
+
+    const geoUrlError = document.createElement("p");
+    geoUrlError.className =
+      "mma-map-list-modal__message mma-map-list-modal__message--danger";
+    geoUrlError.hidden = true;
+    advancedDetails.append(geoUrlError);
+
+    modal.body.append(advancedDetails);
+    const advancedDividerBottom = document.createElement("hr");
+    advancedDividerBottom.className = "mma-map-list-modal__divider";
+    modal.body.append(advancedDividerBottom);
+
+    function isGeoUrlValid() {
+      const value = geoUrlInput.value.trim();
+      return !value || GEOGUESSR_URL_PATTERN.test(value);
+    }
+
+    function validateGeoUrl() {
+      const valid = isGeoUrlValid();
+      geoUrlError.textContent = valid ? "" : t("editMapGeoUrlInvalid");
+      geoUrlError.hidden = valid;
+      return valid;
+    }
+
+    geoUrlInput.addEventListener("input", validateGeoUrl);
 
     async function submit() {
       const name = nameInput.value.trim();
@@ -1483,15 +2058,33 @@
         return;
       }
 
+      if (!validateGeoUrl()) {
+        advancedDetails.open = true;
+        geoUrlInput.focus();
+        return;
+      }
+      const geoUrl = geoUrlInput.value.trim();
+
       modal.close();
 
-      if (name !== map.name) {
-        const renamed = await renameMapViaNativeDialog(map.id, name);
-        if (renamed) {
+      const nameChanged = name !== map.name;
+      const geoChanged = geoUrl !== (map.geoguessrUrl || "");
+      if (nameChanged || geoChanged) {
+        const result = await applyMapEditsViaNativeDialog(map.id, {
+          name: nameChanged ? name : undefined,
+          geoguessrUrl: geoChanged ? geoUrl : undefined,
+        });
+        const cached = mapsById.get(map.id);
+        if (result.renamed) {
           map.name = name;
-          const cached = mapsById.get(map.id);
           if (cached) {
             cached.name = name;
+          }
+        }
+        if (result.linked) {
+          map.geoguessrUrl = geoUrl || undefined;
+          if (cached) {
+            cached.geoguessrUrl = geoUrl || undefined;
           }
         }
       }
@@ -1510,7 +2103,11 @@
     onEnterKey(nameInput, submit);
     modal.footer.append(
       createModalButton(t("cancel"), "mma-map-list-modal__button", modal.close),
-      createModalButton(t("save"), "mma-map-list-modal__button mma-map-list-modal__button--primary", submit)
+      createModalButton(
+        t("save"),
+        "mma-map-list-modal__button mma-map-list-modal__button--primary",
+        submit,
+      ),
     );
 
     window.setTimeout(() => {
@@ -1530,7 +2127,8 @@
     modal.body.append(message);
 
     const warning = document.createElement("p");
-    warning.className = "mma-map-list-modal__message mma-map-list-modal__message--danger";
+    warning.className =
+      "mma-map-list-modal__message mma-map-list-modal__message--danger";
     warning.textContent = t("deleteMapWarning");
     modal.body.append(warning);
 
@@ -1541,7 +2139,11 @@
 
     modal.footer.append(
       createModalButton(t("cancel"), "mma-map-list-modal__button", modal.close),
-      createModalButton(t("menuDelete"), "mma-map-list-modal__button mma-map-list-modal__button--danger", submit)
+      createModalButton(
+        t("menuDelete"),
+        "mma-map-list-modal__button mma-map-list-modal__button--danger",
+        submit,
+      ),
     );
   }
 
@@ -1566,7 +2168,10 @@
   function allSectionOptions() {
     return [
       { id: UNASSIGNED_ID, label: t("sectionUnassigned") },
-      ...headingsData.headings.map((heading) => ({ id: heading.id, label: heading.label }))
+      ...headingsData.headings.map((heading) => ({
+        id: heading.id,
+        label: heading.label,
+      })),
     ];
   }
 
@@ -1591,13 +2196,19 @@
       card.addEventListener("dragend", () => {
         draggingCard = null;
         delete card.dataset.dragging;
-        for (const el of document.querySelectorAll(".mma-map-list__card--drag-over")) {
+        for (const el of document.querySelectorAll(
+          ".mma-map-list__card--drag-over",
+        )) {
           el.classList.remove("mma-map-list__card--drag-over");
         }
-        for (const el of document.querySelectorAll(".mma-map-list__card--drag-over-after")) {
+        for (const el of document.querySelectorAll(
+          ".mma-map-list__card--drag-over-after",
+        )) {
           el.classList.remove("mma-map-list__card--drag-over-after");
         }
-        for (const el of document.querySelectorAll(".mma-map-list__section--drop-target")) {
+        for (const el of document.querySelectorAll(
+          ".mma-map-list__section--drop-target",
+        )) {
           el.classList.remove("mma-map-list__section--drop-target");
         }
       });
@@ -1617,7 +2228,9 @@
       });
       card.addEventListener("drop", (event) => {
         event.preventDefault();
-        const isAfter = card.classList.contains("mma-map-list__card--drag-over-after");
+        const isAfter = card.classList.contains(
+          "mma-map-list__card--drag-over-after",
+        );
         card.classList.remove("mma-map-list__card--drag-over");
         card.classList.remove("mma-map-list__card--drag-over-after");
         if (!draggingCard) {
@@ -1646,9 +2259,13 @@
       const countryCode = countries[map.id];
       const country = document.createElement("button");
       country.type = "button";
-      country.className = "mma-map-list__country" + (countryCode ? "" : " mma-map-list__country--empty");
+      country.className =
+        "mma-map-list__country" +
+        (countryCode ? "" : " mma-map-list__country--empty");
       country.textContent = countryCode ? flagFromCode(countryCode) : "📄";
-      country.title = countryCode ? t("countryChange", { name: nameForCode(countryCode) }) : t("countrySelect");
+      country.title = countryCode
+        ? t("countryChange", { name: nameForCode(countryCode) })
+        : t("countrySelect");
       country.addEventListener("click", () => {
         openCountryModal(map);
       });
@@ -1680,7 +2297,9 @@
     if (showLocationCount) {
       const count = document.createElement("span");
       count.className = "mma-map-list__count";
-      count.textContent = t("locations", { count: map.locationCount.toLocaleString(localeTag()) });
+      count.textContent = t("locations", {
+        count: map.locationCount.toLocaleString(localeTag()),
+      });
       linkArea.append(count);
     }
 
@@ -1708,6 +2327,50 @@
       linkArea.append(tags);
     }
     card.append(linkArea);
+
+    // GeoGuessrマップと紐付いている場合、ネイティブの一覧と全く同じ2つのアイコンリンクを表示する。
+    // アイコン画像は自前で用意せず、ネイティブのDOMから読み取った<img src>をそのまま使う。
+    // linkArea（<a>）の中には入れられない（<a>の入れ子は無効）ため、カード直下の兄弟にする。
+    if (map.geoLink?.mapHref || map.geoLink?.makerHref) {
+      const geoLinksEl = document.createElement("span");
+      geoLinksEl.className = "mma-map-list__geo-links";
+
+      if (map.geoLink.mapHref) {
+        const mapLink = document.createElement("a");
+        mapLink.className = "mma-map-list__geo-link";
+        mapLink.href = map.geoLink.mapHref;
+        mapLink.target = "_blank";
+        mapLink.rel = "noopener noreferrer";
+        mapLink.title = t("geoOpenMap");
+        mapLink.setAttribute("aria-label", t("geoOpenMap"));
+        if (map.geoLink.mapIconSrc) {
+          const icon = document.createElement("img");
+          icon.src = map.geoLink.mapIconSrc;
+          icon.alt = "";
+          mapLink.append(icon);
+        }
+        geoLinksEl.append(mapLink);
+      }
+
+      if (map.geoLink.makerHref) {
+        const makerLink = document.createElement("a");
+        makerLink.className = "mma-map-list__geo-link";
+        makerLink.href = map.geoLink.makerHref;
+        makerLink.target = "_blank";
+        makerLink.rel = "noopener noreferrer";
+        makerLink.title = t("geoOpenMapMaker");
+        makerLink.setAttribute("aria-label", t("geoOpenMapMaker"));
+        if (map.geoLink.makerIconSrc) {
+          const icon = document.createElement("img");
+          icon.src = map.geoLink.makerIconSrc;
+          icon.alt = "";
+          makerLink.append(icon);
+        }
+        geoLinksEl.append(makerLink);
+      }
+
+      card.append(geoLinksEl);
+    }
 
     // 編集・タグ・フォルダ移動・お気に入り・削除は、カード右端の「⋯」メニューへまとめる。
     // カード本体の要素を減らして、マップ名を表示できる幅をできるだけ広く取る。
@@ -1804,24 +2467,34 @@
     }
 
     addItem(t("menuEdit"), "", () => openEditMapModal(map));
-    addItem(favorites[map.id] ? t("favoriteRemove") : t("favoriteAdd"), "", () => {
-      if (favorites[map.id]) {
-        delete favorites[map.id];
-      } else {
-        favorites[map.id] = true;
-      }
-      persistFavorites();
-      renderBoard();
-    });
+    addItem(
+      favorites[map.id] ? t("favoriteRemove") : t("favoriteAdd"),
+      "",
+      () => {
+        if (favorites[map.id]) {
+          delete favorites[map.id];
+        } else {
+          favorites[map.id] = true;
+        }
+        persistFavorites();
+        renderBoard();
+      },
+    );
     addItem(t("menuDelete"), "", () => openDeleteMapModal(map));
 
     // カードは折り返しやスクロールの影響を受けるため、bodyへ固定配置して画面内へ収める。
     document.body.append(menu);
     const anchor = button.getBoundingClientRect();
     const size = menu.getBoundingClientRect();
-    const left = Math.max(8, Math.min(anchor.right - size.width, window.innerWidth - size.width - 8));
+    const left = Math.max(
+      8,
+      Math.min(anchor.right - size.width, window.innerWidth - size.width - 8),
+    );
     const below = anchor.bottom + 4;
-    const top = below + size.height > window.innerHeight - 8 ? Math.max(8, anchor.top - size.height - 4) : below;
+    const top =
+      below + size.height > window.innerHeight - 8
+        ? Math.max(8, anchor.top - size.height - 4)
+        : below;
     menu.style.left = `${left}px`;
     menu.style.top = `${top}px`;
 
@@ -1836,7 +2509,9 @@
   }
 
   function createSection({ id, label, mapIds, kind }) {
-    const filteredIds = mapIds.filter((mapId) => mapsById.has(mapId) && matchesSearch(mapsById.get(mapId)));
+    const filteredIds = mapIds.filter(
+      (mapId) => mapsById.has(mapId) && matchesSearch(mapsById.get(mapId)),
+    );
     if (searchQuery && filteredIds.length === 0) {
       return null;
     }
@@ -1868,8 +2543,12 @@
         if (!draggingSectionId || draggingSectionId === id) {
           return;
         }
-        const fromIndex = headingsData.headings.findIndex((heading) => heading.id === draggingSectionId);
-        const toIndex = headingsData.headings.findIndex((heading) => heading.id === id);
+        const fromIndex = headingsData.headings.findIndex(
+          (heading) => heading.id === draggingSectionId,
+        );
+        const toIndex = headingsData.headings.findIndex(
+          (heading) => heading.id === id,
+        );
         if (fromIndex < 0 || toIndex < 0) {
           return;
         }
@@ -1891,7 +2570,9 @@
     head.append(title);
 
     if (kind === "heading") {
-      const heading = headingsData.headings.find((candidate) => candidate.id === id);
+      const heading = headingsData.headings.find(
+        (candidate) => candidate.id === id,
+      );
       const addButton = document.createElement("button");
       addButton.type = "button";
       addButton.className = "mma-map-list__icon-button";
@@ -1903,13 +2584,17 @@
       renameButton.className = "mma-map-list__icon-button";
       renameButton.textContent = "✎";
       renameButton.title = t("folderRename");
-      renameButton.addEventListener("click", () => handleRenameHeading(heading));
+      renameButton.addEventListener("click", () =>
+        handleRenameHeading(heading),
+      );
       const deleteButton = document.createElement("button");
       deleteButton.type = "button";
       deleteButton.className = "mma-map-list__icon-button";
       deleteButton.textContent = "×";
       deleteButton.title = t("folderDelete");
-      deleteButton.addEventListener("click", () => handleDeleteHeading(heading));
+      deleteButton.addEventListener("click", () =>
+        handleDeleteHeading(heading),
+      );
       head.append(addButton, renameButton, deleteButton);
     }
 
@@ -1966,14 +2651,20 @@
     // ネイティブ一覧の更新などで作り直すときも、検索欄の入力位置を引き継げるよう控えておく。
     const searchFocus =
       searchInputEl && document.activeElement === searchInputEl
-        ? { start: searchInputEl.selectionStart, end: searchInputEl.selectionEnd }
+        ? {
+            start: searchInputEl.selectionStart,
+            end: searchInputEl.selectionEnd,
+          }
         : null;
     searchInputEl = null;
     boardEl = null;
 
     root.replaceChildren();
     // 空フォルダのプレースホルダーはCSSのcontentで描くため、文言だけ変数で渡す。
-    root.style.setProperty("--mma-ml-cards-empty", JSON.stringify(t("cardsEmpty")));
+    root.style.setProperty(
+      "--mma-ml-cards-empty",
+      JSON.stringify(t("cardsEmpty")),
+    );
 
     if (viewMode === "native") {
       // フッターへ移動していたUpdates関連のノードを含め、ページを完全に元の状態へ戻す。
@@ -2038,7 +2729,8 @@
 
     const addHeadingButton = document.createElement("button");
     addHeadingButton.type = "button";
-    addHeadingButton.className = "mma-map-list__button mma-map-list__button--ghost";
+    addHeadingButton.className =
+      "mma-map-list__button mma-map-list__button--ghost";
     addHeadingButton.textContent = t("addFolder");
     addHeadingButton.addEventListener("click", handleAddHeading);
     actions.append(addHeadingButton);
@@ -2094,7 +2786,7 @@
         id: FAVORITES_ID,
         label: t("sectionFavorites"),
         mapIds: favoriteIds,
-        kind: "favorites"
+        kind: "favorites",
       });
       if (favoritesSection) {
         favoritesSection.classList.add("mma-map-list__section--span");
@@ -2108,7 +2800,7 @@
         id: heading.id,
         label: heading.label,
         mapIds: heading.mapIds,
-        kind: "heading"
+        kind: "heading",
       });
       if (section) {
         boardEl.append(section);
@@ -2119,7 +2811,7 @@
       id: UNASSIGNED_ID,
       label: t("sectionUnassigned"),
       mapIds: headingsData.unassignedOrder,
-      kind: "unassigned"
+      kind: "unassigned",
     });
     if (unassignedSection) {
       unassignedSection.classList.add("mma-map-list__section--right");
@@ -2130,13 +2822,17 @@
   function createFootnote() {
     const footnote = document.createElement("p");
     footnote.className = "mma-map-list__footnote";
-    footnote.append(t("footnote"));
+    footnote.append(
+      t("footnoteVersion", { version: chrome.runtime.getManifest().version }),
+    );
+    footnote.append(t("footnotePrefix"));
     const link = document.createElement("a");
     link.href = language === "en" ? PRODUCT_URL_EN : PRODUCT_URL;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
     link.textContent = t("footnoteLink");
     footnote.append(link);
+    footnote.append(t("footnoteSuffix"));
     return footnote;
   }
 
@@ -2146,7 +2842,10 @@
   function createLanguageSwitch() {
     const wrap = document.createElement("div");
     wrap.className = "mma-map-list__lang";
-    for (const [code, label] of [["ja", "日本語"], ["en", "English"]]) {
+    for (const [code, label] of [
+      ["ja", "日本語"],
+      ["en", "English"],
+    ]) {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "mma-map-list__lang-button";
@@ -2180,7 +2879,7 @@
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute(
       "d",
-      "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"
+      "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
     );
     svg.append(path);
     return svg;
@@ -2202,7 +2901,11 @@
 
   /** ネイティブのノードは複製せず移動するため、元の位置を記録してから移す。 */
   function moveFooterNode(node, slot) {
-    movedFooterNodes.push({ node, parent: node.parentNode, next: node.nextSibling });
+    movedFooterNodes.push({
+      node,
+      parent: node.parentNode,
+      next: node.nextSibling,
+    });
     slot.append(node);
   }
 
@@ -2220,10 +2923,14 @@
 
   /** 中央の項目には先頭にアイコンを付ける。ネイティブが既にアイコンを持つ場合は足さない。 */
   function prependFooterIcon(node) {
-    if (node.querySelector(".ctas__icon, img, svg, .mma-map-list__footer-icon")) {
+    if (
+      node.querySelector(".ctas__icon, img, svg, .mma-map-list__footer-icon")
+    ) {
       return;
     }
-    const match = FOOTER_ICONS.find((entry) => entry.pattern.test(node.textContent ?? ""));
+    const match = FOOTER_ICONS.find((entry) =>
+      entry.pattern.test(node.textContent ?? ""),
+    );
     const icon = createFooterIcon(match ? match.icon : "🔗");
     node.prepend(icon);
     injectedFooterIcons.push(icon);
@@ -2254,14 +2961,17 @@
     const slots = {
       left: createFooterSlot("left"),
       center: createFooterSlot("center"),
-      right: createFooterSlot("right")
+      right: createFooterSlot("right"),
     };
 
     updatesToggleButton = document.createElement("button");
     updatesToggleButton.type = "button";
     updatesToggleButton.className = "mma-map-list__footer-link";
     updatesToggleButton.title = t("updatesTitle");
-    updatesToggleButton.append(createFooterIcon("🕘"), document.createTextNode("Updates"));
+    updatesToggleButton.append(
+      createFooterIcon("🕘"),
+      document.createTextNode("Updates"),
+    );
     updatesToggleButton.addEventListener("click", () => openUpdatesPopup(list));
     slots.center.append(updatesToggleButton);
 
@@ -2270,11 +2980,18 @@
     const ctas = section.querySelector(".ctas");
     const candidates = [];
     if (ctas) {
-      candidates.push(...(ctas.children.length > 0 ? [...ctas.children] : [ctas]));
+      candidates.push(
+        ...(ctas.children.length > 0 ? [...ctas.children] : [ctas]),
+      );
     }
     for (const selector of [".updates__version", ":scope > p:last-of-type"]) {
       const node = section.querySelector(selector);
-      if (node && node !== list && !node.contains(list) && !candidates.includes(node)) {
+      if (
+        node &&
+        node !== list &&
+        !node.contains(list) &&
+        !candidates.includes(node)
+      ) {
         candidates.push(node);
       }
     }
@@ -2303,7 +3020,8 @@
 
     // 2段目は1段目と同じ3分割にして、注記を左端、表示切り替えを中央に置く。
     const noteRow = document.createElement("div");
-    noteRow.className = "mma-map-list__footer-row mma-map-list__footer-row--note";
+    noteRow.className =
+      "mma-map-list__footer-row mma-map-list__footer-row--note";
     noteRow.append(createFootnote(), switchButton, createLanguageSwitch());
 
     footerEl = document.createElement("footer");
@@ -2326,7 +3044,9 @@
     if (version) {
       modal.body.append(version.cloneNode(true));
     }
-    modal.footer.append(createModalButton(t("close"), "mma-map-list-modal__button", modal.close));
+    modal.footer.append(
+      createModalButton(t("close"), "mma-map-list-modal__button", modal.close),
+    );
   }
 
   function detachFooter() {
@@ -2384,7 +3104,10 @@
     clearBooting();
 
     nativeListObserver = new MutationObserver(scheduleRefresh);
-    nativeListObserver.observe(nativeListEl, { childList: true, subtree: true });
+    nativeListObserver.observe(nativeListEl, {
+      childList: true,
+      subtree: true,
+    });
   }
 
   function detach() {
@@ -2425,10 +3148,16 @@
     // マップの一覧データ（#dataブロック）とUpdatesセクションは一覧より後ろにあるため、
     // HTMLの解析が終わるまでは取り付けない。それまではネイティブ側を隠したまま待つ。
     const documentParsed = document.readyState !== "loading";
-    const isTargetPage = settingsLoaded && featureEnabled && onTargetPage && documentParsed;
-    const nextNativeList = isTargetPage ? document.querySelector(NATIVE_LIST_SELECTOR) : null;
+    const isTargetPage =
+      settingsLoaded && featureEnabled && onTargetPage && documentParsed;
+    const nextNativeList = isTargetPage
+      ? document.querySelector(NATIVE_LIST_SELECTOR)
+      : null;
 
-    if (nativeListEl && (nativeListEl !== nextNativeList || !nativeListEl.isConnected)) {
+    if (
+      nativeListEl &&
+      (nativeListEl !== nextNativeList || !nativeListEl.isConnected)
+    ) {
       detach();
     }
 
@@ -2437,7 +3166,10 @@
     }
 
     // 独自UIを出さないと分かった時点で、隠していたネイティブの表示を戻す。
-    if (settingsLoaded && (!featureEnabled || !onTargetPage || (documentParsed && !nextNativeList))) {
+    if (
+      settingsLoaded &&
+      (!featureEnabled || !onTargetPage || (documentParsed && !nextNativeList))
+    ) {
       clearBooting();
     }
   }
@@ -2463,7 +3195,7 @@
   const mutationObserver = new MutationObserver(reconcile);
   mutationObserver.observe(document.documentElement, {
     childList: true,
-    subtree: true
+    subtree: true,
   });
 
   // document_startで動くため、解析完了を待って取り付けられるよう状態変化も見る。

@@ -276,12 +276,13 @@ assert(
 assert(mapListSource.includes('MESSAGES = {') && mapListSource.includes('en: {'), "the folder view must ship Japanese and English strings");
 
 // t("key")とdata-i18n="key"で使う文言が、日本語・英語の両方に定義されているか確認する。
+// フォーマッタが長い文字列を次の行へ折り返すことがあるため、コロンの後ろは同じ行に限定しない。
 for (const key of new Set([...mapListSource.matchAll(/\bt\("(\w+)"/g)].map((match) => match[1]))) {
-  const defined = mapListSource.split(`\n      ${key}: `).length - 1;
+  const defined = [...mapListSource.matchAll(new RegExp(`\\n {6}${key}:`, "g"))].length;
   assert(defined >= 2, `the folder view must define "${key}" in both the Japanese and English message tables`);
 }
 for (const key of new Set([...optionsHtml.matchAll(/data-i18n(?:-placeholder)?="(\w+)"/g)].map((match) => match[1]))) {
-  const defined = optionsSource.split(`\n      ${key}: `).length - 1;
+  const defined = [...optionsSource.matchAll(new RegExp(`\\n {6}${key}:`, "g"))].length;
   assert(defined >= 2, `the options page must define "${key}" in both the Japanese and English message tables`);
 }
 assert(

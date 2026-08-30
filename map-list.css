@@ -15,7 +15,8 @@
   display: block !important;
 }
 
-.page-map-list:has(section.updates.mma-map-list-updates-hidden) > section:first-child {
+.page-map-list:has(section.updates.mma-map-list-updates-hidden)
+  > section:first-child {
   width: 100% !important;
   max-width: none !important;
   flex: 1 1 auto !important;
@@ -89,7 +90,9 @@
 /* ネイティブのカード／ボタン風の装飾（背景・枠・太字・下線）を落として、ただのテキストとして見せる。
    装飾が内側のラッパーに付いていることがあるため子孫まで含め、サイト側の指定に確実に勝つよう!importantで打ち消す。 */
 .mma-map-list__footer .mma-map-list__footer-slot > *,
-.mma-map-list__footer .mma-map-list__footer-slot :where(a, div, p, span, button) {
+.mma-map-list__footer
+  .mma-map-list__footer-slot
+  :where(a, div, p, span, button) {
   padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -208,7 +211,12 @@
   gap: 16px;
   margin-bottom: 16px;
   color: var(--mma-ml-text);
-  font: 14px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font:
+    14px/1.4 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 .mma-map-list__native-hidden {
@@ -542,6 +550,37 @@
   cursor: default;
 }
 
+/* GeoGuessrマップに紐付いている場合だけ表示する、ネイティブと同じ2つのアイコンリンク。 */
+.mma-map-list__geo-links {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+}
+
+.mma-map-list__geo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.mma-map-list__geo-link img {
+  display: block;
+  max-width: 16px;
+  max-height: 16px;
+  object-fit: contain;
+}
+
+.mma-map-list__geo-link:hover {
+  background: var(--mma-ml-surface-2);
+  opacity: 1;
+}
+
 .mma-map-list__menu-button {
   display: inline-flex;
   flex: 0 0 auto;
@@ -581,7 +620,12 @@
   background: #111827;
   box-shadow: 0 18px 40px rgb(15 23 42 / 55%);
   color: #f8fafc;
-  font: 13px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font:
+    13px/1.4 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 .mma-map-list__menu-item {
@@ -664,7 +708,12 @@
   background: #fff;
   color: #172033;
   box-shadow: 0 24px 70px rgb(15 23 42 / 30%);
-  font: 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font:
+    14px/1.5 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 /* Updatesのポップアップだけは、変更履歴が読みやすいよう通常の2倍の幅にする。 */
@@ -685,6 +734,14 @@
   font-weight: 650;
 }
 
+.mma-map-list-modal__label--tight {
+  margin-bottom: 6px;
+}
+
+.mma-map-list-modal__label--flush {
+  margin-bottom: 0;
+}
+
 .mma-map-list-modal__input {
   display: block;
   width: 100%;
@@ -694,6 +751,20 @@
   border-radius: 9px;
   color: #172033;
   font: inherit;
+}
+
+/* 入力欄とボタンを横並びで1行にする（新しいタグの追加など）。 */
+.mma-map-list-modal__inline-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.mma-map-list-modal__inline-row .mma-map-list-modal__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-top: 0;
 }
 
 .mma-map-list-modal__select {
@@ -706,6 +777,31 @@
   color: #172033;
   background: #fff;
   font: inherit;
+}
+
+.mma-map-list-modal__divider {
+  margin: 4px 0 14px;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+}
+
+.mma-map-list-modal__divider--top {
+  margin-top: 16px;
+}
+
+.mma-map-list-modal__details {
+  margin-bottom: 14px;
+}
+
+.mma-map-list-modal__details-summary {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mma-map-list-modal__details[open] .mma-map-list-modal__details-summary {
+  margin-bottom: 12px;
 }
 
 .mma-map-list-modal__presets {
@@ -783,6 +879,29 @@
   border: 0;
   border-radius: 4px;
   cursor: pointer;
+}
+
+/* タグ一覧の行末にある削除ボタン。行の右端へ押し出す。 */
+.mma-map-list-modal__tag-delete {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mma-map-list-modal__tag-delete:hover {
+  background: #fecaca;
 }
 
 .mma-map-list-modal__message {
