@@ -1482,23 +1482,16 @@
   }
 
   function createCard(map, sectionId, movable) {
-    const card = document.createElement("a");
+    // カード本体は<a>にしない。先頭の国チップと末尾の「⋯」メニューはリンクの外に置き、
+    // マップ編集画面への遷移は名前・地点数・タグをまとめた内側のlink-areaだけが担う。
+    const card = document.createElement("div");
     card.className = "mma-map-list__card";
-    card.href = `/maps/${map.id}`;
-    if (openInNewTab) {
-      card.target = "_blank";
-      card.rel = "noopener noreferrer";
-    }
     card.dataset.mapId = map.id;
 
     if (movable) {
       const handle = document.createElement("span");
       handle.className = "mma-map-list__drag-handle";
       handle.textContent = "⠿";
-      handle.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-      });
       card.append(handle);
       card.draggable = true;
 
@@ -1567,12 +1560,18 @@
       country.className = "mma-map-list__country" + (countryCode ? "" : " mma-map-list__country--empty");
       country.textContent = countryCode ? flagFromCode(countryCode) : "📄";
       country.title = countryCode ? t("countryChange", { name: nameForCode(countryCode) }) : t("countrySelect");
-      country.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+      country.addEventListener("click", () => {
         openCountryModal(map);
       });
       card.append(country);
+    }
+
+    const linkArea = document.createElement("a");
+    linkArea.className = "mma-map-list__link-area";
+    linkArea.href = `/maps/${map.id}`;
+    if (openInNewTab) {
+      linkArea.target = "_blank";
+      linkArea.rel = "noopener noreferrer";
     }
 
     if (favorites[map.id]) {
@@ -1581,19 +1580,19 @@
       mark.textContent = "♥";
       mark.title = t("favoriteMarked");
       mark.setAttribute("aria-label", t("favoriteMarked"));
-      card.append(mark);
+      linkArea.append(mark);
     }
 
     const link = document.createElement("span");
     link.className = "mma-map-list__link";
     link.textContent = map.name;
-    card.append(link);
+    linkArea.append(link);
 
     if (showLocationCount) {
       const count = document.createElement("span");
       count.className = "mma-map-list__count";
       count.textContent = t("locations", { count: map.locationCount.toLocaleString(localeTag()) });
-      card.append(count);
+      linkArea.append(count);
     }
 
     // 付与済みのタグだけを表示する。タグの付け外しは「⋯」メニューから行う。
@@ -1609,6 +1608,7 @@
       chip.className = "mma-map-list__tag-chip";
       chip.style.background = tag.color;
       chip.textContent = tag.name;
+      // タグはlink-areaの内側にあるため、クリックしてもマップ編集画面へ遷移しないようにする。
       chip.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -1616,8 +1616,9 @@
       tags.append(chip);
     }
     if (tags.childElementCount > 0) {
-      card.append(tags);
+      linkArea.append(tags);
     }
+    card.append(linkArea);
 
     // 編集・タグ・フォルダ移動・お気に入り・削除は、カード右端の「⋯」メニューへまとめる。
     // カード本体の要素を減らして、マップ名を表示できる幅をできるだけ広く取る。
@@ -1629,9 +1630,7 @@
     menuButton.setAttribute("aria-label", t("cardMenu"));
     menuButton.setAttribute("aria-haspopup", "menu");
     menuButton.setAttribute("aria-expanded", "false");
-    menuButton.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
+    menuButton.addEventListener("click", () => {
       if (cardMenuState?.button === menuButton) {
         closeCardMenu();
         return;

@@ -410,7 +410,6 @@
   padding: 8px 10px;
   border: 1px solid transparent;
   border-radius: 10px;
-  text-decoration: none;
 }
 
 .mma-map-list__card:hover {
@@ -488,17 +487,31 @@
   opacity: 0.4;
 }
 
-.mma-map-list__link {
-  overflow: hidden;
+/*
+ * カード本体は<div>で、リンク（マップ編集画面への遷移）はこの要素だけが担う。
+ * 先頭の国チップと末尾の「⋯」メニューはこの外側の兄弟要素にして、そもそも<a>の外に置く。
+ */
+.mma-map-list__link-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  row-gap: 4px;
   flex: 1 1 100px;
   min-width: 0;
   color: var(--mma-ml-text);
   text-decoration: none;
+}
+
+.mma-map-list__link {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.mma-map-list__card:hover .mma-map-list__link {
+.mma-map-list__link-area:hover .mma-map-list__link {
   text-decoration: underline;
 }
 
