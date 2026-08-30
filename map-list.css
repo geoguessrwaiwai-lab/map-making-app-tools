@@ -207,8 +207,12 @@
   --mma-ml-muted: #94a3b8;
   --mma-ml-accent: #3b82f6;
   display: flex;
+  box-sizing: border-box;
   flex-direction: column;
   gap: 16px;
+  /* ネイティブの.page-map-listはmax-width:1200pxをmargin:autoで中央寄せしているだけでpaddingを
+     持たないため、ビューポート幅が1200px以下になると左右の余白が消える。最低限のガターを自前で確保する。 */
+  padding-inline: 10px;
   margin-bottom: 16px;
   color: var(--mma-ml-text);
   font:
