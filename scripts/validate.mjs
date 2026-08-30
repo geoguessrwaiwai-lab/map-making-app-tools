@@ -13,6 +13,8 @@ const REQUIRED_EXTENSION_FILES = [
   "options.html",
   "options.css",
   "options.js",
+  "_locales/ja/messages.json",
+  "_locales/en/messages.json",
   "icon16.png",
   "icon32.png",
   "icon48.png",
@@ -53,11 +55,20 @@ assert(
   sourcesMatch,
   "Makefile must define a SOURCES variable listing the packaged files"
 );
-const packagedSources = sourcesMatch[1].split(/\s+/);
+const localesMatch = makefileSource.match(/^LOCALES := (.+)$/m);
+assert(
+  localesMatch,
+  "Makefile must define a LOCALES variable listing the packaged locale files"
+);
+// ロケールはディレクトリ構造ごと同梱するため、フラットに詰めるSOURCESとは別の変数で管理する。
+const packagedSources = [
+  ...sourcesMatch[1].split(/\s+/),
+  ...localesMatch[1].split(/\s+/),
+];
 for (const path of REQUIRED_EXTENSION_FILES) {
   assert(
     packagedSources.includes(path),
-    `Makefile SOURCES must include ${path} so it ships in the packaged extension`
+    `Makefile SOURCES or LOCALES must include ${path} so it ships in the packaged extension`
   );
 }
 
@@ -71,6 +82,40 @@ assert(
   manifest.version === "1.4.0",
   "the release package must remain version 1.4.0"
 );
+assert(
+  manifest.default_locale === "ja",
+  "default_locale must stay ja so the store falls back to the Japanese listing"
+);
+assert(
+  manifest.name === "__MSG_extName__",
+  "the extension name must come from _locales so the store listing can be localized"
+);
+assert(
+  manifest.description === "__MSG_extDescription__",
+  "the extension description must come from _locales so the store summary can be localized"
+);
+
+// ストアの商品名・概要は_localesから配信されるため、両ロケールで同じキーが揃っている必要がある。
+const LOCALE_CODES = ["ja", "en"];
+const LOCALE_MESSAGE_KEYS = ["extName", "extDescription"];
+// Chrome ウェブストアの概要欄の上限。
+const STORE_SUMMARY_MAX_LENGTH = 132;
+for (const code of LOCALE_CODES) {
+  const localePath = `_locales/${code}/messages.json`;
+  const messages = JSON.parse(fs.readFileSync(localePath, "utf8"));
+  for (const key of LOCALE_MESSAGE_KEYS) {
+    assert(
+      typeof messages[key]?.message === "string" &&
+        messages[key].message.trim().length > 0,
+      `${localePath} must define a non-empty message for ${key}`
+    );
+  }
+  assert(
+    messages.extDescription.message.length <= STORE_SUMMARY_MAX_LENGTH,
+    `${localePath} extDescription must stay within ${STORE_SUMMARY_MAX_LENGTH} characters for the store summary`
+  );
+}
+
 assert(
   JSON.stringify(manifest.permissions) === JSON.stringify(["storage"]),
   "only the storage permission is allowed"
