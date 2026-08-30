@@ -514,6 +514,100 @@
     regionNamesJa = null;
   }
 
+  // 絵文字（国旗）の自動判定用。表示言語に関係なく、日本語名・英語名の両方を対象にする。
+  const COUNTRY_NAME_ENTRIES = REGION_CODES.map((code) => {
+    const en = nameForCodeUsing(code, regionNamesEn);
+    const ja = nameForCodeUsing(code, regionNamesJa);
+    return {
+      code,
+      en: typeof en === "string" && en !== code ? en.toLowerCase() : null,
+      ja: typeof ja === "string" && ja !== code ? ja : null,
+    };
+  });
+  // Intl.DisplayNamesの正式名称（例: アメリカ合衆国）だけでは拾えない口語的な呼び方の別名。
+  const COUNTRY_NAME_ALIASES = { US: ["アメリカ"] };
+  for (const [code, aliases] of Object.entries(COUNTRY_NAME_ALIASES)) {
+    for (const ja of aliases) {
+      COUNTRY_NAME_ENTRIES.push({ code, en: null, ja });
+    }
+  }
+
+  /** マップ名の中で、各国名（日本語名・英語名）が出現する位置を全て集める。 */
+  function findCountryNameMatches(name) {
+    const lowerName = name.toLowerCase();
+    const matches = [];
+    for (const entry of COUNTRY_NAME_ENTRIES) {
+      if (entry.en) {
+        const start = lowerName.indexOf(entry.en);
+        if (start !== -1) {
+          matches.push({
+            code: entry.code,
+            start,
+            end: start + entry.en.length,
+          });
+        }
+      }
+      if (entry.ja) {
+        const start = name.indexOf(entry.ja);
+        if (start !== -1) {
+          matches.push({
+            code: entry.code,
+            start,
+            end: start + entry.ja.length,
+          });
+        }
+      }
+    }
+    return matches;
+  }
+
+  /**
+   * マップ名に国名（日本語名または英語名）がちょうど1ヶ国分だけ含まれていれば、
+   * その国コードを返す。0件・複数件のときはnull（判定不可）。
+   * 「ボリビア」に含まれる「リビア」のように、他国名の内部にすっぽり収まるだけの
+   * 一致は数えない（一致範囲が完全に内包される場合は除外する）。
+   */
+  function detectCountryCodeFromMapName(name) {
+    if (typeof name !== "string" || !name) {
+      return null;
+    }
+
+    const matches = findCountryNameMatches(name);
+    const kept = matches.filter(
+      (match) =>
+        !matches.some(
+          (other) =>
+            other.code !== match.code &&
+            other.start <= match.start &&
+            match.end <= other.end &&
+            other.end - other.start > match.end - match.start
+        )
+    );
+
+    const codes = new Set(kept.map((match) => match.code));
+    return codes.size === 1 ? kept[0].code : null;
+  }
+
+  /** 未設定のマップだけ、マップ名から国旗を自動判定してセットする。変更があればtrueを返す。 */
+  function autoAssignCountriesForIds(ids) {
+    let changed = false;
+    for (const id of ids) {
+      if (countries[id]) {
+        continue;
+      }
+      const map = mapsById.get(id);
+      if (!map) {
+        continue;
+      }
+      const code = detectCountryCodeFromMapName(map.name);
+      if (code) {
+        countries[id] = code;
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
   /** 言語を切り替えたら、国名表示も同じ言語で作り直す。 */
   function refreshRegionNames() {
     try {
@@ -1153,6 +1247,7 @@
     }
     headingsData.unassignedOrder = [...unassigned];
     headingsData.initialized = true;
+    autoAssignCountriesForIds(mapsById.keys());
     return true;
   }
 
@@ -1187,6 +1282,7 @@
     const newIds = [...currentIds].filter((id) => !placedIds.has(id));
     if (newIds.length > 0) {
       changed = true;
+      autoAssignCountriesForIds(newIds);
       const targetHeading = pendingNewMapHeadingId
         ? headingsData.headings.find(
             (heading) => heading.id === pendingNewMapHeadingId
