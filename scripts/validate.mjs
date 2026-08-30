@@ -3,10 +3,12 @@ import vm from "node:vm";
 
 const REQUIRED_EXTENSION_FILES = [
   "manifest.json",
-  "content.js",
-  "page.js",
+  "resize.js",
+  "pochipochi-bridge.js",
+  "pochipochi.js",
   "map-list.js",
-  "content.css",
+  "resize.css",
+  "pochipochi.css",
   "map-list.css",
   "options.html",
   "options.css",
@@ -88,44 +90,72 @@ assert(
 );
 assert(
   Array.isArray(manifest.content_scripts) &&
-    manifest.content_scripts.length === 3,
-  "exactly three content script definitions are required"
+    manifest.content_scripts.length === 4,
+  "exactly four content script definitions are required"
 );
 
-const [contentScript, pageScript, mapListScript] = manifest.content_scripts;
+const [resizeScript, pochipochiBridgeScript, pochipochiScript, mapListScript] =
+  manifest.content_scripts;
 assert(
-  JSON.stringify(contentScript.matches) ===
+  JSON.stringify(resizeScript.matches) ===
     JSON.stringify(["https://map-making.app/maps/*"]),
-  "content script matches must remain limited to Map Making App map paths"
+  "the resize content script matches must remain limited to Map Making App map paths"
 );
 assert(
-  JSON.stringify(contentScript.js) === JSON.stringify(["content.js"]),
-  "content script entry point must be content.js"
+  JSON.stringify(resizeScript.js) === JSON.stringify(["resize.js"]),
+  "the resize content script entry point must be resize.js"
 );
 assert(
-  JSON.stringify(contentScript.css) === JSON.stringify(["content.css"]),
-  "content stylesheet must be content.css"
+  JSON.stringify(resizeScript.css) === JSON.stringify(["resize.css"]),
+  "the resize stylesheet must be resize.css"
 );
 assert(
-  contentScript.run_at === "document_idle",
-  "content script must run at document_idle"
+  resizeScript.run_at === "document_idle",
+  "the resize content script must run at document_idle"
 );
 assert(
-  JSON.stringify(pageScript.matches) ===
+  !Object.hasOwn(resizeScript, "world"),
+  "resize.js must run in the isolated world"
+);
+assert(
+  JSON.stringify(pochipochiBridgeScript.matches) ===
+    JSON.stringify(["https://map-making.app/maps/*"]),
+  "the Pochi-pochi storage bridge matches must remain limited to Map Making App map paths"
+);
+assert(
+  JSON.stringify(pochipochiBridgeScript.js) ===
+    JSON.stringify(["pochipochi-bridge.js"]),
+  "the Pochi-pochi storage bridge entry point must be pochipochi-bridge.js"
+);
+assert(
+  JSON.stringify(pochipochiBridgeScript.css) ===
+    JSON.stringify(["pochipochi.css"]),
+  "the Pochi-pochi stylesheet must be pochipochi.css"
+);
+assert(
+  pochipochiBridgeScript.run_at === "document_idle",
+  "the Pochi-pochi storage bridge must run at document_idle"
+);
+assert(
+  !Object.hasOwn(pochipochiBridgeScript, "world"),
+  "pochipochi-bridge.js must run in the isolated world"
+);
+assert(
+  JSON.stringify(pochipochiScript.matches) ===
     JSON.stringify(["https://map-making.app/maps/*"]),
   "MAIN world script matches must remain limited to Map Making App map paths"
 );
 assert(
-  JSON.stringify(pageScript.js) === JSON.stringify(["page.js"]),
-  "MAIN world script entry point must be page.js"
+  JSON.stringify(pochipochiScript.js) === JSON.stringify(["pochipochi.js"]),
+  "MAIN world script entry point must be pochipochi.js"
 );
 assert(
-  pageScript.run_at === "document_idle",
+  pochipochiScript.run_at === "document_idle",
   "MAIN world script must run at document_idle"
 );
 assert(
-  pageScript.world === "MAIN",
-  "page.js must run in MAIN world to use the editor's location API"
+  pochipochiScript.world === "MAIN",
+  "pochipochi.js must run in MAIN world to use the editor's location API"
 );
 assert(
   JSON.stringify(mapListScript.matches) ===
@@ -153,122 +183,125 @@ for (const path of Object.values(manifest.icons ?? {})) {
   assert(fs.existsSync(path), `Missing icon referenced by manifest: ${path}`);
 }
 
-const contentSource = fs.readFileSync("content.js", "utf8");
-const pageSource = fs.readFileSync("page.js", "utf8");
+const resizeSource = fs.readFileSync("resize.js", "utf8");
+const pochipochiBridgeSource = fs.readFileSync("pochipochi-bridge.js", "utf8");
+const pochipochiSource = fs.readFileSync("pochipochi.js", "utf8");
 const mapListSource = fs.readFileSync("map-list.js", "utf8");
-const contentStyles = fs.readFileSync("content.css", "utf8");
+const resizeStyles = fs.readFileSync("resize.css", "utf8");
+const pochipochiStyles = fs.readFileSync("pochipochi.css", "utf8");
 const mapListStyles = fs.readFileSync("map-list.css", "utf8");
 const optionsHtml = fs.readFileSync("options.html", "utf8");
 const optionsStyles = fs.readFileSync("options.css", "utf8");
 const optionsSource = fs.readFileSync("options.js", "utf8");
-new vm.Script(contentSource, { filename: "content.js" });
-new vm.Script(pageSource, { filename: "page.js" });
+new vm.Script(resizeSource, { filename: "resize.js" });
+new vm.Script(pochipochiBridgeSource, { filename: "pochipochi-bridge.js" });
+new vm.Script(pochipochiSource, { filename: "pochipochi.js" });
 new vm.Script(mapListSource, { filename: "map-list.js" });
 new vm.Script(optionsSource, { filename: "options.js" });
 
 assert(
-  contentSource.includes("/^\\/maps\\/\\d+\\/?$/"),
+  resizeSource.includes("/^\\/maps\\/\\d+\\/?$/"),
   "runtime path check must remain limited to numeric map IDs"
 );
 assert(
-  contentSource.includes("const MIN_PERCENT = 25"),
+  resizeSource.includes("const MIN_PERCENT = 25"),
   "minimum screen width must remain 25%"
 );
 assert(
-  contentSource.includes("const MAX_PERCENT = 75"),
+  resizeSource.includes("const MAX_PERCENT = 75"),
   "maximum screen width must remain 75%"
 );
 assert(
-  !contentSource.includes('handle.addEventListener("keydown"'),
+  !resizeSource.includes('handle.addEventListener("keydown"'),
   "the resize handle must not register keyboard controls"
 );
 assert(
-  !contentSource.includes("handle.tabIndex"),
+  !resizeSource.includes("handle.tabIndex"),
   "the pointer-only resize handle must not enter the tab order"
 );
 assert(
-  contentSource.includes('window.matchMedia("(min-width: 801px)")'),
+  resizeSource.includes('window.matchMedia("(min-width: 801px)")'),
   "the resize handle must only be enabled at viewport widths of 801px or more"
 );
 assert(
-  contentStyles.includes("@media (min-width: 801px)"),
+  resizeStyles.includes("@media (min-width: 801px)"),
   "editor layout overrides must only apply at viewport widths of 801px or more"
 );
 assert(
-  contentSource.includes(
+  resizeSource.includes(
     "minmax(0, ${leftPercent}fr) minmax(0, ${100 - leftPercent}fr)"
   ),
   "grid tracks must allow shrinking below their intrinsic minimum width"
 );
 assert(
   /\.page-map-editor\s*>\s*\*\s*\{[^}]*min-width:\s*0\s*!important/s.test(
-    contentStyles
+    resizeStyles
   ),
   "direct editor grid items must allow shrinking inside narrow tracks"
 );
 assert(
-  contentStyles.includes(".page-map-editor > .mma-resizable-work-area"),
+  resizeStyles.includes(".page-map-editor > .mma-resizable-work-area"),
   "work-area must remain identifiable as the responsive container"
 );
 assert(
-  /\.page-map-editor\s*\{[^}]*overflow-x:\s*clip/s.test(contentStyles),
+  /\.page-map-editor\s*\{[^}]*overflow-x:\s*clip/s.test(resizeStyles),
   "the editor must clip horizontal overflow before it reaches the page"
 );
 assert(
   /\.page-map-editor\s*>\s*\.mma-resizable-work-area\s*\{[^}]*overflow-x:\s*auto\s*!important/s.test(
-    contentStyles
+    resizeStyles
   ),
   "horizontal overflow must remain scrollable inside the work area"
 );
 assert(
-  contentStyles.includes(
+  resizeStyles.includes(
     "@container mma-resizable-work-area (max-width: 640px)"
   ),
   "narrow work areas must use a container query"
 );
 assert(
-  contentStyles.includes('"date"') && contentStyles.includes('"actions"'),
+  resizeStyles.includes('"date"') && resizeStyles.includes('"actions"'),
   "date and actions must stack into separate rows in narrow work areas"
 );
 assert(
-  contentSource.includes("const MAP_IMPORT_BREAKPOINT_PX = 500"),
+  resizeSource.includes("const MAP_IMPORT_BREAKPOINT_PX = 500"),
   "map import visibility must use the 500px breakpoint"
 );
 assert(
-  contentSource.includes("width < MAP_IMPORT_BREAKPOINT_PX"),
+  resizeSource.includes("width < MAP_IMPORT_BREAKPOINT_PX"),
   "map import must only be hidden below the breakpoint"
 );
 assert(
   /\.page-map-editor\.mma-narrow-map\s+\.map-meta__import\s*\{[^}]*display:\s*none/s.test(
-    contentStyles
+    resizeStyles
   ),
   "map import must be hidden while the map is narrow"
 );
 assert(
-  contentSource.includes("const MAP_TOTAL_BREAKPOINT_PX = 300"),
+  resizeSource.includes("const MAP_TOTAL_BREAKPOINT_PX = 300"),
   "map total visibility must use the 300px breakpoint"
 );
 assert(
-  contentSource.includes("width < MAP_TOTAL_BREAKPOINT_PX"),
+  resizeSource.includes("width < MAP_TOTAL_BREAKPOINT_PX"),
   "map total must only be hidden below the breakpoint"
 );
 assert(
   /\.page-map-editor\.mma-compact-map\s+\.map-meta__total\s*\{[^}]*display:\s*none/s.test(
-    contentStyles
+    resizeStyles
   ),
   "map total must be hidden while the map is compact"
 );
 assert(
-  contentSource.includes('const MAP_COUNT_SELECTOR = ".map-meta__count"'),
+  resizeSource.includes('const MAP_COUNT_SELECTOR = ".map-meta__count"'),
   "map count must be detected using the supplied selector"
 );
 assert(
-  contentSource.includes("const MAP_COUNT_BREAKPOINT_OFFSET_PX = 60"),
+  resizeSource.includes("const MAP_COUNT_BREAKPOINT_OFFSET_PX = 60"),
   "map count must increase responsive breakpoints by 60px"
 );
 assert(
-  contentSource.includes("MAP_IMPORT_BREAKPOINT_PX + breakpointOffset") &&
-    contentSource.includes("MAP_TOTAL_BREAKPOINT_PX + breakpointOffset"),
+  resizeSource.includes("MAP_IMPORT_BREAKPOINT_PX + breakpointOffset") &&
+    resizeSource.includes("MAP_TOTAL_BREAKPOINT_PX + breakpointOffset"),
   "map count breakpoint offset must apply to both map metadata controls"
 );
 
@@ -282,8 +315,12 @@ const forbiddenPatterns = [
 ];
 
 for (const [name, pattern] of forbiddenPatterns) {
-  assert(!pattern.test(contentSource), `content.js must not use ${name}`);
-  assert(!pattern.test(pageSource), `page.js must not use ${name}`);
+  assert(!pattern.test(resizeSource), `resize.js must not use ${name}`);
+  assert(
+    !pattern.test(pochipochiBridgeSource),
+    `pochipochi-bridge.js must not use ${name}`
+  );
+  assert(!pattern.test(pochipochiSource), `pochipochi.js must not use ${name}`);
   assert(!pattern.test(mapListSource), `map-list.js must not use ${name}`);
   assert(!pattern.test(optionsSource), `options.js must not use ${name}`);
 }
@@ -408,113 +445,115 @@ assert(
 );
 
 assert(
-  pageSource.includes(
+  pochipochiSource.includes(
     'const PANORAMA_SELECTOR = ".location-preview__panorama"'
   ),
   "pochi-pochi mode must watch the supplied panorama DOM"
 );
 assert(
-  pageSource.includes('const MAP_SELECTOR = ".map-embed"'),
+  pochipochiSource.includes('const MAP_SELECTOR = ".map-embed"'),
   "pochi-pochi mode must capture clicks from the supplied map DOM"
 );
 assert(
-  pageSource.includes("deleteButton.click()"),
+  pochipochiSource.includes("deleteButton.click()"),
   "pochi-pochi mode must fire the site's delete button before map click propagation"
 );
 assert(
-  pageSource.includes("panoramaRemoved"),
+  pochipochiSource.includes("panoramaRemoved"),
   "disappearing Street View DOM must be detected"
 );
 assert(
-  pageSource.includes("!document.querySelector(PANORAMA_SELECTOR)"),
+  pochipochiSource.includes("!document.querySelector(PANORAMA_SELECTOR)"),
   "panorama replacement must not be mistaken for closing Street View"
 );
 assert(
-  pageSource.includes("protectLocation(currentLocation)"),
+  pochipochiSource.includes("protectLocation(currentLocation)"),
   "closing Street View must protect the current location"
 );
 assert(
-  pageSource.includes(
+  pochipochiSource.includes(
     'document.addEventListener("click", handleLocationDelete, true)'
   ),
   "Delete must be excluded from Street View close protection"
 );
 assert(
-  pageSource.includes("transientLocationKey === visibleLocation.key"),
+  pochipochiSource.includes("transientLocationKey === visibleLocation.key"),
   "turning the mode off must delete only the final newly selected location"
 );
 assert(
-  pageSource.includes("mapEditor.getLocationsInBBox(bounds)"),
+  pochipochiSource.includes("mapEditor.getLocationsInBBox(bounds)"),
   "all loaded locations must be protected before enabling pochi-pochi mode"
 );
 assert(
-  pageSource.includes("!protectExistingLocations()"),
+  pochipochiSource.includes("!protectExistingLocations()"),
   "pochi-pochi mode must fail closed when existing locations cannot be enumerated"
 );
 assert(
   /const INFO_URL =\s*"https:\/\/app\.geoguessr-waiwai\.workers\.dev\/map-making-app-tools\/"/.test(
-    pageSource
+    pochipochiSource
   ),
   "the info icon must link to the product landing page"
 );
 assert(
-  pageSource.includes('infoLink.target = "_blank"'),
+  pochipochiSource.includes('infoLink.target = "_blank"'),
   "the info link must open in a new tab"
 );
 assert(
-  pageSource.includes('infoLink.rel = "noopener noreferrer"'),
+  pochipochiSource.includes('infoLink.rel = "noopener noreferrer"'),
   "the new-tab info link must isolate its opener"
 );
 assert(
-  contentSource.includes("getPochipochiSettings(url)"),
+  pochipochiBridgeSource.includes("getPochipochiSettings(url)"),
   "URL defaults must be read from extension-local storage"
 );
 assert(
-  contentSource.includes("chrome.storage.local.set"),
+  pochipochiBridgeSource.includes("chrome.storage.local.set"),
   "URL defaults must be saved to extension-local storage"
 );
 assert(
-  contentSource.includes("resizeFeatureEnabled &&"),
+  resizeSource.includes("resizeFeatureEnabled &&"),
   "the screen width feature must be independently configurable"
 );
 assert(
-  contentSource.includes('"mma-resize-feature-enabled"'),
+  resizeSource.includes('"mma-resize-feature-enabled"'),
   "resize-only CSS must be gated by a document class"
 );
 assert(
-  contentStyles.includes("html.mma-resize-feature-enabled .page-map-editor"),
+  resizeStyles.includes("html.mma-resize-feature-enabled .page-map-editor"),
   "screen layout CSS must be inactive when resizing is disabled"
 );
 assert(
-  contentSource.includes("POCHIPOCHI_DEFAULT_KEY"),
+  pochipochiBridgeSource.includes("POCHIPOCHI_DEFAULT_KEY"),
   "the global Pochi-pochi default must be supported"
 );
 assert(
-  contentSource.includes("hasUrlSetting"),
+  pochipochiBridgeSource.includes("hasUrlSetting"),
   "the per-URL Pochi-pochi setting must override the global default"
 );
 assert(
-  pageSource.includes("let pochiFeatureEnabled = false"),
+  pochipochiSource.includes("let pochiFeatureEnabled = false"),
   "Pochi-pochi controls must wait for the stored feature setting"
 );
 assert(
-  pageSource.includes("INITIALIZATION_MAX_ATTEMPTS = 40"),
+  pochipochiSource.includes("INITIALIZATION_MAX_ATTEMPTS = 40"),
   "stored automatic ON must wait for the editor location index"
 );
 assert(
-  pageSource.includes("retryStoredModeEnable"),
+  pochipochiSource.includes("retryStoredModeEnable"),
   "stored automatic ON must retry after editor initialization"
 );
 assert(
-  pageSource.includes("setModeEnabled(true, false)"),
+  pochipochiSource.includes("setModeEnabled(true, false)"),
   "automatic ON retries must not show a premature error state"
 );
 assert(
-  pageSource.includes('control.dataset.initializing = "true"'),
+  pochipochiSource.includes('control.dataset.initializing = "true"'),
   "Pochi-pochi controls must remain hidden during automatic initialization"
 );
 assert(
-  contentStyles.includes('.mma-pochipochi-control[data-initializing="true"]'),
+  pochipochiStyles.includes(
+    '.mma-pochipochi-control[data-initializing="true"]'
+  ),
   "initializing Pochi-pochi controls must not be rendered"
 );
 assert(
@@ -636,51 +675,51 @@ assert(
   "map cards must open in a new tab when the setting is on"
 );
 assert(
-  contentSource.includes("SETTINGS_READY_EVENT"),
+  pochipochiBridgeSource.includes("SETTINGS_READY_EVENT"),
   "the isolated-world storage bridge must announce when it is ready"
 );
 assert(
-  pageSource.includes("SETTINGS_READY_EVENT, requestStoredSetting"),
+  pochipochiSource.includes("SETTINGS_READY_EVENT, requestStoredSetting"),
   "the MAIN-world control must retry after the storage bridge is ready"
 );
 assert(
-  pageSource.includes("requestStoredSetting()"),
+  pochipochiSource.includes("requestStoredSetting()"),
   "the saved URL default must be requested when the control mounts"
 );
 assert(
-  pageSource.includes(
+  pochipochiSource.includes(
     'document.addEventListener("click", handleMapClick, true)'
   ),
   "map clicks must be handled in the capture phase"
 );
 assert(
-  pageSource.includes("const DRAG_THRESHOLD_PX = 6"),
+  pochipochiSource.includes("const DRAG_THRESHOLD_PX = 6"),
   "map drags must use an explicit movement threshold"
 );
 assert(
-  pageSource.includes(
+  pochipochiSource.includes(
     'document.addEventListener("pointermove", handleMapPointerMove, true)'
   ),
   "map pointer movement must be tracked in the capture phase"
 );
 assert(
-  pageSource.includes("if (skipNextMapClick)"),
+  pochipochiSource.includes("if (skipNextMapClick)"),
   "the click following a map drag must skip deletion"
 );
 assert(
-  !pageSource.includes("stopPropagation"),
+  !pochipochiSource.includes("stopPropagation"),
   "pochi-pochi mode must not stop the site's map click propagation"
 );
 assert(
-  !pageSource.includes("preventDefault"),
+  !pochipochiSource.includes("preventDefault"),
   "pochi-pochi mode must not cancel the site's map click"
 );
 assert(
-  pageSource.includes('label.textContent = "ぽちぽちモード"'),
+  pochipochiSource.includes('label.textContent = "ぽちぽちモード"'),
   "pochi-pochi mode toggle must keep its requested label"
 );
 assert(
-  contentStyles.includes("top: 7px"),
+  pochipochiStyles.includes("top: 7px"),
   "pochi-pochi mode must be positioned 7px from the top"
 );
 

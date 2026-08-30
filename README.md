@@ -119,10 +119,12 @@ Map Making App上でトグルを切り替えたURLでは、そのURL専用のON�
 ```text
 map-making-app-tools/
 ├── manifest.json                 # Manifest V3設定
-├── content.js                    # リサイズ操作とSPA追従
-├── page.js                       # ぽちぽちモードの地点監視と削除
+├── resize.js                     # リサイズ操作とSPA追従
+├── pochipochi-bridge.js          # ぽちぽちモードの設定を分離ストレージへ橋渡し（ISOLATED world）
+├── pochipochi.js                 # ぽちぽちモードの地点監視と削除（MAIN world）
 ├── map-list.js                   # トップページのフォルダビュー
-├── content.css                   # 境界線とドラッグ中の表示
+├── resize.css                    # 境界線とドラッグ中の表示
+├── pochipochi.css                # ぽちぽちモードのトグルUI
 ├── map-list.css                  # フォルダビューの表示
 ├── options.html                  # 拡張機能の設定画面
 ├── options.css
