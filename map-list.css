@@ -744,6 +744,11 @@
   font-size: 13px;
 }
 
+.mma-map-list-modal__message--danger {
+  font-weight: 650;
+  color: #b91c1c;
+}
+
 .mma-map-list-modal__footer {
   display: flex;
   gap: 8px;

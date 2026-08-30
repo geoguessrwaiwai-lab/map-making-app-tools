@@ -67,30 +67,29 @@
       countryClear: "未設定にする",
       countrySelect: "国を選択",
       countryChange: "{name}（クリックで変更）",
-      tagsTitle: "{name} のタグ",
       tagsEmpty: "まだタグがありません。下の欄から作成できます。",
       tagsNewLabel: "新しいタグ名",
       tagsCreate: "＋ タグを作成",
-      menuTags: "タグを編集",
       favoriteAdd: "お気に入りにマーク",
       favoriteRemove: "お気に入りのマークを外す",
       favoriteMarked: "お気に入り",
-      cardEdit: "Map Making App本体の設定ダイアログを開きます",
       cardMenu: "その他の操作",
       menuEdit: "編集する",
       menuDelete: "削除する",
-      cardMove: "フォルダへ移動",
-      moveTitle: "「{name}」の移動先",
-      moveCurrent: "（現在のフォルダ）",
       sectionFavorites: "★ お気に入り",
       sectionUnassigned: "未分類",
-      cardsEmpty: "ここにマップをドラッグ、またはカードの「⋯」→「フォルダへ移動」から追加できます",
+      cardsEmpty: "ここにマップをドラッグ、またはカードの「⋯」→「編集する」から追加できます",
       searchPlaceholder: "マップを検索…",
       newMap: "＋ 新しいマップ",
       createMapTitle: "新しいマップを作成",
       createMapNameLabel: "マップ名",
       createMapFolderLabel: "フォルダ",
       createMapSubmit: "作成",
+      editMapTitle: "マップを編集",
+      editMapTagsLabel: "タグ",
+      deleteMapTitle: "マップを削除しますか？",
+      deleteMapMessage: "「{name}」を削除します。",
+      deleteMapWarning: "この操作は取り消せません。削除後は一覧に表示されなくなります。",
       addFolder: "＋ フォルダを追加",
       switchToFolders: "フォルダビューに切り替える",
       switchToNative: "以前の表示に切り替える",
@@ -118,30 +117,29 @@
       countryClear: "Clear",
       countrySelect: "Choose a country",
       countryChange: "{name} (click to change)",
-      tagsTitle: "Tags for {name}",
       tagsEmpty: "No tags yet. Create one in the field below.",
       tagsNewLabel: "New tag name",
       tagsCreate: "+ Create tag",
-      menuTags: "Edit tags",
       favoriteAdd: "Mark as favourite",
       favoriteRemove: "Remove favourite mark",
       favoriteMarked: "Favourite",
-      cardEdit: "Opens Map Making App's own dialog",
       cardMenu: "More actions",
       menuEdit: "Edit",
       menuDelete: "Delete",
-      cardMove: "Move to folder",
-      moveTitle: "Move “{name}” to",
-      moveCurrent: "(current folder)",
       sectionFavorites: "★ Favourites",
       sectionUnassigned: "Unsorted",
-      cardsEmpty: "Drag maps here, or add them with “⋯” → “Move to folder” on a card",
+      cardsEmpty: "Drag maps here, or add them with “⋯” → “Edit” on a card",
       searchPlaceholder: "Search maps…",
       newMap: "+ New map",
       createMapTitle: "Create a new map",
       createMapNameLabel: "Map name",
       createMapFolderLabel: "Folder",
       createMapSubmit: "Create",
+      editMapTitle: "Edit map",
+      editMapTagsLabel: "Tags",
+      deleteMapTitle: "Delete this map?",
+      deleteMapMessage: "“{name}” will be deleted.",
+      deleteMapWarning: "This can't be undone. Once deleted, it will no longer appear in the list.",
       addFolder: "+ Add folder",
       switchToFolders: "Switch to the folder view",
       switchToNative: "Switch back to the original view",
@@ -525,6 +523,118 @@
     return li ? li.querySelector("button.map-list__edit") : null;
   }
 
+  /**
+   * ネイティブの✎ボタンが開く「Map settings」ダイアログ（React管理下）は、開いた瞬間だけ
+   * DOMに現れる。拡張機能の独自モーダルの裏で名前変更・削除を代行するため、見た目には出さずに
+   * このダイアログを開閉する。
+   */
+  function findNativeEditDialog() {
+    return document.querySelector(".edit-map-modal");
+  }
+
+  /**
+   * ダイアログ自体のclass/styleはReact側が保存・削除のたびに再レンダリングで上書きするため、
+   * こちらでクラスを付け外しして隠そうとするとReactの再描画と際限なく競合し、
+   * 相互に属性を書き換え続けてタブがフリーズする恐れがある。ネイティブ側のDOMには一切触れず、
+   * 自分の独自モーダルと同じ最前面（z-index最大）の覆いを上から重ねるだけにする。
+   */
+  function coverNativeEditDialog() {
+    const cover = document.createElement("div");
+    cover.className = "mma-map-list-modal-overlay";
+    document.body.append(cover);
+    return () => cover.remove();
+  }
+
+  function closeNativeEditDialog(dialog, stopGuarding) {
+    dialog?.closest('[role="dialog"]')?.querySelector(".modal__close")?.click();
+    // 閉じるアニメーション中に覆いを外すと、それはそれで一瞬見えてしまうので少し待つ。
+    window.setTimeout(() => stopGuarding?.(), 300);
+  }
+
+  /** ダイアログがDOM上に現れたタイミングを検知する（見た目は上の覆いで隠れているので速さは問わない）。 */
+  function waitForNativeEditDialog(timeoutMs = 2000) {
+    const existing = findNativeEditDialog();
+    if (existing) {
+      return Promise.resolve(existing);
+    }
+    return new Promise((resolve) => {
+      const observer = new MutationObserver(() => {
+        const dialog = findNativeEditDialog();
+        if (dialog) {
+          observer.disconnect();
+          window.clearTimeout(timer);
+          resolve(dialog);
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      const timer = window.setTimeout(() => {
+        observer.disconnect();
+        resolve(null);
+      }, timeoutMs);
+    });
+  }
+
+  async function revealNativeEditDialog(mapId) {
+    const button = findNativeEditButton(mapId);
+    if (!button) {
+      return null;
+    }
+    // クリックする前から覆っておき、出現から検知までの間も一切見えないようにする。
+    const stopGuarding = coverNativeEditDialog();
+    const waiter = waitForNativeEditDialog();
+    button.click();
+    const dialog = await waiter;
+    if (!dialog) {
+      stopGuarding();
+      return null;
+    }
+    return { dialog, stopGuarding };
+  }
+
+  /** Reactの管理下にある入力欄は`.value`の代入だけでは内部状態が更新されないため、ネイティブのsetterを使う。 */
+  function setNativeInputValue(input, value) {
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
+    setter?.call(input, value);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  /** マップ名の変更を、ネイティブの設定ダイアログのフォーム送信に委譲する。 */
+  async function renameMapViaNativeDialog(mapId, name) {
+    const revealed = await revealNativeEditDialog(mapId);
+    if (!revealed) {
+      return false;
+    }
+    const { dialog, stopGuarding } = revealed;
+
+    const input = dialog.querySelector(".edit-map-modal__rename input.input");
+    const submitButton = dialog.querySelector('.edit-map-modal__rename button[type="submit"]');
+    if (!input || !submitButton) {
+      closeNativeEditDialog(dialog, stopGuarding);
+      return false;
+    }
+
+    setNativeInputValue(input, name);
+    submitButton.click();
+    closeNativeEditDialog(dialog, stopGuarding);
+    return true;
+  }
+
+  /**
+   * 削除を、ネイティブの設定ダイアログの削除ボタンに委譲する。ボタンを押すとサイト側が
+   * ブラウザ標準のconfirm()を出すため、実際にマップが消えるかはユーザーの最終確認に委ねられる。
+   */
+  async function deleteMapViaNativeDialog(mapId) {
+    const revealed = await revealNativeEditDialog(mapId);
+    if (!revealed) {
+      return;
+    }
+    const { dialog, stopGuarding } = revealed;
+
+    const deleteButton = dialog.querySelector(".edit-map-modal__delete button.button--destructive");
+    deleteButton?.click();
+    closeNativeEditDialog(dialog, stopGuarding);
+  }
+
   /** ネイティブのフォルダ要素からフォルダ名を読み取る。マークアップの揺れに対応するため複数の方法を試す。 */
   function readNativeFolderLabel(folderEl) {
     const attrLabel = folderEl.getAttribute("data-folder")?.trim();
@@ -717,6 +827,12 @@
       return headingsData.unassignedOrder;
     }
     return headingsData.headings.find((heading) => heading.id === sectionId)?.mapIds ?? null;
+  }
+
+  /** お気に入り一覧など、実際の保存場所と異なるビューから開いた場合でも本来の所属フォルダを返す。 */
+  function findCurrentSectionId(mapId) {
+    const heading = headingsData.headings.find((candidate) => candidate.mapIds.includes(mapId));
+    return heading ? heading.id : UNASSIGNED_ID;
   }
 
   function removeMapIdEverywhere(mapId) {
@@ -1115,16 +1231,47 @@
     window.setTimeout(() => searchInput.focus(), 0);
   }
 
-  /* ---------- タグ付けモーダル ---------- */
+  /* ---------- マップ編集モーダル（名前・フォルダ・タグ） ---------- */
 
-  function openTagsModal(map) {
-    const modal = openModal(t("tagsTitle", { name: map.name }));
+  function openEditMapModal(map) {
+    const modal = openModal(t("editMapTitle"));
+    const currentSectionId = findCurrentSectionId(map.id);
+
+    const nameLabel = document.createElement("label");
+    nameLabel.className = "mma-map-list-modal__label";
+    nameLabel.textContent = t("createMapNameLabel");
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.className = "mma-map-list-modal__input";
+    nameInput.value = map.name;
+    nameLabel.append(nameInput);
+    modal.body.append(nameLabel);
+
+    const folderLabel = document.createElement("label");
+    folderLabel.className = "mma-map-list-modal__label";
+    folderLabel.textContent = t("createMapFolderLabel");
+    const folderSelect = document.createElement("select");
+    folderSelect.className = "mma-map-list-modal__select";
+    for (const option of allSectionOptions()) {
+      const optionEl = document.createElement("option");
+      optionEl.value = option.id;
+      optionEl.textContent = option.label;
+      folderSelect.append(optionEl);
+    }
+    folderSelect.value = currentSectionId;
+    folderLabel.append(folderSelect);
+    modal.body.append(folderLabel);
+
+    const tagsLabel = document.createElement("p");
+    tagsLabel.className = "mma-map-list-modal__label";
+    tagsLabel.textContent = t("editMapTagsLabel");
+    modal.body.append(tagsLabel);
+
     const currentTagIds = new Set(tagsData.mapTagIds[map.id] || []);
-
     const list = document.createElement("div");
     list.className = "mma-map-list-modal__checklist";
 
-    function renderList() {
+    function renderTagList() {
       list.replaceChildren();
       if (tagsData.tags.length === 0) {
         const empty = document.createElement("p");
@@ -1157,7 +1304,7 @@
       }
     }
 
-    renderList();
+    renderTagList();
     modal.body.append(list);
 
     const newTagLabel = document.createElement("label");
@@ -1180,24 +1327,78 @@
       tagsData.tags.push(tag);
       currentTagIds.add(tag.id);
       newTagInput.value = "";
-      renderList();
+      renderTagList();
     }
 
     onEnterKey(newTagInput, addTag);
-    modal.body.append(
-      createModalButton(t("tagsCreate"), "mma-map-list-modal__button", addTag)
-    );
+    modal.body.append(createModalButton(t("tagsCreate"), "mma-map-list-modal__button", addTag));
 
-    function submit() {
+    async function submit() {
+      const name = nameInput.value.trim();
+      if (!name) {
+        nameInput.focus();
+        return;
+      }
+
+      modal.close();
+
+      if (name !== map.name) {
+        const renamed = await renameMapViaNativeDialog(map.id, name);
+        if (renamed) {
+          map.name = name;
+          const cached = mapsById.get(map.id);
+          if (cached) {
+            cached.name = name;
+          }
+        }
+      }
+
+      const targetId = folderSelect.value;
+      if (targetId !== currentSectionId) {
+        const target = findSectionArray(targetId);
+        moveMapTo(map.id, targetId, target ? target.length : 0);
+      }
+
       tagsData.mapTagIds[map.id] = [...currentTagIds];
       persistTags();
       render();
+    }
+
+    onEnterKey(nameInput, submit);
+    modal.footer.append(
+      createModalButton(t("cancel"), "mma-map-list-modal__button", modal.close),
+      createModalButton(t("save"), "mma-map-list-modal__button mma-map-list-modal__button--primary", submit)
+    );
+
+    window.setTimeout(() => {
+      nameInput.focus();
+      nameInput.select();
+    }, 0);
+  }
+
+  /* ---------- マップ削除モーダル ---------- */
+
+  function openDeleteMapModal(map) {
+    const modal = openModal(t("deleteMapTitle"));
+
+    const message = document.createElement("p");
+    message.className = "mma-map-list-modal__message";
+    message.textContent = t("deleteMapMessage", { name: map.name });
+    modal.body.append(message);
+
+    const warning = document.createElement("p");
+    warning.className = "mma-map-list-modal__message mma-map-list-modal__message--danger";
+    warning.textContent = t("deleteMapWarning");
+    modal.body.append(warning);
+
+    async function submit() {
       modal.close();
+      await deleteMapViaNativeDialog(map.id);
     }
 
     modal.footer.append(
       createModalButton(t("cancel"), "mma-map-list-modal__button", modal.close),
-      createModalButton(t("save"), "mma-map-list-modal__button mma-map-list-modal__button--primary", submit)
+      createModalButton(t("menuDelete"), "mma-map-list-modal__button mma-map-list-modal__button--danger", submit)
     );
   }
 
@@ -1381,7 +1582,7 @@
         closeCardMenu();
         return;
       }
-      openCardMenu(menuButton, map, sectionId, movable);
+      openCardMenu(menuButton, map);
     });
     card.append(menuButton);
 
@@ -1394,7 +1595,7 @@
     cardMenuState?.close();
   }
 
-  function openCardMenu(button, map, sectionId, movable) {
+  function openCardMenu(button, map) {
     closeCardMenu();
 
     const menu = document.createElement("div");
@@ -1460,12 +1661,7 @@
       menu.append(item);
     }
 
-    // 編集と削除はネイティブの設定ダイアログへ委譲する（拡張機能側では削除しない）。
-    addItem(t("menuEdit"), t("cardEdit"), () => findNativeEditButton(map.id)?.click());
-    addItem(t("menuTags"), "", () => openTagsModal(map));
-    if (movable) {
-      addItem(t("cardMove"), "", () => openMoveModal(map, sectionId));
-    }
+    addItem(t("menuEdit"), "", () => openEditMapModal(map));
     addItem(favorites[map.id] ? t("favoriteRemove") : t("favoriteAdd"), "", () => {
       if (favorites[map.id]) {
         delete favorites[map.id];
@@ -1475,7 +1671,7 @@
       persistFavorites();
       renderBoard();
     });
-    addItem(t("menuDelete"), t("cardEdit"), () => findNativeEditButton(map.id)?.click());
+    addItem(t("menuDelete"), "", () => openDeleteMapModal(map));
 
     // カードは折り返しやスクロールの影響を受けるため、bodyへ固定配置して画面内へ収める。
     document.body.append(menu);
@@ -1495,31 +1691,6 @@
     items[0]?.focus();
     window.addEventListener("scroll", close, true);
     window.addEventListener("resize", close);
-  }
-
-  /** 「⋯」→「フォルダへ移動」。ドラッグ＆ドロップを使わずに移動先を選べるようにする。 */
-  function openMoveModal(map, currentSectionId) {
-    const modal = openModal(t("moveTitle", { name: map.name }));
-
-    const list = document.createElement("div");
-    list.className = "mma-map-list-modal__checklist";
-    for (const option of allSectionOptions()) {
-      const isCurrent = option.id === currentSectionId;
-      const row = document.createElement("button");
-      row.type = "button";
-      row.className = "mma-map-list-modal__check-row mma-map-list-modal__check-row--action";
-      row.textContent = isCurrent ? `${option.label} ${t("moveCurrent")}` : option.label;
-      row.disabled = isCurrent;
-      row.addEventListener("click", () => {
-        const target = findSectionArray(option.id);
-        moveMapTo(map.id, option.id, target ? target.length : 0);
-        modal.close();
-      });
-      list.append(row);
-    }
-    modal.body.append(list);
-
-    modal.footer.append(createModalButton(t("close"), "mma-map-list-modal__button", modal.close));
   }
 
   function createSection({ id, label, mapIds, kind }) {
