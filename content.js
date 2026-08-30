@@ -24,7 +24,8 @@
   const RESIZE_FEATURE_KEY = "mma-feature-screen-resize-enabled";
   const POCHIPOCHI_FEATURE_KEY = "mma-feature-pochipochi-enabled";
   const POCHIPOCHI_DEFAULT_KEY = "mma-pochipochi-default-enabled";
-  const OPEN_DIALOG_SELECTOR = 'dialog[open], [role="dialog"]:not([data-state="closed"])';
+  const OPEN_DIALOG_SELECTOR =
+    'dialog[open], [role="dialog"]:not([data-state="closed"])';
 
   let editor = null;
   let handle = null;
@@ -153,7 +154,9 @@
   }
 
   /** 地図の実幅に応じたインポート操作と合計表示の状態を反映する。 */
-  function updateMapWidthState(width = observedMap?.getBoundingClientRect().width) {
+  function updateMapWidthState(
+    width = observedMap?.getBoundingClientRect().width
+  ) {
     if (!editor) {
       return;
     }
@@ -163,11 +166,13 @@
       : 0;
     editor.classList.toggle(
       NARROW_MAP_CLASS,
-      Number.isFinite(width) && width < MAP_IMPORT_BREAKPOINT_PX + breakpointOffset
+      Number.isFinite(width) &&
+        width < MAP_IMPORT_BREAKPOINT_PX + breakpointOffset
     );
     editor.classList.toggle(
       COMPACT_MAP_CLASS,
-      Number.isFinite(width) && width < MAP_TOTAL_BREAKPOINT_PX + breakpointOffset
+      Number.isFinite(width) &&
+        width < MAP_TOTAL_BREAKPOINT_PX + breakpointOffset
     );
   }
 
@@ -195,8 +200,12 @@
   /** 対象の編集画面へハンドルを取り付ける。 */
   function attach(nextEditor) {
     editor = nextEditor;
-    previousInlineColumns = editor.style.getPropertyValue("grid-template-columns");
-    previousInlinePriority = editor.style.getPropertyPriority("grid-template-columns");
+    previousInlineColumns = editor.style.getPropertyValue(
+      "grid-template-columns"
+    );
+    previousInlinePriority = editor.style.getPropertyPriority(
+      "grid-template-columns"
+    );
     markWorkArea();
 
     handle = document.createElement("div");
@@ -282,7 +291,9 @@
       resizeFeatureEnabled &&
       SUPPORTED_VIEWPORT.matches &&
       TARGET_PATH.test(location.pathname);
-    const nextEditor = isTargetPage ? document.querySelector(EDITOR_SELECTOR) : null;
+    const nextEditor = isTargetPage
+      ? document.querySelector(EDITOR_SELECTOR)
+      : null;
 
     if (editor && (editor !== nextEditor || !editor.isConnected)) {
       detach();
@@ -311,7 +322,7 @@
     const stored = await chrome.storage.local.get([
       urlKey,
       POCHIPOCHI_FEATURE_KEY,
-      POCHIPOCHI_DEFAULT_KEY
+      POCHIPOCHI_DEFAULT_KEY,
     ]);
     const hasUrlSetting = Object.hasOwn(stored, urlKey);
 
@@ -321,14 +332,12 @@
       enabled: hasUrlSetting
         ? stored[urlKey] === true
         : stored[POCHIPOCHI_DEFAULT_KEY] === true,
-      hasUrlSetting
+      hasUrlSetting,
     };
   }
 
   function dispatchPochipochiSettings(eventName, settings) {
-    document.dispatchEvent(
-      new CustomEvent(eventName, { detail: settings })
-    );
+    document.dispatchEvent(new CustomEvent(eventName, { detail: settings }));
   }
 
   /** MAIN worldからの要求に応じ、URL単位のデフォルト設定を返す。 */
@@ -393,7 +402,7 @@
   const mutationObserver = new MutationObserver(reconcile);
   mutationObserver.observe(document.documentElement, {
     childList: true,
-    subtree: true
+    subtree: true,
   });
   SUPPORTED_VIEWPORT.addEventListener("change", reconcile);
   document.addEventListener(SETTINGS_REQUEST_EVENT, handleSettingsRequest);

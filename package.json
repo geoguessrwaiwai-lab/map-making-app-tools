@@ -1,0 +1,12 @@
+{
+  "name": "map-making-app-tools",
+  "private": true,
+  "version": "1.4.0",
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "3.9.6"
+  }
+}

@@ -81,7 +81,8 @@
       folderAdd: "フォルダを追加",
       folderRename: "フォルダ名を変更",
       folderDeleteTitle: "フォルダを削除しますか？",
-      folderDeleteMessage: "「{label}」を削除します。含まれていたマップは未分類に移動します。",
+      folderDeleteMessage:
+        "「{label}」を削除します。含まれていたマップは未分類に移動します。",
       folderAddMap: "このフォルダに新しいマップを作成",
       folderDelete: "フォルダを削除",
       countryTitle: "{name} の国チップ",
@@ -97,7 +98,8 @@
       tagsDelete: "タグを削除",
       tagsDeleteAria: "「{name}」タグを削除",
       deleteTagTitle: "タグを削除しますか？",
-      deleteTagMessage: "「{name}」タグを削除します。付与していたすべてのマップから外れます。",
+      deleteTagMessage:
+        "「{name}」タグを削除します。付与していたすべてのマップから外れます。",
       deleteTagWarning: "この操作は取り消せません。",
       favoriteAdd: "お気に入りにマーク",
       favoriteRemove: "お気に入りのマークを外す",
@@ -147,7 +149,8 @@
       folderAdd: "Add a folder",
       folderRename: "Rename folder",
       folderDeleteTitle: "Delete this folder?",
-      folderDeleteMessage: "“{label}” will be deleted. The maps inside move to Unsorted.",
+      folderDeleteMessage:
+        "“{label}” will be deleted. The maps inside move to Unsorted.",
       folderAddMap: "Create a new map in this folder",
       folderDelete: "Delete folder",
       countryTitle: "Country chip for {name}",
@@ -163,7 +166,8 @@
       tagsDelete: "Delete tag",
       tagsDeleteAria: "Delete “{name}” tag",
       deleteTagTitle: "Delete this tag?",
-      deleteTagMessage: "“{name}” will be deleted and removed from every map it's attached to.",
+      deleteTagMessage:
+        "“{name}” will be deleted and removed from every map it's attached to.",
       deleteTagWarning: "This can't be undone.",
       favoriteAdd: "Mark as favourite",
       favoriteRemove: "Remove favourite mark",
@@ -548,7 +552,7 @@
       return template;
     }
     return template.replace(/\{(\w+)\}/g, (match, name) =>
-      name in params ? String(params[name]) : match,
+      name in params ? String(params[name]) : match
     );
   }
 
@@ -673,9 +677,7 @@
               headings: headings.headings
                 .filter(
                   (h) =>
-                    h &&
-                    typeof h.id === "string" &&
-                    typeof h.label === "string",
+                    h && typeof h.id === "string" && typeof h.label === "string"
                 )
                 .map((h) => ({
                   id: h.id,
@@ -705,7 +707,7 @@
               tags: storedTags.tags
                 .filter(
                   (t) =>
-                    t && typeof t.id === "string" && typeof t.name === "string",
+                    t && typeof t.id === "string" && typeof t.name === "string"
                 )
                 .map((t) => ({
                   id: t.id,
@@ -718,7 +720,7 @@
                   Array.isArray(tagIds)
                     ? tagIds.filter((tagId) => typeof tagId === "string")
                     : [],
-                ]),
+                ])
               ),
             }
           : defaultTagsData();
@@ -758,7 +760,7 @@
 
   function readMapsFromJsonBlock() {
     const script = document.querySelector(
-      'script#data[type="application/json"]',
+      'script#data[type="application/json"]'
     );
     if (!script) {
       return null;
@@ -889,7 +891,7 @@
     }
 
     const link = nativeListEl.querySelector(
-      `a.map-link[href*="/maps/${mapId}"]`,
+      `a.map-link[href*="/maps/${mapId}"]`
     );
     const li = link?.closest("li.map-list__entry");
     return li ? li.querySelector("button.map-list__edit") : null;
@@ -967,7 +969,7 @@
   function setNativeInputValue(input, value) {
     const setter = Object.getOwnPropertyDescriptor(
       window.HTMLInputElement.prototype,
-      "value",
+      "value"
     )?.set;
     setter?.call(input, value);
     input.dispatchEvent(new Event("input", { bubbles: true }));
@@ -977,7 +979,7 @@
   function submitNativeRenameForm(dialog, name) {
     const input = dialog.querySelector(".edit-map-modal__rename input.input");
     const submitButton = dialog.querySelector(
-      '.edit-map-modal__rename button[type="submit"]',
+      '.edit-map-modal__rename button[type="submit"]'
     );
     if (!input || !submitButton) {
       return false;
@@ -1007,7 +1009,7 @@
   /** 名前・GeoGuessrリンクの変更を、同じネイティブの設定ダイアログへまとめて委譲する。 */
   async function applyMapEditsViaNativeDialog(
     mapId,
-    { name, geoguessrUrl } = {},
+    { name, geoguessrUrl } = {}
   ) {
     const revealed = await revealNativeEditDialog(mapId);
     if (!revealed) {
@@ -1038,7 +1040,7 @@
     const { dialog, stopGuarding } = revealed;
 
     const deleteButton = dialog.querySelector(
-      ".edit-map-modal__delete button.button--destructive",
+      ".edit-map-modal__delete button.button--destructive"
     );
     deleteButton?.click();
     closeNativeEditDialog(dialog, stopGuarding);
@@ -1086,13 +1088,13 @@
         return;
       }
       const folders = [...rootList.children].filter((child) =>
-        child.matches?.(".map-folder"),
+        child.matches?.(".map-folder")
       );
       if (folders.length === 0) {
         return;
       }
       const allResolved = folders.every(
-        (folder) => readNativeFolderLabel(folder) !== t("folderFallback"),
+        (folder) => readNativeFolderLabel(folder) !== t("folderFallback")
       );
       if (allResolved) {
         return;
@@ -1173,7 +1175,7 @@
 
     const beforeUnassigned = headingsData.unassignedOrder.length;
     headingsData.unassignedOrder = headingsData.unassignedOrder.filter((id) =>
-      currentIds.has(id),
+      currentIds.has(id)
     );
     if (headingsData.unassignedOrder.length !== beforeUnassigned) {
       changed = true;
@@ -1187,7 +1189,7 @@
       changed = true;
       const targetHeading = pendingNewMapHeadingId
         ? headingsData.headings.find(
-            (heading) => heading.id === pendingNewMapHeadingId,
+            (heading) => heading.id === pendingNewMapHeadingId
           )
         : null;
       if (targetHeading) {
@@ -1255,14 +1257,14 @@
   /** お気に入り一覧など、実際の保存場所と異なるビューから開いた場合でも本来の所属フォルダを返す。 */
   function findCurrentSectionId(mapId) {
     const heading = headingsData.headings.find((candidate) =>
-      candidate.mapIds.includes(mapId),
+      candidate.mapIds.includes(mapId)
     );
     return heading ? heading.id : UNASSIGNED_ID;
   }
 
   function removeMapIdEverywhere(mapId) {
     headingsData.unassignedOrder = headingsData.unassignedOrder.filter(
-      (id) => id !== mapId,
+      (id) => id !== mapId
     );
     for (const heading of headingsData.headings) {
       heading.mapIds = heading.mapIds.filter((id) => id !== mapId);
@@ -1335,7 +1337,7 @@
   }
 
   document.addEventListener("dragover", (event) =>
-    updateAutoScroll(event.clientY),
+    updateAutoScroll(event.clientY)
   );
   document.addEventListener("dragend", stopAutoScroll);
   document.addEventListener("drop", stopAutoScroll);
@@ -1453,7 +1455,7 @@
       swatchButton.className = "mma-map-list__color-picker-swatch";
       if (color === currentColor) {
         swatchButton.classList.add(
-          "mma-map-list__color-picker-swatch--selected",
+          "mma-map-list__color-picker-swatch--selected"
         );
       }
       swatchButton.style.background = color;
@@ -1470,7 +1472,7 @@
     const size = popup.getBoundingClientRect();
     const left = Math.max(
       8,
-      Math.min(anchor.left, window.innerWidth - size.width - 8),
+      Math.min(anchor.left, window.innerWidth - size.width - 8)
     );
     const below = anchor.bottom + 4;
     const top =
@@ -1501,7 +1503,7 @@
           createModalButton(preset, "mma-map-list-modal__preset", () => {
             input.value = preset;
             input.focus();
-          }),
+          })
         );
       }
       modal.body.append(presets);
@@ -1537,8 +1539,8 @@
       createModalButton(
         t("save"),
         "mma-map-list-modal__button mma-map-list-modal__button--primary",
-        submit,
-      ),
+        submit
+      )
     );
 
     window.setTimeout(() => {
@@ -1576,7 +1578,7 @@
 
     function submit() {
       headingsData.headings = headingsData.headings.filter(
-        (candidate) => candidate.id !== heading.id,
+        (candidate) => candidate.id !== heading.id
       );
       headingsData.unassignedOrder.push(...heading.mapIds);
       persistHeadings();
@@ -1589,8 +1591,8 @@
       createModalButton(
         t("delete"),
         "mma-map-list-modal__button mma-map-list-modal__button--danger",
-        submit,
-      ),
+        submit
+      )
     );
   }
 
@@ -1607,7 +1609,7 @@
       return null;
     }
     for (const button of nativeListEl.querySelectorAll(
-      "p.map-list-head button",
+      "p.map-list-head button"
     )) {
       if (button.textContent.trim() === "New map") {
         return button;
@@ -1700,8 +1702,8 @@
       createModalButton(
         t("createMapSubmit"),
         "mma-map-list-modal__button mma-map-list-modal__button--primary",
-        submit,
-      ),
+        submit
+      )
     );
   }
 
@@ -1737,7 +1739,7 @@
       row.className =
         "mma-map-list-modal__check-row mma-map-list-modal__check-row--action";
       row.append(
-        document.createTextNode(`${flagFromCode(code)} ${label} (${code})`),
+        document.createTextNode(`${flagFromCode(code)} ${label} (${code})`)
       );
       row.addEventListener("click", () => {
         countries[map.id] = code;
@@ -1763,13 +1765,13 @@
     function selectEntry(entry) {
       if (selectedEntry) {
         selectedEntry.row.classList.remove(
-          "mma-map-list-modal__check-row--selected",
+          "mma-map-list-modal__check-row--selected"
         );
       }
       selectedEntry = entry ?? null;
       if (selectedEntry) {
         selectedEntry.row.classList.add(
-          "mma-map-list-modal__check-row--selected",
+          "mma-map-list-modal__check-row--selected"
         );
         selectedEntry.row.scrollIntoView({ block: "nearest" });
       }
@@ -1805,7 +1807,7 @@
           event.key === "ArrowDown"
             ? Math.min(
                 currentIndex < 0 ? 0 : currentIndex + 1,
-                visible.length - 1,
+                visible.length - 1
               )
             : Math.max(currentIndex < 0 ? 0 : currentIndex - 1, 0);
         selectEntry(visible[nextIndex]);
@@ -1826,7 +1828,7 @@
         render();
         modal.close();
       }),
-      createModalButton(t("close"), "mma-map-list-modal__button", modal.close),
+      createModalButton(t("close"), "mma-map-list-modal__button", modal.close)
     );
 
     window.setTimeout(() => searchInput.focus(), 0);
@@ -1864,7 +1866,8 @@
     modal.body.append(folderLabel);
 
     const tagsLabel = document.createElement("p");
-    tagsLabel.className = "mma-map-list-modal__label mma-map-list-modal__label--flush";
+    tagsLabel.className =
+      "mma-map-list-modal__label mma-map-list-modal__label--flush";
     tagsLabel.textContent = t("editMapTagsLabel");
     modal.body.append(tagsLabel);
 
@@ -1920,7 +1923,10 @@
         deleteButton.className = "mma-map-list-modal__tag-delete";
         deleteButton.textContent = "−";
         deleteButton.title = t("tagsDelete");
-        deleteButton.setAttribute("aria-label", t("tagsDeleteAria", { name: tag.name }));
+        deleteButton.setAttribute(
+          "aria-label",
+          t("tagsDeleteAria", { name: tag.name })
+        );
         deleteButton.addEventListener("click", (event) => {
           // <label>直下のボタンなので、既定動作のままだとチェックボックスまで切り替わってしまう。
           event.preventDefault();
@@ -1943,15 +1949,20 @@
       deleteModal.body.append(message);
 
       const warning = document.createElement("p");
-      warning.className = "mma-map-list-modal__message mma-map-list-modal__message--danger";
+      warning.className =
+        "mma-map-list-modal__message mma-map-list-modal__message--danger";
       warning.textContent = t("deleteTagWarning");
       deleteModal.body.append(warning);
 
       function submitDelete() {
-        tagsData.tags = tagsData.tags.filter((candidate) => candidate.id !== tag.id);
+        tagsData.tags = tagsData.tags.filter(
+          (candidate) => candidate.id !== tag.id
+        );
         currentTagIds.delete(tag.id);
         for (const mapId of Object.keys(tagsData.mapTagIds)) {
-          tagsData.mapTagIds[mapId] = tagsData.mapTagIds[mapId].filter((id) => id !== tag.id);
+          tagsData.mapTagIds[mapId] = tagsData.mapTagIds[mapId].filter(
+            (id) => id !== tag.id
+          );
         }
         persistTags();
         renderTagList();
@@ -1960,8 +1971,16 @@
       }
 
       deleteModal.footer.append(
-        createModalButton(t("cancel"), "mma-map-list-modal__button", deleteModal.close),
-        createModalButton(t("delete"), "mma-map-list-modal__button mma-map-list-modal__button--danger", submitDelete)
+        createModalButton(
+          t("cancel"),
+          "mma-map-list-modal__button",
+          deleteModal.close
+        ),
+        createModalButton(
+          t("delete"),
+          "mma-map-list-modal__button mma-map-list-modal__button--danger",
+          submitDelete
+        )
       );
     }
 
@@ -1969,7 +1988,8 @@
     modal.body.append(list);
 
     const newTagLabel = document.createElement("label");
-    newTagLabel.className = "mma-map-list-modal__label mma-map-list-modal__label--tight";
+    newTagLabel.className =
+      "mma-map-list-modal__label mma-map-list-modal__label--tight";
     newTagLabel.htmlFor = "mma-new-tag-input";
     newTagLabel.textContent = t("tagsNewLabel");
     modal.body.append(newTagLabel);
@@ -1998,7 +2018,7 @@
 
     onEnterKey(newTagInput, addTag);
     newTagRow.append(
-      createModalButton(t("tagsCreate"), "mma-map-list-modal__button", addTag),
+      createModalButton(t("tagsCreate"), "mma-map-list-modal__button", addTag)
     );
     modal.body.append(newTagRow);
 
@@ -2106,8 +2126,8 @@
       createModalButton(
         t("save"),
         "mma-map-list-modal__button mma-map-list-modal__button--primary",
-        submit,
-      ),
+        submit
+      )
     );
 
     window.setTimeout(() => {
@@ -2142,8 +2162,8 @@
       createModalButton(
         t("menuDelete"),
         "mma-map-list-modal__button mma-map-list-modal__button--danger",
-        submit,
-      ),
+        submit
+      )
     );
   }
 
@@ -2197,17 +2217,17 @@
         draggingCard = null;
         delete card.dataset.dragging;
         for (const el of document.querySelectorAll(
-          ".mma-map-list__card--drag-over",
+          ".mma-map-list__card--drag-over"
         )) {
           el.classList.remove("mma-map-list__card--drag-over");
         }
         for (const el of document.querySelectorAll(
-          ".mma-map-list__card--drag-over-after",
+          ".mma-map-list__card--drag-over-after"
         )) {
           el.classList.remove("mma-map-list__card--drag-over-after");
         }
         for (const el of document.querySelectorAll(
-          ".mma-map-list__section--drop-target",
+          ".mma-map-list__section--drop-target"
         )) {
           el.classList.remove("mma-map-list__section--drop-target");
         }
@@ -2229,7 +2249,7 @@
       card.addEventListener("drop", (event) => {
         event.preventDefault();
         const isAfter = card.classList.contains(
-          "mma-map-list__card--drag-over-after",
+          "mma-map-list__card--drag-over-after"
         );
         card.classList.remove("mma-map-list__card--drag-over");
         card.classList.remove("mma-map-list__card--drag-over-after");
@@ -2478,7 +2498,7 @@
         }
         persistFavorites();
         renderBoard();
-      },
+      }
     );
     addItem(t("menuDelete"), "", () => openDeleteMapModal(map));
 
@@ -2488,7 +2508,7 @@
     const size = menu.getBoundingClientRect();
     const left = Math.max(
       8,
-      Math.min(anchor.right - size.width, window.innerWidth - size.width - 8),
+      Math.min(anchor.right - size.width, window.innerWidth - size.width - 8)
     );
     const below = anchor.bottom + 4;
     const top =
@@ -2510,7 +2530,7 @@
 
   function createSection({ id, label, mapIds, kind }) {
     const filteredIds = mapIds.filter(
-      (mapId) => mapsById.has(mapId) && matchesSearch(mapsById.get(mapId)),
+      (mapId) => mapsById.has(mapId) && matchesSearch(mapsById.get(mapId))
     );
     if (searchQuery && filteredIds.length === 0) {
       return null;
@@ -2544,10 +2564,10 @@
           return;
         }
         const fromIndex = headingsData.headings.findIndex(
-          (heading) => heading.id === draggingSectionId,
+          (heading) => heading.id === draggingSectionId
         );
         const toIndex = headingsData.headings.findIndex(
-          (heading) => heading.id === id,
+          (heading) => heading.id === id
         );
         if (fromIndex < 0 || toIndex < 0) {
           return;
@@ -2571,7 +2591,7 @@
 
     if (kind === "heading") {
       const heading = headingsData.headings.find(
-        (candidate) => candidate.id === id,
+        (candidate) => candidate.id === id
       );
       const addButton = document.createElement("button");
       addButton.type = "button";
@@ -2585,7 +2605,7 @@
       renameButton.textContent = "✎";
       renameButton.title = t("folderRename");
       renameButton.addEventListener("click", () =>
-        handleRenameHeading(heading),
+        handleRenameHeading(heading)
       );
       const deleteButton = document.createElement("button");
       deleteButton.type = "button";
@@ -2593,7 +2613,7 @@
       deleteButton.textContent = "×";
       deleteButton.title = t("folderDelete");
       deleteButton.addEventListener("click", () =>
-        handleDeleteHeading(heading),
+        handleDeleteHeading(heading)
       );
       head.append(addButton, renameButton, deleteButton);
     }
@@ -2663,7 +2683,7 @@
     // 空フォルダのプレースホルダーはCSSのcontentで描くため、文言だけ変数で渡す。
     root.style.setProperty(
       "--mma-ml-cards-empty",
-      JSON.stringify(t("cardsEmpty")),
+      JSON.stringify(t("cardsEmpty"))
     );
 
     if (viewMode === "native") {
@@ -2876,7 +2896,7 @@
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute(
       "d",
-      "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+      "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"
     );
     svg.append(path);
     return svg;
@@ -2926,7 +2946,7 @@
       return;
     }
     const match = FOOTER_ICONS.find((entry) =>
-      entry.pattern.test(node.textContent ?? ""),
+      entry.pattern.test(node.textContent ?? "")
     );
     const icon = createFooterIcon(match ? match.icon : "🔗");
     node.prepend(icon);
@@ -2967,7 +2987,7 @@
     updatesToggleButton.title = t("updatesTitle");
     updatesToggleButton.append(
       createFooterIcon("🕘"),
-      document.createTextNode("Updates"),
+      document.createTextNode("Updates")
     );
     updatesToggleButton.addEventListener("click", () => openUpdatesPopup(list));
     slots.center.append(updatesToggleButton);
@@ -2978,7 +2998,7 @@
     const candidates = [];
     if (ctas) {
       candidates.push(
-        ...(ctas.children.length > 0 ? [...ctas.children] : [ctas]),
+        ...(ctas.children.length > 0 ? [...ctas.children] : [ctas])
       );
     }
     for (const selector of [".updates__version", ":scope > p:last-of-type"]) {
@@ -3019,7 +3039,7 @@
     const switchWrap = document.createElement("p");
     switchWrap.className = "mma-map-list__switch-wrap";
     switchWrap.append(
-      t("footnotePrefix") + t("footnoteLink") + t("footnoteSuffix"),
+      t("footnotePrefix") + t("footnoteLink") + t("footnoteSuffix")
     );
     switchWrap.append(switchButton);
 
@@ -3050,7 +3070,7 @@
       modal.body.append(version.cloneNode(true));
     }
     modal.footer.append(
-      createModalButton(t("close"), "mma-map-list-modal__button", modal.close),
+      createModalButton(t("close"), "mma-map-list-modal__button", modal.close)
     );
   }
 

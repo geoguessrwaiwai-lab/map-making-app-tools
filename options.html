@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="ja">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Map Making App Tools 設定</title>
-    <link rel="stylesheet" href="options.css">
+    <link rel="stylesheet" href="options.css" />
   </head>
   <body>
     <main>
       <header>
-        <img src="icon48.png" width="48" height="48" alt="">
+        <img src="icon48.png" width="48" height="48" alt="" />
         <div>
           <p class="eyebrow">MAP MAKING APP TOOLS</p>
           <h1 data-i18n="pageTitle">拡張機能の設定</h1>
@@ -19,7 +19,12 @@
       <section aria-labelledby="language-title">
         <h2 id="language-title" data-i18n="languageTitle">表示言語</h2>
         <label class="setting-row">
-          <span><strong data-i18n="languageName">言語</strong><small data-i18n="languageDescription">拡張機能が表示する文言の言語です。トップページのフッター右下からも切り替えられます。</small></span>
+          <span>
+            <strong data-i18n="languageName">言語</strong>
+            <small data-i18n="languageDescription">
+              拡張機能が表示する文言の言語です。トップページのフッター右下からも切り替えられます。
+            </small>
+          </span>
           <select id="language" class="select">
             <option value="ja">日本語</option>
             <option value="en">English</option>
@@ -29,79 +34,206 @@
 
       <section aria-labelledby="features-title">
         <h2 id="features-title" data-i18n="featuresTitle">使用する機能</h2>
-        <p class="section-description" data-i18n="featuresDescription">機能ごとに有効・無効を切り替えられます。変更は開いているMap Making Appにも反映されます。</p>
+        <p class="section-description" data-i18n="featuresDescription">
+          機能ごとに有効・無効を切り替えられます。変更は開いているMap Making
+          Appにも反映されます。
+        </p>
 
         <label class="setting-row">
-          <span><strong data-i18n="resizeName">画面幅調整</strong><small data-i18n="resizeDescription">左右の画面領域の境界線をドラッグして幅を変更します。</small></span>
-          <span class="switch"><input id="resize-enabled" type="checkbox"><span aria-hidden="true"></span></span>
+          <span>
+            <strong data-i18n="resizeName">画面幅調整</strong>
+            <small data-i18n="resizeDescription">
+              左右の画面領域の境界線をドラッグして幅を変更します。
+            </small>
+          </span>
+          <span class="switch">
+            <input id="resize-enabled" type="checkbox" />
+            <span aria-hidden="true"></span>
+          </span>
         </label>
 
         <label class="setting-row">
-          <span><strong data-i18n="pochiName">ぽちぽちモード</strong><small data-i18n="pochiDescription">新しく確認したロケーションを、次の選択時に削除します。</small></span>
-          <span class="switch"><input id="pochipochi-enabled" type="checkbox"><span aria-hidden="true"></span></span>
+          <span>
+            <strong data-i18n="pochiName">ぽちぽちモード</strong>
+            <small data-i18n="pochiDescription">
+              新しく確認したロケーションを、次の選択時に削除します。
+            </small>
+          </span>
+          <span class="switch">
+            <input id="pochipochi-enabled" type="checkbox" />
+            <span aria-hidden="true"></span>
+          </span>
         </label>
 
         <label class="setting-row">
-          <span><strong data-i18n="folderViewName">フォルダビュー</strong><small data-i18n="folderViewDescription">トップページのマップ一覧を、フォルダ・お気に入り・タグ・国チップつきのカード表示に切り替えます。</small></span>
-          <span class="switch"><input id="map-list-enabled" type="checkbox"><span aria-hidden="true"></span></span>
+          <span>
+            <strong data-i18n="folderViewName">フォルダビュー</strong>
+            <small data-i18n="folderViewDescription">
+              トップページのマップ一覧を、フォルダ・お気に入り・タグ・国チップつきのカード表示に切り替えます。
+            </small>
+          </span>
+          <span class="switch">
+            <input id="map-list-enabled" type="checkbox" />
+            <span aria-hidden="true"></span>
+          </span>
         </label>
       </section>
 
       <section aria-labelledby="map-list-title">
-        <h2 id="map-list-title" data-i18n="mapListTitle">フォルダビューの動作</h2>
+        <h2 id="map-list-title" data-i18n="mapListTitle">
+          フォルダビューの動作
+        </h2>
         <label class="setting-row">
-          <span><strong data-i18n="newTabName">マップを別タブで開く</strong><small data-i18n="newTabDescription">フォルダビューのマップ名をクリックしたとき、新しいタブで開きます。OFFにすると同じタブで開きます。</small></span>
-          <span class="switch"><input id="map-list-new-tab" type="checkbox"><span aria-hidden="true"></span></span>
+          <span>
+            <strong data-i18n="newTabName">マップを別タブで開く</strong>
+            <small data-i18n="newTabDescription">
+              フォルダビューのマップ名をクリックしたとき、新しいタブで開きます。OFFにすると同じタブで開きます。
+            </small>
+          </span>
+          <span class="switch">
+            <input id="map-list-new-tab" type="checkbox" />
+            <span aria-hidden="true"></span>
+          </span>
         </label>
         <label class="setting-row">
-          <span><strong data-i18n="showLocationCountName">ロケーション数を表示</strong><small data-i18n="showLocationCountDescription">各マップカードに「{N} locs」のように収録ロケーション数を表示します。</small></span>
-          <span class="switch"><input id="map-list-show-location-count" type="checkbox"><span aria-hidden="true"></span></span>
+          <span>
+            <strong data-i18n="showLocationCountName">
+              ロケーション数を表示
+            </strong>
+            <small data-i18n="showLocationCountDescription">
+              各マップカードに「{N}
+              locs」のように収録ロケーション数を表示します。
+            </small>
+          </span>
+          <span class="switch">
+            <input id="map-list-show-location-count" type="checkbox" />
+            <span aria-hidden="true"></span>
+          </span>
         </label>
         <label class="setting-row">
-          <span><strong data-i18n="showCountryName">国チップアイコンを表示</strong><small data-i18n="showCountryDescription">各マップカードに国旗（または未設定アイコン）を表示します。</small></span>
-          <span class="switch"><input id="map-list-show-country" type="checkbox"><span aria-hidden="true"></span></span>
+          <span>
+            <strong data-i18n="showCountryName">国チップアイコンを表示</strong>
+            <small data-i18n="showCountryDescription">
+              各マップカードに国旗（または未設定アイコン）を表示します。
+            </small>
+          </span>
+          <span class="switch">
+            <input id="map-list-show-country" type="checkbox" />
+            <span aria-hidden="true"></span>
+          </span>
         </label>
-        <p class="note" data-i18n="mapListNote">フォルダビュー自体をやめる場合は、上の「フォルダビュー」をOFFにしてください。</p>
+        <p class="note" data-i18n="mapListNote">
+          フォルダビュー自体をやめる場合は、上の「フォルダビュー」をOFFにしてください。
+        </p>
       </section>
 
       <section aria-labelledby="defaults-title">
-        <h2 id="defaults-title" data-i18n="defaultsTitle">ぽちぽちモードの初期状態</h2>
+        <h2 id="defaults-title" data-i18n="defaultsTitle">
+          ぽちぽちモードの初期状態
+        </h2>
         <label class="setting-row">
-          <span><strong data-i18n="defaultOnName">ONをデフォルトにする</strong><small data-i18n="defaultOnDescription">URL別の設定がまだないマップでは、ぽちぽちモードをONで開始します。</small></span>
-          <span class="switch"><input id="pochipochi-default-enabled" type="checkbox"><span aria-hidden="true"></span></span>
+          <span>
+            <strong data-i18n="defaultOnName">ONをデフォルトにする</strong>
+            <small data-i18n="defaultOnDescription">
+              URL別の設定がまだないマップでは、ぽちぽちモードをONで開始します。
+            </small>
+          </span>
+          <span class="switch">
+            <input id="pochipochi-default-enabled" type="checkbox" />
+            <span aria-hidden="true"></span>
+          </span>
         </label>
-        <p class="note" data-i18n="defaultsNote">Map Making App上で切り替えたURLには、そのURL専用のON／OFFが保存され、こちらのデフォルトより優先されます。</p>
+        <p class="note" data-i18n="defaultsNote">
+          Map Making
+          App上で切り替えたURLには、そのURL専用のON／OFFが保存され、こちらのデフォルトより優先されます。
+        </p>
 
         <div class="url-settings" aria-labelledby="url-settings-title">
           <div class="url-settings-heading">
             <div>
-              <h3 id="url-settings-title" data-i18n="urlSettingsTitle">URLごとの設定</h3>
-              <p data-i18n="urlSettingsDescription">保存済みのURL別設定を変更したり、全体デフォルトへ戻したりできます。</p>
+              <h3 id="url-settings-title" data-i18n="urlSettingsTitle">
+                URLごとの設定
+              </h3>
+              <p data-i18n="urlSettingsDescription">
+                保存済みのURL別設定を変更したり、全体デフォルトへ戻したりできます。
+              </p>
             </div>
             <span id="url-settings-count" class="url-settings-count"></span>
           </div>
           <label class="search-field">
-            <span class="visually-hidden" data-i18n="urlSearchLabel">URLを検索</span>
-            <input id="url-settings-search" type="search" data-i18n-placeholder="urlSearchPlaceholder" placeholder="URLの一部を入力して検索" autocomplete="off">
+            <span class="visually-hidden" data-i18n="urlSearchLabel">
+              URLを検索
+            </span>
+            <input
+              id="url-settings-search"
+              type="search"
+              data-i18n-placeholder="urlSearchPlaceholder"
+              placeholder="URLの一部を入力して検索"
+              autocomplete="off"
+            />
           </label>
-          <div id="url-settings-list" class="url-settings-list" role="list"></div>
-          <p id="url-settings-empty" class="url-settings-empty" data-i18n="urlSettingsEmpty" hidden>該当するURL別設定はありません。</p>
+          <div
+            id="url-settings-list"
+            class="url-settings-list"
+            role="list"
+          ></div>
+          <p
+            id="url-settings-empty"
+            class="url-settings-empty"
+            data-i18n="urlSettingsEmpty"
+            hidden
+          >
+            該当するURL別設定はありません。
+          </p>
           <div class="url-settings-actions">
-            <button id="url-settings-delete-all" class="danger-button" type="button" data-i18n="urlDeleteAll">URLごとの設定をすべて削除</button>
+            <button
+              id="url-settings-delete-all"
+              class="danger-button"
+              type="button"
+              data-i18n="urlDeleteAll"
+            >
+              URLごとの設定をすべて削除
+            </button>
           </div>
         </div>
       </section>
 
       <p id="status" class="status" role="status" aria-live="polite"></p>
-      <a id="help-link" class="help-link" href="https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/" target="_blank" rel="noopener noreferrer" data-i18n="helpLink">使い方とプライバシーについて</a>
+      <a
+        id="help-link"
+        class="help-link"
+        href="https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-i18n="helpLink"
+      >
+        使い方とプライバシーについて
+      </a>
     </main>
 
-    <dialog id="delete-all-dialog" class="confirm-dialog" aria-labelledby="delete-all-title">
-      <h2 id="delete-all-title" data-i18n="deleteAllTitle">URLごとの設定をすべて削除しますか？</h2>
-      <p data-i18n="deleteAllMessage">保存されているすべてのURL別ON／OFFを削除します。各マップには、ぽちぽちモードの全体デフォルトが適用されるようになります。</p>
+    <dialog
+      id="delete-all-dialog"
+      class="confirm-dialog"
+      aria-labelledby="delete-all-title"
+    >
+      <h2 id="delete-all-title" data-i18n="deleteAllTitle">
+        URLごとの設定をすべて削除しますか？
+      </h2>
+      <p data-i18n="deleteAllMessage">
+        保存されているすべてのURL別ON／OFFを削除します。各マップには、ぽちぽちモードの全体デフォルトが適用されるようになります。
+      </p>
       <div class="dialog-actions">
-        <button id="delete-all-cancel" type="button" data-i18n="cancel">キャンセル</button>
-        <button id="delete-all-confirm" class="danger-button" type="button" data-i18n="deleteAllConfirm">すべて削除</button>
+        <button id="delete-all-cancel" type="button" data-i18n="cancel">
+          キャンセル
+        </button>
+        <button
+          id="delete-all-confirm"
+          class="danger-button"
+          type="button"
+          data-i18n="deleteAllConfirm"
+        >
+          すべて削除
+        </button>
       </div>
     </dialog>
     <script src="options.js"></script>

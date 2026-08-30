@@ -26,9 +26,21 @@ Map Making App Toolsへの不具合報告、改善案、質問、Pull Requestを
 - 動作が変わる場合はREADMEと、[`browser-extensions-site`](https://github.com/geoguessrwaiwai-lab/browser-extensions-site)で管理する案内サイト・プライバシーポリシーも更新する
 - `dist/`内の生成物をコミットしない
 
+## フォーマット
+
+JavaScript/CSS/HTMLはPrettierで統一しています。初回のみ`npm install`を実行してください。VSCodeで開く場合は`esbenp.prettier-vscode`拡張機能（`.vscode/extensions.json`で推奨）を入れるとformat on saveで自動整形されます。
+
+```bash
+npm install
+make format       # 書き換える
+make format-check # 崩れていないかだけ確認する
+```
+
 ## 検証
 
 ```bash
 make validate
 make package
 ```
+
+`make validate`は`make format-check`を含むため、フォーマットが崩れていると失敗します。

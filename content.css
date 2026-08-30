@@ -10,11 +10,15 @@
     max-width: 100%;
   }
 
-  html.mma-resize-feature-enabled .page-map-editor.mma-narrow-map .map-meta__import {
+  html.mma-resize-feature-enabled
+    .page-map-editor.mma-narrow-map
+    .map-meta__import {
     display: none;
   }
 
-  html.mma-resize-feature-enabled .page-map-editor.mma-compact-map .map-meta__total {
+  html.mma-resize-feature-enabled
+    .page-map-editor.mma-compact-map
+    .map-meta__total {
     display: none;
   }
 
@@ -42,13 +46,18 @@
       max-width: 100%;
     }
 
-    html.mma-resize-feature-enabled .page-map-editor .location-preview__actions {
+    html.mma-resize-feature-enabled
+      .page-map-editor
+      .location-preview__actions {
       width: 100%;
       flex-wrap: wrap;
       justify-self: stretch;
     }
 
-    html.mma-resize-feature-enabled .page-map-editor .location-preview__date .nselect {
+    html.mma-resize-feature-enabled
+      .page-map-editor
+      .location-preview__date
+      .nselect {
       max-width: 100%;
     }
   }
@@ -73,7 +82,9 @@
   background: rgb(100 116 139 / 35%);
   content: "";
   transform: translateX(-50%);
-  transition: background-color 120ms ease, box-shadow 120ms ease;
+  transition:
+    background-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .mma-resize-handle:hover::after,
@@ -103,7 +114,12 @@ html.mma-is-resizing * {
   background: rgb(17 24 39 / 88%);
   box-shadow: 0 4px 14px rgb(0 0 0 / 24%);
   color: #fff;
-  font: 600 12px/1.2 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font:
+    600 12px/1.2 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   cursor: pointer;
   user-select: none;
   backdrop-filter: blur(8px);
@@ -126,7 +142,12 @@ html.mma-is-resizing * {
   border: 1.5px solid currentcolor;
   border-radius: 50%;
   color: #dbeafe;
-  font: 700 12px/1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font:
+    700 12px/1 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   text-decoration: none;
 }
 
