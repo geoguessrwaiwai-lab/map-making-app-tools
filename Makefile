@@ -4,9 +4,9 @@ VERSION := $(shell node -p "require('./manifest.json').version")
 DIST_DIR := dist
 PACKAGE := $(DIST_DIR)/map-making-app-tools-$(VERSION).zip
 UNPACKED_DIR := $(DIST_DIR)/map-making-app-tools-unpacked
-SOURCES := manifest.json content.js tag-groups.js page.js content.css tag-groups.css options.html options.css options.js icon16.png icon32.png icon48.png icon128.png
+SOURCES := manifest.json resize.js pochipochi-bridge.js pochipochi.js map-list.js tag-groups.js resize.css pochipochi.css map-list.css tag-groups.css options.html options.css options.js icon16.png icon32.png icon48.png icon128.png
 
-.PHONY: package unpacked validate clean
+.PHONY: package unpacked validate format format-check clean
 
 # 構文と参照ファイルを検証してから、Chrome Web Store提出用ZIPを作成する。
 package: validate $(PACKAGE)
@@ -19,9 +19,17 @@ unpacked: validate
 	@cp $(SOURCES) "$(UNPACKED_DIR)/"
 	@echo "Created: $(UNPACKED_DIR)"
 
-# プロジェクト構造、JavaScript、Manifest、プライバシー上の不変条件を検証する。
-validate:
+# プロジェクト構造、JavaScript、Manifest、プライバシー上の不変条件、フォーマットを検証する。
+validate: format-check
 	@node scripts/validate.mjs
+
+# Prettierでフォーマットする。
+format:
+	@npx prettier --write .
+
+# フォーマットが崩れていないかだけを確認する（書き換えない）。
+format-check:
+	@npx prettier --check .
 
 $(PACKAGE): $(SOURCES)
 	@mkdir -p "$(DIST_DIR)"

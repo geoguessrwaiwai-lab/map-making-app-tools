@@ -29,7 +29,10 @@
   }
 
   function isContextInvalidatedError(error) {
-    return error instanceof Error && /Extension context invalidated/.test(error.message);
+    return (
+      error instanceof Error &&
+      /Extension context invalidated/.test(error.message)
+    );
   }
 
   /**
@@ -123,12 +126,14 @@
     }
 
     try {
-      chrome.storage.local.set({ [storageKey(currentMapUrl)]: groupsData }).catch((error) => {
-        if (isContextInvalidatedError(error)) {
-          handleContextInvalidated();
-        }
-        // それ以外の一時的な保存失敗でも、表示中の状態はそのまま維持する。
-      });
+      chrome.storage.local
+        .set({ [storageKey(currentMapUrl)]: groupsData })
+        .catch((error) => {
+          if (isContextInvalidatedError(error)) {
+            handleContextInvalidated();
+          }
+          // それ以外の一時的な保存失敗でも、表示中の状態はそのまま維持する。
+        });
     } catch (error) {
       if (isContextInvalidatedError(error)) {
         handleContextInvalidated();
@@ -142,12 +147,22 @@
       const key = storageKey(mapUrl);
       const stored = await chrome.storage.local.get(key);
       const data = stored[key];
-      if (data && Array.isArray(data.groups) && data.tags && typeof data.tags === "object") {
+      if (
+        data &&
+        Array.isArray(data.groups) &&
+        data.tags &&
+        typeof data.tags === "object"
+      ) {
         return {
           groups: data.groups
-            .filter((group) => group && typeof group.id === "string" && typeof group.name === "string")
+            .filter(
+              (group) =>
+                group &&
+                typeof group.id === "string" &&
+                typeof group.name === "string"
+            )
             .map((group) => ({ id: group.id, name: group.name })),
-          tags: { ...data.tags }
+          tags: { ...data.tags },
         };
       }
       return { groups: [], tags: {} };
@@ -262,7 +277,10 @@
 
   /** 元の一覧の既存タグ（draggable属性あり）のドラッグ開始・終了だけを横取りせずに検知する。 */
   function handleNativeDragStart(event) {
-    const li = event.target instanceof Element ? event.target.closest("li.tag.has-button") : null;
+    const li =
+      event.target instanceof Element
+        ? event.target.closest("li.tag.has-button")
+        : null;
     if (!li || !tagListEl?.contains(li)) {
       return;
     }
@@ -400,7 +418,11 @@
     onEnterKey(input, submit);
 
     modal.footer.append(
-      createModalButton("キャンセル", "mma-tag-groups-modal__button", modal.close),
+      createModalButton(
+        "キャンセル",
+        "mma-tag-groups-modal__button",
+        modal.close
+      ),
       createModalButton(
         "保存",
         "mma-tag-groups-modal__button mma-tag-groups-modal__button--primary",
@@ -462,7 +484,8 @@
       modal.body.append(filterLabel);
 
       const selectAllRow = document.createElement("label");
-      selectAllRow.className = "mma-tag-groups-modal__check-row mma-tag-groups-modal__check-row--all";
+      selectAllRow.className =
+        "mma-tag-groups-modal__check-row mma-tag-groups-modal__check-row--all";
       const selectAllCheckbox = document.createElement("input");
       selectAllCheckbox.type = "checkbox";
       const selectAllText = document.createElement("span");
@@ -476,9 +499,11 @@
 
       const sortedNames = allNames.sort((left, right) => {
         const leftFree =
-          groupsData.tags[left].groupId === UNASSIGNED_GROUP || groupsData.tags[left].groupId === group.id;
+          groupsData.tags[left].groupId === UNASSIGNED_GROUP ||
+          groupsData.tags[left].groupId === group.id;
         const rightFree =
-          groupsData.tags[right].groupId === UNASSIGNED_GROUP || groupsData.tags[right].groupId === group.id;
+          groupsData.tags[right].groupId === UNASSIGNED_GROUP ||
+          groupsData.tags[right].groupId === group.id;
         if (leftFree !== rightFree) {
           return leftFree ? -1 : 1;
         }
@@ -489,7 +514,9 @@
         const info = groupsData.tags[name];
         const otherGroup =
           info.groupId && info.groupId !== group.id
-            ? groupsData.groups.find((candidate) => candidate.id === info.groupId)
+            ? groupsData.groups.find(
+                (candidate) => candidate.id === info.groupId
+              )
             : null;
 
         const row = document.createElement("label");
@@ -503,7 +530,9 @@
         checkbox.addEventListener("change", updateSelectAllState);
 
         const text = document.createElement("span");
-        text.textContent = otherGroup ? `${name}（${otherGroup.name}に所属中）` : name;
+        text.textContent = otherGroup
+          ? `${name}（${otherGroup.name}に所属中）`
+          : name;
 
         row.append(checkbox, text);
         list.append(row);
@@ -514,13 +543,15 @@
         const visible = rows.filter((entry) => !entry.row.hidden);
         selectAllCheckbox.disabled = visible.length === 0;
         selectAllCheckbox.checked =
-          visible.length > 0 && visible.every((entry) => entry.checkbox.checked);
+          visible.length > 0 &&
+          visible.every((entry) => entry.checkbox.checked);
       }
 
       filterInput.addEventListener("input", () => {
         const query = filterInput.value.trim().toLocaleLowerCase();
         for (const entry of rows) {
-          entry.row.hidden = query.length > 0 && !entry.name.toLocaleLowerCase().includes(query);
+          entry.row.hidden =
+            query.length > 0 && !entry.name.toLocaleLowerCase().includes(query);
         }
         updateSelectAllState();
       });
@@ -561,7 +592,11 @@
     }
 
     modal.footer.append(
-      createModalButton("キャンセル", "mma-tag-groups-modal__button", modal.close),
+      createModalButton(
+        "キャンセル",
+        "mma-tag-groups-modal__button",
+        modal.close
+      ),
       createModalButton(
         "保存",
         "mma-tag-groups-modal__button mma-tag-groups-modal__button--primary",
@@ -583,7 +618,9 @@
     modal.body.append(message);
 
     function submit() {
-      groupsData.groups = groupsData.groups.filter((candidate) => candidate.id !== group.id);
+      groupsData.groups = groupsData.groups.filter(
+        (candidate) => candidate.id !== group.id
+      );
       for (const info of Object.values(groupsData.tags)) {
         if (info.groupId === group.id) {
           info.groupId = "";
@@ -600,7 +637,11 @@
     }
 
     modal.footer.append(
-      createModalButton("キャンセル", "mma-tag-groups-modal__button", modal.close),
+      createModalButton(
+        "キャンセル",
+        "mma-tag-groups-modal__button",
+        modal.close
+      ),
       createModalButton(
         "削除",
         "mma-tag-groups-modal__button mma-tag-groups-modal__button--danger",
@@ -624,7 +665,9 @@
 
     const allChip = document.createElement("button");
     allChip.type = "button";
-    allChip.className = "mma-tag-groups__chip" + (activeGroupId === ALL_GROUPS ? " is-active" : "");
+    allChip.className =
+      "mma-tag-groups__chip" +
+      (activeGroupId === ALL_GROUPS ? " is-active" : "");
     allChip.textContent = "すべて";
     allChip.addEventListener("click", () => setActiveGroup(ALL_GROUPS));
     toolbar.append(allChip);
@@ -632,10 +675,14 @@
     const unassignedChip = document.createElement("button");
     unassignedChip.type = "button";
     unassignedChip.className =
-      "mma-tag-groups__chip" + (activeGroupId === UNASSIGNED_GROUP ? " is-active" : "");
+      "mma-tag-groups__chip" +
+      (activeGroupId === UNASSIGNED_GROUP ? " is-active" : "");
     unassignedChip.textContent = `未分類 (${countForGroup(UNASSIGNED_GROUP)})`;
-    unassignedChip.title = "未分類のタグで絞り込み（タグをドロップすると未分類に戻します）";
-    unassignedChip.addEventListener("click", () => setActiveGroup(UNASSIGNED_GROUP));
+    unassignedChip.title =
+      "未分類のタグで絞り込み（タグをドロップすると未分類に戻します）";
+    unassignedChip.addEventListener("click", () =>
+      setActiveGroup(UNASSIGNED_GROUP)
+    );
     makeDropTarget(unassignedChip, UNASSIGNED_GROUP);
     toolbar.append(unassignedChip);
 
@@ -646,7 +693,8 @@
       const filterButton = document.createElement("button");
       filterButton.type = "button";
       filterButton.className =
-        "mma-tag-groups__chip" + (activeGroupId === group.id ? " is-active" : "");
+        "mma-tag-groups__chip" +
+        (activeGroupId === group.id ? " is-active" : "");
       filterButton.textContent = `${group.name} (${countForGroup(group.id)})`;
       filterButton.title = `「${group.name}」で絞り込み（タグをドロップして紐づけ）`;
       filterButton.addEventListener("click", () => setActiveGroup(group.id));
@@ -655,9 +703,12 @@
       const selectAllLabel = document.createElement("label");
       selectAllLabel.className = "mma-tag-groups__select-all";
       const groupTagNames = getGroupTagNames(group.id);
-      const groupTagLis = groupTagNames.flatMap((name) => findNativeTagLis(name));
+      const groupTagLis = groupTagNames.flatMap((name) =>
+        findNativeTagLis(name)
+      );
       const selectAllChecked =
-        groupTagLis.length > 0 && groupTagLis.every((li) => isNativeTagSelected(li));
+        groupTagLis.length > 0 &&
+        groupTagLis.every((li) => isNativeTagSelected(li));
       const selectAllCheckbox = document.createElement("input");
       selectAllCheckbox.type = "checkbox";
       selectAllCheckbox.checked = selectAllChecked;
@@ -665,7 +716,9 @@
       selectAllCheckbox.title = selectAllChecked
         ? `「${group.name}」のタグを全て選択解除`
         : `「${group.name}」のタグをまだ選択されていない分も含めて全て選択状態にする`;
-      selectAllCheckbox.addEventListener("click", (event) => event.stopPropagation());
+      selectAllCheckbox.addEventListener("click", (event) =>
+        event.stopPropagation()
+      );
       selectAllCheckbox.addEventListener("change", () =>
         handleSelectAllForGroup(group, selectAllCheckbox.checked)
       );
@@ -772,14 +825,21 @@
       return;
     }
 
-    const isTargetPage = settingsLoaded && featureEnabled && TARGET_PATH.test(location.pathname);
-    const editorEl = isTargetPage ? document.querySelector(EDITOR_SELECTOR) : null;
-    const nextTagManager = editorEl ? editorEl.querySelector(TAG_MANAGER_SELECTOR) : null;
+    const isTargetPage =
+      settingsLoaded && featureEnabled && TARGET_PATH.test(location.pathname);
+    const editorEl = isTargetPage
+      ? document.querySelector(EDITOR_SELECTOR)
+      : null;
+    const nextTagManager = editorEl
+      ? editorEl.querySelector(TAG_MANAGER_SELECTOR)
+      : null;
     const nextMapUrl = isTargetPage ? readMapUrl() : "";
 
     if (
       tagManager &&
-      (tagManager !== nextTagManager || !tagManager.isConnected || currentMapUrl !== nextMapUrl)
+      (tagManager !== nextTagManager ||
+        !tagManager.isConnected ||
+        currentMapUrl !== nextMapUrl)
     ) {
       detach();
     }
@@ -792,7 +852,7 @@
   const mutationObserver = new MutationObserver(reconcile);
   mutationObserver.observe(document.documentElement, {
     childList: true,
-    subtree: true
+    subtree: true,
   });
 
   chrome.storage.onChanged.addListener((changes, areaName) => {

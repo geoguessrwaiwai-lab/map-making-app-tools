@@ -1,0 +1,985 @@
+.mma-map-list-updates-hidden {
+  display: none !important;
+}
+
+/* リロード直後、設定を読み込んで独自UIを描画し終えるまでネイティブの一覧を見せない。
+   display:noneにすると場所ごと詰まってしまうため、領域は保ったまま非表示にする。 */
+.mma-map-list-booting [data-replace="InteractiveMapList"],
+.mma-map-list-booting section.updates {
+  visibility: hidden !important;
+}
+
+/* Updatesセクションを畳んだ状態では、そのために確保されていた右側の余白を
+   「Your Maps」側へ譲り渡す（ネイティブ側のカラム分割を無効化して全幅を使う）。 */
+.page-map-list:has(section.updates.mma-map-list-updates-hidden) {
+  display: block !important;
+}
+
+.page-map-list:has(section.updates.mma-map-list-updates-hidden)
+  > section:first-child {
+  width: 100% !important;
+  max-width: none !important;
+  flex: 1 1 auto !important;
+}
+
+.mma-map-list__footer {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  flex-direction: column;
+  gap: 8px;
+  margin: 24px 0 0;
+  padding: 10px 20px;
+  border-top: 1px solid rgb(255 255 255 / 14%);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.mma-map-list__footer-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px 20px;
+}
+
+/* 2段目は1段目とdividerで区切り、注記を左端、表示切り替えを中央に置く。 */
+.mma-map-list__footer-row--note {
+  padding-top: 8px;
+  border-top: 1px solid rgb(255 255 255 / 14%);
+}
+
+.mma-map-list__footer .mma-map-list__footnote {
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  opacity: 0.7;
+  text-align: left;
+}
+
+.mma-map-list__footer-slot {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  align-items: center;
+  gap: 6px 18px;
+}
+
+.mma-map-list__footer-slot--left {
+  justify-content: flex-start;
+}
+
+.mma-map-list__footer-slot--center {
+  justify-content: center;
+}
+
+.mma-map-list__footer-slot--right {
+  justify-content: flex-end;
+}
+
+/* 移動してきたネイティブのノードは、フッターでは1行のテキストとして横並びにする。
+   ネイティブ側の同じ詳細度のルールに確実に勝てるよう、フッターのクラスから指定する。 */
+.mma-map-list__footer .mma-map-list__footer-slot > * {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  text-align: left;
+}
+
+/* ネイティブのカード／ボタン風の装飾（背景・枠・太字・下線）を落として、ただのテキストとして見せる。
+   装飾が内側のラッパーに付いていることがあるため子孫まで含め、サイト側の指定に確実に勝つよう!importantで打ち消す。 */
+.mma-map-list__footer .mma-map-list__footer-slot > *,
+.mma-map-list__footer
+  .mma-map-list__footer-slot
+  :where(a, div, p, span, button) {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  font-weight: inherit !important;
+  text-decoration: none !important;
+}
+
+.mma-map-list__footer .mma-map-list__footer-slot a:hover {
+  text-decoration: underline !important;
+}
+
+/* 説明文（「learn how to use the app」など）はフッターでは省き、名前だけを出す。 */
+.mma-map-list__footer .ctas__label {
+  display: none;
+}
+
+.mma-map-list__footer .ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+/* 背景を外すと、色指定のないアイコン（Manual）が黒のままで見えなくなるため文字色に合わせる。
+   Discordのpathはfill属性を自前で持っているため、ここでの指定には影響されない。 */
+.mma-map-list__footer .ctas__icon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.mma-map-list__footer .ctas__title,
+.mma-map-list__footer .ctas__label {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.mma-map-list__footer-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* フッター右下の言語切り替え。 */
+.mma-map-list__lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: end;
+}
+
+.mma-map-list__lang-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.mma-map-list__lang-button:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.mma-map-list__lang-button[aria-pressed="true"] {
+  font-weight: 700;
+  opacity: 1;
+  cursor: default;
+}
+
+/* 中央の項目はボタンではなくテキストとして見せる。 */
+.mma-map-list__footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mma-map-list__footer-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+  .mma-map-list__footer-row {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .mma-map-list__footer-slot {
+    justify-content: center;
+  }
+}
+
+.mma-map-list {
+  --mma-ml-surface: rgb(17 24 39 / 88%);
+  --mma-ml-surface-2: rgb(30 41 59 / 88%);
+  --mma-ml-border: rgb(255 255 255 / 14%);
+  --mma-ml-text: #f8fafc;
+  --mma-ml-muted: #94a3b8;
+  --mma-ml-accent: #3b82f6;
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  gap: 16px;
+  /* ネイティブの.page-map-listはmax-width:1200pxをmargin:autoで中央寄せしているだけでpaddingを
+     持たないため、ビューポート幅が1200px以下になると左右の余白が消える。最低限のガターを自前で確保する。 */
+  padding-inline: 10px;
+  margin-bottom: 16px;
+  color: var(--mma-ml-text);
+  font:
+    14px/1.4 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.mma-map-list__native-hidden {
+  display: none !important;
+}
+
+.mma-map-list__board {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 801px) {
+  .mma-map-list__board {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: 12px 16px;
+  }
+
+  /* 段ごとに高さを揃えると、背の高いフォルダの隣に隙間が空く。1pxの行を敷き、各フォルダが
+     自分の高さぶんの行数を占めることで、短いカラムへ次のフォルダを詰める（Masonry配置）。
+     行数はJSが測って与えるため、測り終えるまではこのクラスを付けない（付く前は通常のグリッド）。 */
+  .mma-map-list__board--masonry {
+    grid-auto-rows: 1px;
+    row-gap: 0;
+  }
+
+  .mma-map-list__section--span {
+    grid-column: 1 / -1;
+  }
+
+  /* 未分類はフォルダの並びに関わらず、常に右側のカラムへ固定する。 */
+  .mma-map-list__section--right {
+    grid-column: 2;
+  }
+}
+
+.mma-map-list__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.mma-map-list__search-field {
+  position: relative;
+  display: flex;
+  flex: 1 1 220px;
+  min-width: 160px;
+  max-width: 300px;
+  align-items: center;
+}
+
+.mma-map-list__search-icon {
+  position: absolute;
+  left: 10px;
+  width: 18px;
+  height: 18px;
+  fill: var(--mma-ml-muted);
+  pointer-events: none;
+}
+
+.mma-map-list__search {
+  width: 100%;
+  padding: 9px 12px 9px 34px;
+  border: 1px solid var(--mma-ml-border);
+  border-radius: 10px;
+  background: var(--mma-ml-surface-2);
+  color: var(--mma-ml-text);
+  font: inherit;
+}
+
+/* 「＋ 新しいマップ」「＋ フォルダを追加」はツールバーの右端へ寄せる。 */
+.mma-map-list__toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: auto;
+  gap: 10px;
+}
+
+.mma-map-list__button {
+  padding: 8px 14px;
+  border: 1px solid var(--mma-ml-border);
+  border-radius: 10px;
+  background: var(--mma-ml-surface-2);
+  color: var(--mma-ml-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mma-map-list__button:hover {
+  border-color: var(--mma-ml-accent);
+}
+
+.mma-map-list__button--ghost {
+  background: transparent;
+}
+
+.mma-map-list__switch-view {
+  /* フッターの中ではvarの定義元（.mma-map-list）の外に出るため、フォールバックを持たせる。 */
+  color: var(--mma-ml-muted, inherit);
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.mma-map-list__switch-view:hover {
+  color: var(--mma-ml-text);
+}
+
+.mma-map-list__section {
+  border: 1px solid var(--mma-ml-border);
+  border-radius: 14px;
+  background: var(--mma-ml-surface);
+}
+
+.mma-map-list__section[hidden] {
+  display: none;
+}
+
+.mma-map-list__section.mma-map-list__section--drag-over {
+  outline: 2px solid var(--mma-ml-accent);
+  outline-offset: -2px;
+}
+
+.mma-map-list__section.mma-map-list__section--drop-target {
+  outline: 2px solid var(--mma-ml-accent);
+  outline-offset: -2px;
+}
+
+.mma-map-list__section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--mma-ml-border);
+  cursor: grab;
+}
+
+.mma-map-list__section-head[draggable="false"] {
+  cursor: default;
+}
+
+.mma-map-list__section-title {
+  flex: 1 1 auto;
+  overflow: hidden;
+  font-weight: 700;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mma-map-list__section-count {
+  color: var(--mma-ml-muted);
+  font-weight: 400;
+}
+
+.mma-map-list__icon-button {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--mma-ml-muted);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mma-map-list__icon-button:hover {
+  background: rgb(255 255 255 / 10%);
+  color: var(--mma-ml-text);
+}
+
+.mma-map-list__cards {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  gap: 4px;
+  min-height: 8px;
+}
+
+.mma-map-list__cards:empty::after {
+  display: block;
+  padding: 10px;
+  color: var(--mma-ml-muted);
+  font-size: 12px;
+  /* 文言は表示言語によって変わるため、JS側から--mma-ml-cards-emptyで渡す。 */
+  content: var(--mma-ml-cards-empty, "");
+}
+
+.mma-map-list__card {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  row-gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+
+.mma-map-list__card:hover {
+  background: rgb(255 255 255 / 6%);
+}
+
+.mma-map-list__card.mma-map-list__card--drag-over::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -5px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--mma-ml-accent);
+  opacity: 0.7;
+}
+
+.mma-map-list__card.mma-map-list__card--drag-over-after::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--mma-ml-accent);
+  opacity: 0.7;
+}
+
+.mma-map-list__card[data-dragging="true"] {
+  opacity: 0.4;
+}
+
+.mma-map-list__drag-handle {
+  position: absolute;
+  top: 50%;
+  left: -24px;
+  padding: 6px 8px;
+  transform: translateY(-50%);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--mma-ml-muted);
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.mma-map-list__card:hover .mma-map-list__drag-handle {
+  opacity: 1;
+}
+
+.mma-map-list__favorite-mark {
+  flex: 0 0 auto;
+  color: #f43f5e;
+  font-size: 12px;
+}
+
+.mma-map-list__country {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  padding: 8px;
+  margin: -8px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mma-map-list__country--empty {
+  font-size: 14px;
+  opacity: 0.4;
+}
+
+/*
+ * カード本体は<div>で、リンク（マップ編集画面への遷移）はこの要素だけが担う。
+ * 先頭の国チップと末尾の「⋯」メニューはこの外側の兄弟要素にして、そもそも<a>の外に置く。
+ */
+.mma-map-list__link-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  row-gap: 4px;
+  flex: 1 1 100px;
+  min-width: 0;
+  color: var(--mma-ml-text);
+  text-decoration: none;
+}
+
+.mma-map-list__link {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mma-map-list__link-area:hover .mma-map-list__link {
+  text-decoration: underline;
+}
+
+.mma-map-list__count {
+  flex: 0 0 auto;
+  color: var(--mma-ml-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* マップ名をできるだけ長く見せるため、余った幅はタグではなくリンクへ配る。 */
+.mma-map-list__tags {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.mma-map-list__tag-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #0b1220;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: default;
+}
+
+/* GeoGuessrマップに紐付いている場合だけ表示する、ネイティブと同じ2つのアイコンリンク。 */
+.mma-map-list__geo-links {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+}
+
+.mma-map-list__geo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.mma-map-list__geo-link img {
+  display: block;
+  max-width: 16px;
+  max-height: 16px;
+  object-fit: contain;
+}
+
+.mma-map-list__geo-link:hover {
+  background: var(--mma-ml-surface-2);
+  opacity: 1;
+}
+
+.mma-map-list__menu-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--mma-ml-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mma-map-list__menu-button:hover,
+.mma-map-list__menu-button[aria-expanded="true"] {
+  background: var(--mma-ml-surface-2);
+  color: var(--mma-ml-text);
+}
+
+/*
+ * メニューはカードの折り返しやスクロールに影響されないよう、bodyへ固定配置する。
+ * .mma-map-listの外に出るため--mma-ml-*は届かない。色とフォントはモーダルと同様に直接指定する。
+ */
+.mma-map-list__menu {
+  position: fixed;
+  z-index: 2147483646;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 4px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 10px;
+  background: #111827;
+  box-shadow: 0 18px 40px rgb(15 23 42 / 55%);
+  color: #f8fafc;
+  font:
+    13px/1.4 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.mma-map-list__menu-item {
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mma-map-list__menu-item:hover,
+.mma-map-list__menu-item:focus-visible {
+  background: rgb(255 255 255 / 10%);
+  outline: none;
+}
+
+/* タグの色スウォッチをクリックすると出るプリセットカラーの選択ポップアップ。5列×2行で並べる。 */
+.mma-map-list__color-picker {
+  position: fixed;
+  z-index: 2147483647;
+  display: grid;
+  grid-template-columns: repeat(5, 24px);
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 10px;
+  background: #111827;
+  box-shadow: 0 18px 40px rgb(15 23 42 / 55%);
+}
+
+.mma-map-list__color-picker-swatch {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.mma-map-list__color-picker-swatch:hover {
+  border-color: rgb(255 255 255 / 40%);
+}
+
+.mma-map-list__color-picker-swatch--selected {
+  border-color: #fff;
+}
+
+.mma-map-list__footnote {
+  padding: 4px 2px 0;
+  color: var(--mma-ml-muted);
+  font-size: 12px;
+}
+
+.mma-map-list__footnote a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mma-map-list__footnote a:hover {
+  text-decoration: underline;
+}
+
+.mma-map-list__switch-wrap {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  opacity: 0.7;
+}
+
+/* モーダル（tag-groups.jsのモーダル基盤と共通のクラス命名規則） */
+
+.mma-map-list-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(15 23 42 / 55%);
+}
+
+.mma-map-list-modal {
+  width: min(420px, calc(100% - 32px));
+  max-height: calc(100% - 64px);
+  overflow-y: auto;
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  color: #172033;
+  box-shadow: 0 24px 70px rgb(15 23 42 / 30%);
+  font:
+    14px/1.5 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+/* Updatesのポップアップだけは、変更履歴が読みやすいよう通常の2倍の幅にする。 */
+.mma-map-list-modal--wide {
+  width: min(840px, calc(100% - 32px));
+}
+
+.mma-map-list-modal__title {
+  margin: 0 0 14px;
+  font-size: 17px;
+}
+
+.mma-map-list-modal__label {
+  display: block;
+  margin-bottom: 12px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.mma-map-list-modal__label--tight {
+  margin-bottom: 6px;
+}
+
+.mma-map-list-modal__label--flush {
+  margin-bottom: 0;
+}
+
+.mma-map-list-modal__input {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  color: #172033;
+  font: inherit;
+}
+
+/* 入力欄とボタンを横並びで1行にする（新しいタグの追加など）。 */
+.mma-map-list-modal__inline-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.mma-map-list-modal__inline-row .mma-map-list-modal__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-top: 0;
+}
+
+.mma-map-list-modal__select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  color: #172033;
+  background: #fff;
+  font: inherit;
+}
+
+.mma-map-list-modal__divider {
+  margin: 4px 0 14px;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+}
+
+.mma-map-list-modal__divider--top {
+  margin-top: 16px;
+}
+
+.mma-map-list-modal__details {
+  margin-bottom: 14px;
+}
+
+.mma-map-list-modal__details-summary {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mma-map-list-modal__details[open] .mma-map-list-modal__details-summary {
+  margin-bottom: 12px;
+}
+
+.mma-map-list-modal__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.mma-map-list-modal__preset {
+  padding: 5px 10px;
+  border: 1px solid #d7dee8;
+  border-radius: 999px;
+  background: #f4f7fb;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mma-map-list-modal__preset:hover {
+  border-color: #94a3b8;
+}
+
+.mma-map-list-modal__checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 260px;
+  margin-bottom: 12px;
+  overflow-y: auto;
+}
+
+.mma-map-list-modal__check-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.mma-map-list-modal__check-row[hidden] {
+  display: none;
+}
+
+.mma-map-list-modal__check-row:hover {
+  background: #f4f7fb;
+}
+
+.mma-map-list-modal__check-row.mma-map-list-modal__check-row--selected {
+  background: #dbeafe;
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+.mma-map-list-modal__check-row--action {
+  width: 100%;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.mma-map-list-modal__check-row--action:disabled {
+  color: #94a3b8;
+  cursor: default;
+}
+
+.mma-map-list-modal__swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* タグ一覧の行末にある削除ボタン。行の右端へ押し出す。 */
+.mma-map-list-modal__tag-delete {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mma-map-list-modal__tag-delete:hover {
+  background: #fecaca;
+}
+
+.mma-map-list-modal__message {
+  margin: 0 0 14px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.mma-map-list-modal__message--danger {
+  font-weight: 650;
+  color: #b91c1c;
+}
+
+.mma-map-list-modal__footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.mma-map-list-modal__button {
+  padding: 8px 14px;
+  border: 1px solid #d7dee8;
+  border-radius: 9px;
+  background: #fff;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mma-map-list-modal__button--primary {
+  border-color: #2563eb;
+  color: #fff;
+  background: #2563eb;
+}
+
+.mma-map-list-modal__button--danger {
+  border-color: #fecaca;
+  color: #b91c1c;
+  background: #fff7f7;
+}
+
+/* ネイティブの更新履歴（Updates）をポップアップに複製する際、サイト側の配色を継承して
+   読めなくならないよう、この中だけ明示的に配色を上書きする。 */
+.mma-map-list-modal .updates__container,
+.mma-map-list-modal .updates__version {
+  color: #172033;
+}
+
+.mma-map-list-modal .updates__container a,
+.mma-map-list-modal .updates__version a {
+  color: #2563eb;
+}

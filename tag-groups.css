@@ -9,7 +9,12 @@
   border-radius: 10px;
   background: rgb(255 255 255 / 4%);
   color: #f9fafb;
-  font: 500 13px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font:
+    500 13px/1.4 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 .mma-tag-groups__title {
@@ -123,7 +128,12 @@
   background: #1a1d27;
   color: #f9fafb;
   box-shadow: 0 20px 50px rgb(0 0 0 / 45%);
-  font: 500 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font:
+    500 14px/1.5 system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 .mma-tag-groups-modal__header {

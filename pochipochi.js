@@ -5,7 +5,8 @@
   const MAP_SELECTOR = ".map-embed";
   const PANORAMA_SELECTOR = ".location-preview__panorama";
   const DELETE_BUTTON_SELECTOR = '[data-qa="location-delete"]';
-  const INFO_URL = "https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/";
+  const INFO_URL =
+    "https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/";
   const MAP_CONTROL_SELECTOR =
     ".embed-controls, button, a, input, select, textarea, [role='button'], [role='combobox']";
   const DRAG_THRESHOLD_PX = 6;
@@ -58,13 +59,16 @@
   }
 
   function coordinateKey(location) {
-    const lat = typeof location?.lat === "function" ? location.lat() : location?.lat;
-    const lng = typeof location?.lng === "function" ? location.lng() : location?.lng;
+    const lat =
+      typeof location?.lat === "function" ? location.lat() : location?.lat;
+    const lng =
+      typeof location?.lng === "function" ? location.lng() : location?.lng;
     return Number.isFinite(lat) && Number.isFinite(lng) ? `${lat},${lng}` : "";
   }
 
   function getLocationKeys(location, openedLocation = null) {
-    const id = location?.id ?? openedLocation?.location?.id ?? openedLocation?.id;
+    const id =
+      location?.id ?? openedLocation?.location?.id ?? openedLocation?.id;
     const panoId = location?.panoId || (openedLocation ? getDomPanoId() : "");
     const coordinates = coordinateKey(location?.location);
     const keys = [];
@@ -117,7 +121,8 @@
     window.setTimeout(() => {
       control?.removeAttribute("data-error");
       if (control) {
-        control.title = "次のロケーションを選ぶと、直前に新しく選んだロケーションを削除します";
+        control.title =
+          "次のロケーションを選ぶと、直前に新しく選んだロケーションを削除します";
       }
     }, 3000);
   }
@@ -128,11 +133,13 @@
     }
 
     control.dataset.error = "true";
-    control.title = "保存済みロケーションを確認できなかったため、モードを開始しませんでした";
+    control.title =
+      "保存済みロケーションを確認できなかったため、モードを開始しませんでした";
     window.setTimeout(() => {
       control?.removeAttribute("data-error");
       if (control) {
-        control.title = "次のロケーションを選ぶと、直前に新しく選んだロケーションを削除します";
+        control.title =
+          "次のロケーションを選ぶと、直前に新しく選んだロケーションを削除します";
       }
     }, 3000);
   }
@@ -234,7 +241,11 @@
 
   /** マップのパン操作を、通常の地点選択クリックと区別する。 */
   function handleMapPointerDown(event) {
-    if (event.button !== 0 || event.isPrimary === false || !isMapSurfaceTarget(event.target)) {
+    if (
+      event.button !== 0 ||
+      event.isPrimary === false ||
+      !isMapSurfaceTarget(event.target)
+    ) {
       mapPointerState = null;
       return;
     }
@@ -243,7 +254,7 @@
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      dragged: false
+      dragged: false,
     };
   }
 
@@ -254,7 +265,10 @@
 
     const deltaX = event.clientX - mapPointerState.startX;
     const deltaY = event.clientY - mapPointerState.startY;
-    if (deltaX * deltaX + deltaY * deltaY >= DRAG_THRESHOLD_PX * DRAG_THRESHOLD_PX) {
+    if (
+      deltaX * deltaX + deltaY * deltaY >=
+      DRAG_THRESHOLD_PX * DRAG_THRESHOLD_PX
+    ) {
       mapPointerState.dragged = true;
     }
   }
@@ -284,7 +298,11 @@
    * 元イベントは停止しないため、この処理後もMap Making Appの地点選択が実行される。
    */
   function handleMapClick(event) {
-    if (!modeEnabled || event.button !== 0 || !TARGET_PATH.test(location.pathname)) {
+    if (
+      !modeEnabled ||
+      event.button !== 0 ||
+      !TARGET_PATH.test(location.pathname)
+    ) {
       return;
     }
 
@@ -314,7 +332,9 @@
   /** Deleteによるプレビュー消失を、SaveまたはCloseとして扱わない。 */
   function handleLocationDelete(event) {
     const deleteButton =
-      event.target instanceof Element ? event.target.closest(DELETE_BUTTON_SELECTOR) : null;
+      event.target instanceof Element
+        ? event.target.closest(DELETE_BUTTON_SELECTOR)
+        : null;
     if (!(deleteButton instanceof HTMLButtonElement) || deleteButton.disabled) {
       return;
     }
@@ -496,14 +516,19 @@
 
   /** iPhone風トグルを画面右上へ追加する。 */
   function mountControl() {
-    if (control || !pochiFeatureEnabled || !TARGET_PATH.test(location.pathname)) {
+    if (
+      control ||
+      !pochiFeatureEnabled ||
+      !TARGET_PATH.test(location.pathname)
+    ) {
       return;
     }
 
     control = document.createElement("div");
     activePath = location.pathname;
     control.className = CONTROL_CLASS;
-    control.title = "次のロケーションを選ぶと、直前に新しく選んだロケーションを削除します";
+    control.title =
+      "次のロケーションを選ぶと、直前に新しく選んだロケーションを削除します";
 
     const infoLink = document.createElement("a");
     infoLink.className = "mma-pochipochi-info";
@@ -559,7 +584,8 @@
   /** SPA遷移とStreet ViewのDOM再生成を同じ監視で追跡する。 */
   function reconcile() {
     const isTargetPage =
-      TARGET_PATH.test(location.pathname) && document.querySelector(EDITOR_SELECTOR);
+      TARGET_PATH.test(location.pathname) &&
+      document.querySelector(EDITOR_SELECTOR);
     const wasMounted = Boolean(control);
     const pathChanged = Boolean(control && activePath !== location.pathname);
 
@@ -588,7 +614,8 @@
       [...mutation.removedNodes].some(
         (node) =>
           node instanceof Element &&
-          (node.matches(PANORAMA_SELECTOR) || node.querySelector(PANORAMA_SELECTOR))
+          (node.matches(PANORAMA_SELECTOR) ||
+            node.querySelector(PANORAMA_SELECTOR))
       )
     );
 
@@ -613,7 +640,8 @@
       return [...mutation.addedNodes, ...mutation.removedNodes].some(
         (node) =>
           node instanceof Element &&
-          (node.matches(PANORAMA_SELECTOR) || node.querySelector(PANORAMA_SELECTOR))
+          (node.matches(PANORAMA_SELECTOR) ||
+            node.querySelector(PANORAMA_SELECTOR))
       );
     });
 
@@ -626,7 +654,7 @@
     attributes: true,
     attributeFilter: ["href", "pano"],
     childList: true,
-    subtree: true
+    subtree: true,
   });
 
   document.addEventListener("pointerdown", handleMapPointerDown, true);

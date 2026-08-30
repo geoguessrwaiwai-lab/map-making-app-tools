@@ -1,0 +1,5 @@
+/dist/
+/artwork/
+/store-assets/
+*.png
+*.md
