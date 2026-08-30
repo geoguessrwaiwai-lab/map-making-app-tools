@@ -22,6 +22,7 @@
 ## 検証と生成物
 
 - 拡張機能を変更した場合は、`make validate`、`make package`、`make unpacked`を実行する。
+- 実装が完了するたびに（コミット・pushの前に必ず）`make unpacked`を実行し、`dist/map-making-app-tools-unpacked`を最新の状態にしておく。
 - `scripts/validate.mjs`で検証している対象URL、権限なし、外部通信なしの不変条件を弱めない。
 - `dist/`内のZIPや展開済みファイルをソース管理に追加しない。
 

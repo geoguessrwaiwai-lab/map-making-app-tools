@@ -18,6 +18,7 @@
   const TAGS_KEY = "mma-map-list-tags";
   const SHOW_LOCATION_COUNT_KEY = "mma-map-list-show-location-count";
   const SHOW_COUNTRY_KEY = "mma-map-list-show-country";
+  const PENDING_HEADING_KEY = "mma-map-list-pending-new-map-heading";
   const UNASSIGNED_ID = "__unassigned__";
   const FAVORITES_ID = "__favorites__";
   const LABEL_MAX_LENGTH = 24;
@@ -86,6 +87,10 @@
       cardsEmpty: "ここにマップをドラッグ、またはカードの「⋯」→「フォルダへ移動」から追加できます",
       searchPlaceholder: "マップを検索…",
       newMap: "＋ 新しいマップ",
+      createMapTitle: "新しいマップを作成",
+      createMapNameLabel: "マップ名",
+      createMapFolderLabel: "フォルダ",
+      createMapSubmit: "作成",
       addFolder: "＋ フォルダを追加",
       switchToFolders: "フォルダビューに切り替える",
       switchToNative: "以前の表示に切り替える",
@@ -133,6 +138,10 @@
       cardsEmpty: "Drag maps here, or add them with “⋯” → “Move to folder” on a card",
       searchPlaceholder: "Search maps…",
       newMap: "+ New map",
+      createMapTitle: "Create a new map",
+      createMapNameLabel: "Map name",
+      createMapFolderLabel: "Folder",
+      createMapSubmit: "Create",
       addFolder: "+ Add folder",
       switchToFolders: "Switch to the folder view",
       switchToNative: "Switch back to the original view",
@@ -360,7 +369,8 @@
         NEW_TAB_KEY,
         SHOW_LOCATION_COUNT_KEY,
         SHOW_COUNTRY_KEY,
-        LANGUAGE_KEY
+        LANGUAGE_KEY,
+        PENDING_HEADING_KEY
       ]);
 
       const headings = stored[HEADINGS_KEY];
@@ -407,6 +417,9 @@
       showCountry = stored[SHOW_COUNTRY_KEY] !== false;
       language = normalizeLanguage(stored[LANGUAGE_KEY]);
       refreshRegionNames();
+
+      const storedPendingHeading = stored[PENDING_HEADING_KEY];
+      pendingNewMapHeadingId = typeof storedPendingHeading === "string" ? storedPendingHeading : null;
 
       return true;
     } catch (error) {
@@ -510,19 +523,6 @@
     const link = nativeListEl.querySelector(`a.map-link[href*="/maps/${mapId}"]`);
     const li = link?.closest("li.map-list__entry");
     return li ? li.querySelector("button.map-list__edit") : null;
-  }
-
-  function findNativeActionButton(label) {
-    if (!nativeListEl) {
-      return null;
-    }
-
-    for (const button of nativeListEl.querySelectorAll("p.map-list-head button")) {
-      if (button.textContent.trim() === label) {
-        return button;
-      }
-    }
-    return null;
   }
 
   /** ネイティブのフォルダ要素からフォルダ名を読み取る。マークアップの揺れに対応するため複数の方法を試す。 */
@@ -665,8 +665,11 @@
       } else {
         headingsData.unassignedOrder.push(...newIds);
       }
+      if (pendingNewMapHeadingId) {
+        pendingNewMapHeadingId = null;
+        persistKey(PENDING_HEADING_KEY, null);
+      }
     }
-    pendingNewMapHeadingId = null;
 
     for (const id of Object.keys(favorites)) {
       if (!currentIds.has(id)) {
@@ -892,13 +895,113 @@
     );
   }
 
-  function handleAddMapToHeading(heading) {
-    const button = findNativeActionButton("New map");
-    if (!button) {
-      return;
+  /* ---------- 新規マップ作成 ---------- */
+
+  /** ネイティブの新規マップ作成フォーム（name入力とCreateボタンを持つ）を探す。表示前は存在しない。 */
+  function findNativeCreateMapForm() {
+    return nativeListEl?.querySelector("form.map-list-head") ?? null;
+  }
+
+  /** 作成フォームが現れる前に表示されている「New map」トグルボタンを探す。 */
+  function findNativeCreateMapToggle() {
+    if (!nativeListEl) {
+      return null;
     }
-    pendingNewMapHeadingId = heading.id;
-    button.click();
+    for (const button of nativeListEl.querySelectorAll("p.map-list-head button")) {
+      if (button.textContent.trim() === "New map") {
+        return button;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * ネイティブの作成フォームは最初はDOMになく、「New map」ボタンを押した時だけ現れる。
+   * まだ無ければトグルボタンを押し、フォームが出現するまで少し待つ。
+   */
+  async function revealNativeCreateMapForm() {
+    let form = findNativeCreateMapForm();
+    if (form) {
+      return form;
+    }
+
+    const toggle = findNativeCreateMapToggle();
+    if (!toggle) {
+      return null;
+    }
+    toggle.click();
+
+    for (let attempt = 0; attempt < 25; attempt++) {
+      form = findNativeCreateMapForm();
+      if (form) {
+        return form;
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 40));
+    }
+    return null;
+  }
+
+  /** マップ名と作成先フォルダを入力させた上で、ネイティブの作成フォームへ処理を委譲する。 */
+  function openCreateMapModal(defaultSectionId) {
+    const modal = openModal(t("createMapTitle"));
+
+    const nameLabel = document.createElement("label");
+    nameLabel.className = "mma-map-list-modal__label";
+    nameLabel.textContent = t("createMapNameLabel");
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.className = "mma-map-list-modal__input";
+    nameLabel.append(nameInput);
+    modal.body.append(nameLabel);
+
+    const folderLabel = document.createElement("label");
+    folderLabel.className = "mma-map-list-modal__label";
+    folderLabel.textContent = t("createMapFolderLabel");
+    const folderSelect = document.createElement("select");
+    folderSelect.className = "mma-map-list-modal__select";
+    for (const option of allSectionOptions()) {
+      const optionEl = document.createElement("option");
+      optionEl.value = option.id;
+      optionEl.textContent = option.label;
+      folderSelect.append(optionEl);
+    }
+    folderSelect.value = defaultSectionId ?? UNASSIGNED_ID;
+    folderLabel.append(folderSelect);
+    modal.body.append(folderLabel);
+
+    async function submit() {
+      const name = nameInput.value.trim();
+      if (!name) {
+        nameInput.focus();
+        return;
+      }
+
+      const form = await revealNativeCreateMapForm();
+      const nameField = form?.querySelector('input[name="name"]');
+      const submitButton = form?.querySelector('button[type="submit"]');
+      if (!form || !nameField || !submitButton) {
+        return;
+      }
+
+      nameField.value = name;
+      const targetId = folderSelect.value;
+      pendingNewMapHeadingId = targetId === UNASSIGNED_ID ? null : targetId;
+      persistKey(PENDING_HEADING_KEY, pendingNewMapHeadingId);
+      modal.close();
+      submitButton.click();
+    }
+
+    onEnterKey(nameInput, submit);
+    window.setTimeout(() => nameInput.focus(), 0);
+
+    modal.footer.append(
+      createModalButton(t("cancel"), "mma-map-list-modal__button", modal.close),
+      createModalButton(t("createMapSubmit"), "mma-map-list-modal__button mma-map-list-modal__button--primary", submit)
+    );
+  }
+
+  function handleAddMapToHeading(heading) {
+    openCreateMapModal(heading.id);
   }
 
   /* ---------- 国選択モーダル ---------- */
@@ -1613,8 +1716,7 @@
     newMapButton.className = "mma-map-list__button";
     newMapButton.textContent = t("newMap");
     newMapButton.addEventListener("click", () => {
-      pendingNewMapHeadingId = null;
-      findNativeActionButton("New map")?.click();
+      openCreateMapModal(UNASSIGNED_ID);
     });
 
     const actions = document.createElement("div");

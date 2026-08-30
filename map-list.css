@@ -652,6 +652,18 @@
   font: inherit;
 }
 
+.mma-map-list-modal__select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  color: #172033;
+  background: #fff;
+  font: inherit;
+}
+
 .mma-map-list-modal__presets {
   display: flex;
   flex-wrap: wrap;

@@ -199,7 +199,8 @@ assert(mapListSource.includes("FAVORITES_KEY"), "favorites must be namespaced in
 assert(mapListSource.includes("COUNTRIES_KEY"), "country chips must be namespaced in extension storage");
 assert(mapListSource.includes("TAGS_KEY"), "map tags must be namespaced in extension storage");
 assert(mapListSource.includes("findNativeEditButton"), "edit/delete must be delegated to the site's own settings dialog");
-assert(mapListSource.includes('findNativeActionButton("New map")'), "new map creation must be delegated to the site's own button");
+assert(mapListSource.includes("findNativeCreateMapForm"), "new map creation must be delegated to the site's own create-map form");
+assert(!/document\.createElement\(\s*["']form["']\s*\)/.test(mapListSource), "map-list.js must not construct its own submission form; it must reuse the site's native one");
 assert(mapListSource.includes("mma-map-list__native-hidden"), "the native list must only be hidden visually, not removed");
 assert(mapListStyles.includes(".mma-map-list__native-hidden"), "the native-hidden class must be defined in map-list.css");
 assert(mapListSource.includes('const UPDATES_SECTION_SELECTOR = "section.updates"'), "the footer must be built from the site's own updates section");
