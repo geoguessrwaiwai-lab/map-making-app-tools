@@ -602,6 +602,37 @@
   outline: none;
 }
 
+/* タグの色スウォッチをクリックすると出るプリセットカラーの選択ポップアップ。5列×2行で並べる。 */
+.mma-map-list__color-picker {
+  position: fixed;
+  z-index: 2147483647;
+  display: grid;
+  grid-template-columns: repeat(5, 24px);
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 10px;
+  background: #111827;
+  box-shadow: 0 18px 40px rgb(15 23 42 / 55%);
+}
+
+.mma-map-list__color-picker-swatch {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.mma-map-list__color-picker-swatch:hover {
+  border-color: rgb(255 255 255 / 40%);
+}
+
+.mma-map-list__color-picker-swatch--selected {
+  border-color: #fff;
+}
+
 .mma-map-list__footnote {
   padding: 4px 2px 0;
   color: var(--mma-ml-muted);
@@ -748,7 +779,10 @@
   display: inline-block;
   width: 14px;
   height: 14px;
+  padding: 0;
+  border: 0;
   border-radius: 4px;
+  cursor: pointer;
 }
 
 .mma-map-list-modal__message {

@@ -38,11 +38,11 @@
   ];
   const PRESET_HEADINGS = {
     ja: [
-      "🌏 アジア", "🌏 中央アジア", "🌍 ヨーロッパ", "🌍 アフリカ",
+      "🌏 アジア", "🌍 ヨーロッパ", "🌍 アフリカ",
       "🌎 北アメリカ", "🌎 中南米", "🌎 南アメリカ", "🌏 オセアニア"
     ],
     en: [
-      "🌏 Asia", "🌏 Central Asia", "🌍 Europe", "🌍 Africa",
+      "🌏 Asia", "🌍 Europe", "🌍 Africa",
       "🌎 North America", "🌎 Latin America", "🌎 South America", "🌏 Oceania"
     ]
   };
@@ -70,6 +70,7 @@
       tagsEmpty: "まだタグがありません。下の欄から作成できます。",
       tagsNewLabel: "新しいタグ名",
       tagsCreate: "＋ タグを作成",
+      tagsColorPicker: "色を選択",
       favoriteAdd: "お気に入りにマーク",
       favoriteRemove: "お気に入りのマークを外す",
       favoriteMarked: "お気に入り",
@@ -120,6 +121,7 @@
       tagsEmpty: "No tags yet. Create one in the field below.",
       tagsNewLabel: "New tag name",
       tagsCreate: "+ Create tag",
+      tagsColorPicker: "Choose a color",
       favoriteAdd: "Mark as favourite",
       favoriteRemove: "Remove favourite mark",
       favoriteMarked: "Favourite",
@@ -198,6 +200,7 @@
   let draggingSectionId = null;
   let draggingCard = null;
   let cardMenuState = null;
+  let colorPickerState = null;
   let searchInputEl = null;
   let boardEl = null;
   let searchRenderTimer = null;
@@ -941,6 +944,7 @@
     function close() {
       overlay.remove();
       document.removeEventListener("keydown", handleKeydown, true);
+      closeColorPicker();
     }
 
     overlay.addEventListener("mousedown", (event) => {
@@ -971,6 +975,77 @@
     button.textContent = label;
     button.addEventListener("click", onClick);
     return button;
+  }
+
+  function closeColorPicker() {
+    colorPickerState?.close();
+  }
+
+  /** タグの色スウォッチをクリックしたときに、その場にプリセットカラーの選択ポップアップを開く。 */
+  function openColorPicker(anchorButton, currentColor, onSelect) {
+    closeColorPicker();
+
+    const popup = document.createElement("div");
+    popup.className = "mma-map-list__color-picker";
+    popup.setAttribute("role", "menu");
+
+    function close() {
+      if (colorPickerState?.popup !== popup) {
+        return;
+      }
+      colorPickerState = null;
+      popup.remove();
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+      document.removeEventListener("keydown", handleKeydown, true);
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    }
+
+    function handlePointerDown(event) {
+      if (!popup.contains(event.target) && !anchorButton.contains(event.target)) {
+        close();
+      }
+    }
+
+    function handleKeydown(event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+        anchorButton.focus();
+      }
+    }
+
+    for (const color of TAG_PALETTE) {
+      const swatchButton = document.createElement("button");
+      swatchButton.type = "button";
+      swatchButton.className = "mma-map-list__color-picker-swatch";
+      if (color === currentColor) {
+        swatchButton.classList.add("mma-map-list__color-picker-swatch--selected");
+      }
+      swatchButton.style.background = color;
+      swatchButton.setAttribute("aria-label", color);
+      swatchButton.addEventListener("click", () => {
+        close();
+        onSelect(color);
+      });
+      popup.append(swatchButton);
+    }
+
+    document.body.append(popup);
+    const anchor = anchorButton.getBoundingClientRect();
+    const size = popup.getBoundingClientRect();
+    const left = Math.max(8, Math.min(anchor.left, window.innerWidth - size.width - 8));
+    const below = anchor.bottom + 4;
+    const top = below + size.height > window.innerHeight - 8 ? Math.max(8, anchor.top - size.height - 4) : below;
+    popup.style.left = `${left}px`;
+    popup.style.top = `${top}px`;
+
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    document.addEventListener("keydown", handleKeydown, true);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+
+    colorPickerState = { popup, close };
   }
 
   /* ---------- フォルダ追加・編集・削除 ---------- */
@@ -1348,9 +1423,23 @@
             currentTagIds.delete(tag.id);
           }
         });
-        const swatch = document.createElement("span");
+        const swatch = document.createElement("button");
+        swatch.type = "button";
         swatch.className = "mma-map-list-modal__swatch";
         swatch.style.background = tag.color;
+        swatch.title = t("tagsColorPicker");
+        swatch.setAttribute("aria-label", t("tagsColorPicker"));
+        swatch.addEventListener("click", (event) => {
+          // <label>直下のボタンなので、既定動作のままだとチェックボックスまで切り替わってしまう。
+          event.preventDefault();
+          event.stopPropagation();
+          openColorPicker(swatch, tag.color, (color) => {
+            tag.color = color;
+            persistTags();
+            renderTagList();
+            render();
+          });
+        });
         const text = document.createElement("span");
         text.textContent = tag.name;
         row.append(checkbox, swatch, text);
@@ -2306,6 +2395,7 @@
     window.clearTimeout(searchRenderTimer);
     searchRenderTimer = null;
     closeCardMenu();
+    closeColorPicker();
 
     detachFooter();
 
