@@ -854,6 +854,60 @@
     render();
   }
 
+  /* ---------- ドラッグ中のオートスクロール ---------- */
+
+  const AUTO_SCROLL_EDGE_PX = 80;
+  const AUTO_SCROLL_MAX_SPEED_PX = 18;
+
+  let autoScrollDirection = 0;
+  let autoScrollSpeed = 0;
+  let autoScrollRafId = null;
+
+  function stopAutoScroll() {
+    autoScrollDirection = 0;
+    if (autoScrollRafId !== null) {
+      window.cancelAnimationFrame(autoScrollRafId);
+      autoScrollRafId = null;
+    }
+  }
+
+  function stepAutoScroll() {
+    if (autoScrollDirection === 0) {
+      autoScrollRafId = null;
+      return;
+    }
+    window.scrollBy(0, autoScrollDirection * autoScrollSpeed);
+    autoScrollRafId = window.requestAnimationFrame(stepAutoScroll);
+  }
+
+  /** カード・フォルダのドラッグ中、画面端付近まで来たらその方向へ自動スクロールする。 */
+  function updateAutoScroll(clientY) {
+    if (!draggingCard && !draggingSectionId) {
+      stopAutoScroll();
+      return;
+    }
+
+    const viewportHeight = window.innerHeight;
+    if (clientY < AUTO_SCROLL_EDGE_PX) {
+      autoScrollDirection = -1;
+      autoScrollSpeed = AUTO_SCROLL_MAX_SPEED_PX * (1 - clientY / AUTO_SCROLL_EDGE_PX);
+    } else if (clientY > viewportHeight - AUTO_SCROLL_EDGE_PX) {
+      autoScrollDirection = 1;
+      autoScrollSpeed = AUTO_SCROLL_MAX_SPEED_PX * (1 - (viewportHeight - clientY) / AUTO_SCROLL_EDGE_PX);
+    } else {
+      stopAutoScroll();
+      return;
+    }
+
+    if (autoScrollRafId === null) {
+      autoScrollRafId = window.requestAnimationFrame(stepAutoScroll);
+    }
+  }
+
+  document.addEventListener("dragover", (event) => updateAutoScroll(event.clientY));
+  document.addEventListener("dragend", stopAutoScroll);
+  document.addEventListener("drop", stopAutoScroll);
+
   /* ---------- モーダル基盤 ---------- */
 
   function openModal(titleText) {
