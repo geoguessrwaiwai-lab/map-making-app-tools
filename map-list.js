@@ -491,6 +491,8 @@
   let colorPickerState = null;
   let searchInputEl = null;
   let boardEl = null;
+  let sectionResizeObserver = null;
+  let masonryFrameId = null;
   let searchRenderTimer = null;
 
   let regionNames = null;
@@ -2874,6 +2876,7 @@
           }
         : null;
     searchInputEl = null;
+    stopBoardMasonry();
     boardEl = null;
 
     root.replaceChildren();
@@ -2976,6 +2979,67 @@
     }
   }
 
+  /** CSSの`row-gap`を0にして行数で間隔を作るため、フォルダ間の余白はJS側から与える。 */
+  const BOARD_ROW_GAP_PX = 12;
+  const BOARD_MASONRY_CLASS = "mma-map-list__board--masonry";
+
+  /**
+   * 2カラム表示のとき、各フォルダに自分の高さぶんの行数（`grid-row-end: span N`）を持たせる。
+   * グリッドの自動配置は空いている行を上から詰めるため、これだけで背の低いカラムへ次のフォルダが
+   * 流れ込み、段ごとの高さ揃えで空いていた隙間が埋まる。
+   * 高さを測れるまではクラスを付けないので、測定前や1カラム表示では通常のグリッドのまま崩れない。
+   */
+  function updateBoardMasonry() {
+    if (!boardEl) {
+      return;
+    }
+    // 1カラム表示（800px以下）はflexで縦に積むだけなので、行数の指定は不要。
+    if (!window.matchMedia("(min-width: 801px)").matches) {
+      boardEl.classList.remove(BOARD_MASONRY_CLASS);
+      return;
+    }
+    for (const section of boardEl.children) {
+      // セクションは`align-items: start`で内容ぶんの高さのままなので、行数を与えても伸び縮みしない。
+      const height = section.getBoundingClientRect().height;
+      const rows = Math.max(1, Math.ceil(height + BOARD_ROW_GAP_PX));
+      section.style.gridRowEnd = `span ${rows}`;
+    }
+    boardEl.classList.add(BOARD_MASONRY_CLASS);
+  }
+
+  function scheduleBoardMasonry() {
+    if (masonryFrameId !== null) {
+      return;
+    }
+    masonryFrameId = window.requestAnimationFrame(() => {
+      masonryFrameId = null;
+      updateBoardMasonry();
+    });
+  }
+
+  /** 折り返しや画面幅の変化でフォルダの高さが変わったら測り直す。 */
+  function observeBoardSections() {
+    if (!boardEl) {
+      return;
+    }
+    if (!sectionResizeObserver) {
+      sectionResizeObserver = new ResizeObserver(scheduleBoardMasonry);
+    }
+    sectionResizeObserver.disconnect();
+    for (const section of boardEl.children) {
+      sectionResizeObserver.observe(section);
+    }
+  }
+
+  function stopBoardMasonry() {
+    sectionResizeObserver?.disconnect();
+    sectionResizeObserver = null;
+    if (masonryFrameId !== null) {
+      window.cancelAnimationFrame(masonryFrameId);
+      masonryFrameId = null;
+    }
+  }
+
   /** 検索やお気に入りの変更で作り直すのは一覧部分だけにして、ツールバーの入力状態を保つ。 */
   function renderBoard() {
     if (!boardEl) {
@@ -3034,6 +3098,9 @@
       unassignedSection.classList.add("mma-map-list__section--right");
       boardEl.append(unassignedSection);
     }
+
+    observeBoardSections();
+    scheduleBoardMasonry();
   }
 
   function createFootnote() {
@@ -3355,6 +3422,7 @@
     tagsData = null;
     searchQuery = "";
     searchInputEl = null;
+    stopBoardMasonry();
     boardEl = null;
     pendingNewMapHeadingId = null;
     draggingSectionId = null;

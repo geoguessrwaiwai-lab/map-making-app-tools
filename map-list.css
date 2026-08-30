@@ -241,6 +241,14 @@
     gap: 12px 16px;
   }
 
+  /* 段ごとに高さを揃えると、背の高いフォルダの隣に隙間が空く。1pxの行を敷き、各フォルダが
+     自分の高さぶんの行数を占めることで、短いカラムへ次のフォルダを詰める（Masonry配置）。
+     行数はJSが測って与えるため、測り終えるまではこのクラスを付けない（付く前は通常のグリッド）。 */
+  .mma-map-list__board--masonry {
+    grid-auto-rows: 1px;
+    row-gap: 0;
+  }
+
   .mma-map-list__section--span {
     grid-column: 1 / -1;
   }
