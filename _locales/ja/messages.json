@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Map Making App Tools",
+    "description": "Chrome ウェブストアと拡張機能管理画面に表示される拡張機能名。"
+  },
+  "extDescription": {
+    "message": "Map Making Appの画面幅調整、ロケーション整理、マップ一覧のフォルダ分けを使いやすくします。",
+    "description": "Chrome ウェブストアの概要欄に表示される説明。132文字以内に収める。"
+  }
+}
