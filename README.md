@@ -10,11 +10,8 @@
 
 それぞれの機能は拡張機能の設定画面からON/OFFできるため、気に入った機能だけを使用できます。デフォルトでは全ての機能がONになっています。
 
-## 免責
+## インストール
 
-本プロジェクトは非公式であり、Map Making Appまたはその運営者との提携、承認、関係を示すものではありません。
-
-- [案内サイト](https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/)
 - [Chrome ウェブストアからインストール](https://chromewebstore.google.com/detail/flhepjgbbcielemfkkkfimcfhgfomofj?utm_source=item-share-cb)
 
 ## 機能
@@ -82,6 +79,8 @@ Chromeで`chrome://extensions/`を開き、「デベロッパー モード」を
 開発方針・フォーマット・検証・パッケージ作成など詳しい手順は[CONTRIBUTING.md](CONTRIBUTING.md)を参照してください。
 
 ## お問い合わせ
+
+本プロジェクトは非公式であり、Map Making Appまたはその運営者との提携、承認、関係を示すものではありません。
 
 - [HP](https://app.geoguessr-waiwai.workers.dev/map-making-app-tools/)
 - [GitHub Issues](https://github.com/geoguessrwaiwai-lab/map-making-app-tools/issues)
