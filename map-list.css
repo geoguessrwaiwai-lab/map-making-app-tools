@@ -689,6 +689,22 @@
 
 .mma-map-list__footnote a {
   color: inherit;
+  text-decoration: none;
+}
+
+.mma-map-list__footnote a:hover {
+  text-decoration: underline;
+}
+
+.mma-map-list__switch-wrap {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  opacity: 0.7;
 }
 
 /* モーダル（tag-groups.jsのモーダル基盤と共通のクラス命名規則） */

@@ -130,7 +130,7 @@
       addFolder: "＋ フォルダを追加",
       switchToFolders: "フォルダビューに切り替える",
       switchToNative: "以前の表示に切り替える",
-      footnoteVersion: "拡張機能バージョン: {version}・by WaiWai　",
+      footnoteVersion: "拡張機能バージョン: {version}",
       footnotePrefix: "このUIは",
       footnoteLink: "拡張機能によって変更されています",
       footnoteSuffix: "。",
@@ -194,7 +194,7 @@
       addFolder: "+ Add folder",
       switchToFolders: "Switch to the folder view",
       switchToNative: "Switch back to the original view",
-      footnoteVersion: "Extension version: {version} · by WaiWai　",
+      footnoteVersion: "Extension version: {version}",
       footnotePrefix: "This page is ",
       footnoteLink: "modified by a browser extension",
       footnoteSuffix: ".",
@@ -2822,17 +2822,14 @@
   function createFootnote() {
     const footnote = document.createElement("p");
     footnote.className = "mma-map-list__footnote";
-    footnote.append(
-      t("footnoteVersion", { version: chrome.runtime.getManifest().version }),
-    );
-    footnote.append(t("footnotePrefix"));
     const link = document.createElement("a");
     link.href = language === "en" ? PRODUCT_URL_EN : PRODUCT_URL;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
-    link.textContent = t("footnoteLink");
+    link.textContent = t("footnoteVersion", {
+      version: chrome.runtime.getManifest().version,
+    });
     footnote.append(link);
-    footnote.append(t("footnoteSuffix"));
     return footnote;
   }
 
@@ -3018,11 +3015,19 @@
       render();
     });
 
+    // 表示切り替えボタンの手前に、拡張機能による変更である旨の説明文を平文で添える。
+    const switchWrap = document.createElement("p");
+    switchWrap.className = "mma-map-list__switch-wrap";
+    switchWrap.append(
+      t("footnotePrefix") + t("footnoteLink") + t("footnoteSuffix"),
+    );
+    switchWrap.append(switchButton);
+
     // 2段目は1段目と同じ3分割にして、注記を左端、表示切り替えを中央に置く。
     const noteRow = document.createElement("div");
     noteRow.className =
       "mma-map-list__footer-row mma-map-list__footer-row--note";
-    noteRow.append(createFootnote(), switchButton, createLanguageSwitch());
+    noteRow.append(createFootnote(), switchWrap, createLanguageSwitch());
 
     footerEl = document.createElement("footer");
     footerEl.className = "mma-map-list__footer";
