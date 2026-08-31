@@ -839,16 +839,9 @@
         return false;
       }
 
-      headingsData = defaultHeadingsData();
-      favorites = {};
-      countries = {};
-      tagsData = defaultTagsData();
-      viewMode = "custom";
-      openInNewTab = true;
-      showLocationCount = true;
-      showCountry = true;
-      language = defaultLanguage();
-      return true;
+      // ストレージ読み込みが失敗しても、既存のフォルダ分け等を空データで
+      // 上書き保存してしまわないよう、失敗として扱い今回の更新は中断する。
+      return false;
     }
   }
 
