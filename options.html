@@ -198,6 +198,41 @@
         </div>
       </section>
 
+      <section aria-labelledby="backup-title">
+        <h2 id="backup-title" data-i18n="backupTitle">設定のバックアップ</h2>
+        <p class="section-description" data-i18n="backupDescription">
+          フォルダ分け・お気に入り・タグなど、この拡張機能のすべての設定をファイルに書き出したり、書き出したファイルから復元したりできます。
+        </p>
+        <div class="backup-actions">
+          <button
+            id="export-settings"
+            type="button"
+            class="secondary-button"
+            data-i18n="exportButton"
+          >
+            設定をエクスポート
+          </button>
+          <button
+            id="import-settings"
+            type="button"
+            class="secondary-button"
+            data-i18n="importButton"
+          >
+            設定をインポート
+          </button>
+          <input
+            id="import-settings-file"
+            type="file"
+            accept="application/json"
+            hidden
+          />
+        </div>
+        <p class="note" data-i18n="importNote">
+          インポートすると、現在保存されているすべての設定がファイルの内容で上書きされます。開いているMap
+          Making Appのタブには、再読み込みするまで反映されない場合があります。
+        </p>
+      </section>
+
       <p id="status" class="status" role="status" aria-live="polite"></p>
       <a
         id="help-link"
@@ -233,6 +268,31 @@
           data-i18n="deleteAllConfirm"
         >
           すべて削除
+        </button>
+      </div>
+    </dialog>
+    <dialog
+      id="import-confirm-dialog"
+      class="confirm-dialog"
+      aria-labelledby="import-confirm-title"
+    >
+      <h2 id="import-confirm-title" data-i18n="importConfirmTitle">
+        設定をインポートしますか？
+      </h2>
+      <p data-i18n="importConfirmMessage">
+        現在保存されているすべての設定が、選択したファイルの内容で上書きされます。この操作は取り消せません。
+      </p>
+      <div class="dialog-actions">
+        <button id="import-confirm-cancel" type="button" data-i18n="cancel">
+          キャンセル
+        </button>
+        <button
+          id="import-confirm-confirm"
+          class="danger-button"
+          type="button"
+          data-i18n="importConfirmConfirm"
+        >
+          インポートする
         </button>
       </div>
     </dialog>

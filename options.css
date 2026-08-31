@@ -296,6 +296,28 @@ small {
   cursor: not-allowed;
 }
 
+.backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.secondary-button {
+  padding: 8px 12px;
+  border: 1px solid #d7dee8;
+  border-radius: 9px;
+  color: #172033;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.secondary-button:hover {
+  border-color: #94a3b8;
+}
+
 .confirm-dialog {
   width: min(440px, calc(100% - 32px));
   padding: 24px;

@@ -111,6 +111,22 @@
       loadUrlFailed: "URL別設定を読み込めませんでした。",
       deletedAll: "URLごとの設定をすべて削除しました。",
       deleteAllFailed: "URLごとの設定を削除できませんでした。",
+      backupTitle: "設定のバックアップ",
+      backupDescription:
+        "フォルダ分け・お気に入り・タグなど、この拡張機能のすべての設定をファイルに書き出したり、書き出したファイルから復元したりできます。",
+      exportButton: "設定をエクスポート",
+      importButton: "設定をインポート",
+      importNote:
+        "インポートすると、現在保存されているすべての設定がファイルの内容で上書きされます。開いているMap Making Appのタブには、再読み込みするまで反映されない場合があります。",
+      importConfirmTitle: "設定をインポートしますか？",
+      importConfirmMessage:
+        "現在保存されているすべての設定が、選択したファイルの内容で上書きされます。この操作は取り消せません。",
+      importConfirmConfirm: "インポートする",
+      exportDone: "設定をファイルに書き出しました。",
+      exportFailed: "設定を書き出せませんでした。",
+      importInvalidFile: "このファイルは読み込めませんでした。",
+      importDone: "設定をインポートしました。",
+      importFailed: "設定をインポートできませんでした。",
     },
     en: {
       documentTitle: "Map Making App Tools settings",
@@ -177,6 +193,22 @@
       loadUrlFailed: "Could not load the per-URL settings.",
       deletedAll: "Deleted every per-URL setting.",
       deleteAllFailed: "Could not delete the per-URL settings.",
+      backupTitle: "Backup settings",
+      backupDescription:
+        "Export every setting for this extension — folders, favourites, tags and more — to a file, or restore them from a file you exported earlier.",
+      exportButton: "Export settings",
+      importButton: "Import settings",
+      importNote:
+        "Importing overwrites every setting currently saved with the contents of the file. An open Map Making App tab may need a reload to pick up the change.",
+      importConfirmTitle: "Import these settings?",
+      importConfirmMessage:
+        "Every setting currently saved will be overwritten with the contents of the selected file. This cannot be undone.",
+      importConfirmConfirm: "Import",
+      exportDone: "Exported the settings to a file.",
+      exportFailed: "Could not export the settings.",
+      importInvalidFile: "Could not read this file.",
+      importDone: "Imported the settings.",
+      importFailed: "Could not import the settings.",
     },
   };
   let language = "en";
@@ -238,8 +270,17 @@
   const deleteAllDialog = document.querySelector("#delete-all-dialog");
   const deleteAllCancel = document.querySelector("#delete-all-cancel");
   const deleteAllConfirm = document.querySelector("#delete-all-confirm");
+  const exportButton = document.querySelector("#export-settings");
+  const importButton = document.querySelector("#import-settings");
+  const importFileInput = document.querySelector("#import-settings-file");
+  const importConfirmDialog = document.querySelector("#import-confirm-dialog");
+  const importConfirmCancel = document.querySelector("#import-confirm-cancel");
+  const importConfirmConfirm = document.querySelector(
+    "#import-confirm-confirm"
+  );
   let statusTimer = null;
   let urlSettings = [];
+  let pendingImportData = null;
 
   function showStatus(message, isError = false) {
     window.clearTimeout(statusTimer);
@@ -362,6 +403,98 @@
     }
   }
 
+  const EXPORT_SCHEMA = "map-making-app-tools-settings";
+  const EXPORT_SCHEMA_VERSION = 1;
+
+  function formatDateForFilename(date) {
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}`;
+  }
+
+  async function exportSettings() {
+    try {
+      const data = await chrome.storage.local.get(null);
+      const payload = {
+        schema: EXPORT_SCHEMA,
+        schemaVersion: EXPORT_SCHEMA_VERSION,
+        extensionVersion: chrome.runtime.getManifest().version,
+        exportedAt: new Date().toISOString(),
+        data,
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `map-making-app-tools-settings-${formatDateForFilename(new Date())}.json`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showStatus(t("exportDone"));
+    } catch {
+      showStatus(t("exportFailed"), true);
+    }
+  }
+
+  function readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ""));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsText(file);
+    });
+  }
+
+  function isPlainObject(value) {
+    return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+  }
+
+  async function handleImportFileSelected() {
+    const file = importFileInput.files?.[0];
+    importFileInput.value = "";
+    if (!file) {
+      return;
+    }
+
+    try {
+      const text = await readFileAsText(file);
+      const parsed = JSON.parse(text);
+      if (!isPlainObject(parsed) || !isPlainObject(parsed.data)) {
+        throw new Error("invalid settings file shape");
+      }
+      pendingImportData = parsed.data;
+      importConfirmDialog.showModal();
+    } catch {
+      pendingImportData = null;
+      showStatus(t("importInvalidFile"), true);
+    }
+  }
+
+  async function confirmImport() {
+    if (!pendingImportData) {
+      importConfirmDialog.close();
+      return;
+    }
+
+    importConfirmConfirm.disabled = true;
+    try {
+      await chrome.storage.local.clear();
+      await chrome.storage.local.set(pendingImportData);
+      importConfirmDialog.close();
+      showStatus(t("importDone"));
+      await restoreLanguage();
+      await restoreSettings();
+      await restoreUrlSettings();
+    } catch {
+      showStatus(t("importFailed"), true);
+    } finally {
+      importConfirmConfirm.disabled = false;
+      pendingImportData = null;
+    }
+  }
+
   for (const { key, input } of Object.values(SETTINGS)) {
     input.addEventListener("change", async () => {
       try {
@@ -372,6 +505,21 @@
       }
     });
   }
+
+  exportButton.addEventListener("click", exportSettings);
+  importButton.addEventListener("click", () => importFileInput.click());
+  importFileInput.addEventListener("change", handleImportFileSelected);
+  importConfirmCancel.addEventListener("click", () => {
+    pendingImportData = null;
+    importConfirmDialog.close();
+  });
+  importConfirmDialog.addEventListener("click", (event) => {
+    if (event.target === importConfirmDialog) {
+      pendingImportData = null;
+      importConfirmDialog.close();
+    }
+  });
+  importConfirmConfirm.addEventListener("click", confirmImport);
 
   urlSettingsSearch.addEventListener("input", renderUrlSettings);
   deleteAllButton.addEventListener("click", () => {
