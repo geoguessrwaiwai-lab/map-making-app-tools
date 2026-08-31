@@ -1,6 +1,6 @@
 # Chrome Web Store 掲載情報
 
-Map Making App Tools `1.4.0` のChrome Web Store提出用情報です。
+Map Making App Tools `1.4.1` のChrome Web Store提出用情報です。
 
 ホームページはCloudflare Workersで公開しています。
 
@@ -17,7 +17,7 @@ Map Making App Toolsは、Map Making Appのマップ編集画面の幅調整、�
 
 「ぽちぽちモード」をONにすると、現在のマップの保存状態を汚すことなく、新しい地点を連続して選択し、閲覧できます。もとから保存されている地点は保護されるため、既存のロケーションを残したまま、新しく確認した候補を続けて整理できます。
 
-トップページのマップ一覧には「フォルダビュー」を追加しました。ネイティブの一覧の見た目・機能を変えずに視覚的に隠し、フォルダでグループ化したカード表示を重ねます。フォルダの追加・並び替え、マップのお気に入り・国チップ・タグ付けができ、編集・削除やマップ作成はMap Making App本体の操作に委譲します。表示言語（日本語／英語）や、マップカードのロケーション数・国チップアイコンの表示は設定で切り替えられます。フッターからいつでもネイティブの表示へ戻せます。
+トップページのマップ一覧には「フォルダビュー」を追加しました。ネイティブの一覧の見た目・機能を変えずに視覚的に隠し、フォルダでグループ化したカード表示を重ねます。フォルダの追加・並び替え、マップのお気に入り・国チップ・タグ付けができ、編集・削除やマップ作成はMap Making App本体の操作に委譲します。表示言語（日本語／英語）や、マップカードのロケーション数・国チップアイコンの表示は設定で切り替えられます。フッターからいつでもネイティブの表示へ戻せます。設定画面からは、すべての設定をJSONファイルへエクスポート・インポートしてバックアップできます。
 
 外部通信、広告、分析ツール、Cookie、外部JavaScriptは使用しません。拡張機能専用ストレージには、機能別設定、ぽちぽちモードの全体デフォルト、対象のマップURLとURL別のON／OFF、フォルダビューのフォルダ構成・フォルダとマップの並び順・お気に入り・国チップ・タグ・表示言語・表示設定だけを保存します。地点ID、pano ID、座標はページ内で一時的に処理し、保存または外部送信しません。
 
@@ -33,7 +33,7 @@ Drag the handle in the center of the editor to adjust the widths of the map and 
 
 Turn on Pochi-pochi mode to continuously select and view new locations without cluttering the current map's saved state. Locations that were already saved remain protected, so you can continue reviewing and organizing new candidates while keeping existing locations intact.
 
-The map list on the home page now has a folder view. It visually hides the native list without changing its behavior, and overlays a card layout grouped by user-defined folders. You can add and reorder folders, favorite maps, and assign a country chip and tags to each map, while editing, deleting, and creating maps still delegate to Map Making App's own controls. Settings let you switch the display language (Japanese or English) and choose whether map cards show location counts and country chip icons. You can return to the native list from the footer at any time.
+The map list on the home page now has a folder view. It visually hides the native list without changing its behavior, and overlays a card layout grouped by user-defined folders. You can add and reorder folders, favorite maps, and assign a country chip and tags to each map, while editing, deleting, and creating maps still delegate to Map Making App's own controls. Settings let you switch the display language (Japanese or English) and choose whether map cards show location counts and country chip icons. You can return to the native list from the footer at any time. The settings screen also lets you export or import all of your settings as a JSON file for backup.
 
 The extension does not use external network requests, advertising, analytics tools, cookies, or remote JavaScript. Extension-local storage contains only feature settings, the global Pochi-pochi mode default, the target map URL, the URL-specific ON/OFF setting, and the folder view's folders, the order of folders and maps, favorites, country chips, tags, display language, and display preferences. Location IDs, pano IDs, and coordinates are processed temporarily within the page and are neither stored nor transmitted externally.
 
@@ -164,7 +164,7 @@ Adjust the editor screen width, streamline location cleanup, and group your map 
 ## 提出ファイル
 
 ```text
-dist/map-making-app-tools-1.4.0.zip
+dist/map-making-app-tools-1.4.1.zip
 ```
 
 ZIPには拡張機能の実行に必要なファイルだけが含まれ、ホームページやストア画像は含まれません。
@@ -174,7 +174,7 @@ ZIPには拡張機能の実行に必要なファイルだけが含まれ、ホ�
 - 公開範囲: `一般公開`
 - 地域: `すべての地域`
 - 価格: `無料`
-- テスト手順: インストール後、`https://map-making.app/maps/数字`形式の編集ページを画面幅801px以上で開き、中央のハンドルを左右へドラッグする。画面右上の「ぽちぽちモード」をONにして新しいロケーションを選び、次にマップをクリックすると、直前の新しいロケーションがMap Making AppのDeleteボタンで削除される。モード開始前から保存されているロケーションと、マップをドラッグした場合のロケーションは削除されない。`https://map-making.app/`のトップページを開くと、マップ一覧がフォルダごとのカード表示になり、フォルダの追加・名称変更・削除、フォルダとマップのドラッグ並び替え、カードの「⋯」メニューからの編集・お気に入り・削除ができる。フッターのボタンでいつでもネイティブの一覧表示へ戻せる。`chrome://extensions/`で本拡張機能の「詳細」から「拡張機能のオプション」を開くと、各機能のON／OFF、ぽちぽちモードのデフォルト、表示言語、フォルダビューの表示設定を変更できる
+- テスト手順: インストール後、`https://map-making.app/maps/数字`形式の編集ページを画面幅801px以上で開き、中央のハンドルを左右へドラッグする。画面右上の「ぽちぽちモード」をONにして新しいロケーションを選び、次にマップをクリックすると、直前の新しいロケーションがMap Making AppのDeleteボタンで削除される。モード開始前から保存されているロケーションと、マップをドラッグした場合のロケーションは削除されない。`https://map-making.app/`のトップページを開くと、マップ一覧がフォルダごとのカード表示になり、フォルダの追加・名称変更・削除、フォルダとマップのドラッグ並び替え、カードの「⋯」メニューからの編集・お気に入り・削除ができる。フッターのボタンでいつでもネイティブの一覧表示へ戻せる。`chrome://extensions/`で本拡張機能の「詳細」から「拡張機能のオプション」を開くと、各機能のON／OFF、ぽちぽちモードのデフォルト、表示言語、フォルダビューの表示設定を変更できる。同じ画面の「設定のバックアップ」から、設定をJSONファイルへエクスポートし、そのファイルをインポートして復元できる
 
 ## 公式ガイド
 

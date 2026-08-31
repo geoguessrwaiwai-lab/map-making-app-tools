@@ -2,6 +2,16 @@
 
 このプロジェクトの主な変更はこのファイルに記録します。バージョン番号は`manifest.json`に合わせます。
 
+## [1.4.1] - 2026-08-31
+
+### Added
+
+- 拡張機能のオプション画面に「設定のバックアップ」を追加。フォルダ分け・お気に入り・タグなど、保存されているすべての設定をJSONファイルへエクスポートしたり、書き出したファイルからインポートして復元したりできる
+
+### Fixed
+
+- `chrome.storage.local`の読み込みに失敗した際、フォルダ分けやお気に入りなどの既存データを空データで上書き保存してしまい、消失させる不具合を修正
+
 ## [1.4.0] - 2026-08-30
 
 ### Added
@@ -65,7 +75,8 @@
 
 - 案内サイトを共通の`browser-extensions-site`リポジトリへ移行
 
-[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.1.0...v1.2.0

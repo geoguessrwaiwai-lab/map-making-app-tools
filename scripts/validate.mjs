@@ -79,8 +79,8 @@ assert(
   "manifest version must use MAJOR.MINOR.PATCH"
 );
 assert(
-  manifest.version === "1.4.0",
-  "the release package must remain version 1.4.0"
+  manifest.version === "1.4.1",
+  "the release package must remain version 1.4.1"
 );
 assert(
   manifest.default_locale === "ja",
