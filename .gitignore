@@ -1,5 +1,6 @@
 /dist/
 /node_modules/
+/.backup/
 .DS_Store
 /.vscode/*
 !/.vscode/settings.json
