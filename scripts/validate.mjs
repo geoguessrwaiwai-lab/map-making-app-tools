@@ -309,45 +309,16 @@ assert(
   "date and actions must stack into separate rows in narrow work areas"
 );
 assert(
-  resizeSource.includes("const MAP_IMPORT_BREAKPOINT_PX = 500"),
-  "map import visibility must use the 500px breakpoint"
-);
-assert(
-  resizeSource.includes("width < MAP_IMPORT_BREAKPOINT_PX"),
-  "map import must only be hidden below the breakpoint"
-);
-assert(
-  /\.page-map-editor\.mma-narrow-map\s+\.map-meta__import\s*\{[^}]*display:\s*none/s.test(
+  /\.page-map-editor\s+\.map-meta\s*,[^{]*\.map-meta__actions\s*,[^{]*\.map-meta__import\s*\{[^}]*flex-wrap:\s*nowrap/s.test(
     resizeStyles
   ),
-  "map import must be hidden while the map is narrow"
+  "the map metadata bar must never wrap its buttons/text onto new lines"
 );
 assert(
-  resizeSource.includes("const MAP_TOTAL_BREAKPOINT_PX = 300"),
-  "map total visibility must use the 300px breakpoint"
-);
-assert(
-  resizeSource.includes("width < MAP_TOTAL_BREAKPOINT_PX"),
-  "map total must only be hidden below the breakpoint"
-);
-assert(
-  /\.page-map-editor\.mma-compact-map\s+\.map-meta__total\s*\{[^}]*display:\s*none/s.test(
+  /\.page-map-editor\s+\.map-meta\s*\{[^}]*overflow-x:\s*auto/s.test(
     resizeStyles
   ),
-  "map total must be hidden while the map is compact"
-);
-assert(
-  resizeSource.includes('const MAP_COUNT_SELECTOR = ".map-meta__count"'),
-  "map count must be detected using the supplied selector"
-);
-assert(
-  resizeSource.includes("const MAP_COUNT_BREAKPOINT_OFFSET_PX = 60"),
-  "map count must increase responsive breakpoints by 60px"
-);
-assert(
-  resizeSource.includes("MAP_IMPORT_BREAKPOINT_PX + breakpointOffset") &&
-    resizeSource.includes("MAP_TOTAL_BREAKPOINT_PX + breakpointOffset"),
-  "map count breakpoint offset must apply to both map metadata controls"
+  "the map metadata bar must scroll horizontally instead of wrapping"
 );
 
 const forbiddenPatterns = [

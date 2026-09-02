@@ -10,16 +10,29 @@
     max-width: 100%;
   }
 
-  html.mma-resize-feature-enabled
-    .page-map-editor.mma-narrow-map
-    .map-meta__import {
-    display: none;
+  html.mma-resize-feature-enabled .page-map-editor .map-meta,
+  html.mma-resize-feature-enabled .page-map-editor .map-meta__actions,
+  html.mma-resize-feature-enabled .page-map-editor .map-meta__import {
+    flex-wrap: nowrap;
+  }
+
+  html.mma-resize-feature-enabled .page-map-editor .map-meta {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
   html.mma-resize-feature-enabled
-    .page-map-editor.mma-compact-map
-    .map-meta__total {
+    .page-map-editor
+    .map-meta::-webkit-scrollbar {
     display: none;
+  }
+
+  html.mma-resize-feature-enabled .page-map-editor .map-meta > *,
+  html.mma-resize-feature-enabled .page-map-editor .map-meta__actions > *,
+  html.mma-resize-feature-enabled .page-map-editor .map-meta__import > * {
+    flex-shrink: 0;
   }
 
   html.mma-resize-feature-enabled .page-map-editor > .mma-resizable-work-area {
