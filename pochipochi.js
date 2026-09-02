@@ -461,6 +461,8 @@
 
     if (initializationAttempts >= INITIALIZATION_MAX_ATTEMPTS) {
       cancelStoredInitialization();
+      control?.removeAttribute("data-initializing");
+      showInitializationError();
       return;
     }
 
