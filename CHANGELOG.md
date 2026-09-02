@@ -2,6 +2,18 @@
 
 このプロジェクトの主な変更はこのファイルに記録します。バージョン番号は`manifest.json`に合わせます。
 
+## [1.4.2] - 2026-09-02
+
+### Fixed
+
+- ぽちぽちモードON中にJSONインポートで地点が追加された場合、その地点をクリックして閉じると誤って削除されてしまう不具合を修正
+- ぽちぽちモードの自動ON復元に失敗し続けた場合、画面右上のトグルが表示されないまま固定されてしまう不具合を修正
+- ホーム画面でマップを削除した際、リロードするまでフォルダビューにそのマップが残り続けてしまう不具合を修正
+
+### Changed
+
+- マップ編集画面上部の地点数・保存・Undo/Redo・インポート/エクスポートのバーが、画面幅が狭いときに折り返してしまう問題を解消。折り返さず横一列を保ち、収まらない分は横スクロール（スクロールバーは非表示）で見られるようにした。これに伴い、地図の実幅に応じてインポート操作や合計表示を段階的に非表示にしていた従来のレスポンシブ表示を廃止した
+
 ## [1.4.1] - 2026-08-31
 
 ### Added
@@ -75,7 +87,8 @@
 
 - 案内サイトを共通の`browser-extensions-site`リポジトリへ移行
 
-[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.2...HEAD
+[1.4.2]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.2.0...v1.3.0
