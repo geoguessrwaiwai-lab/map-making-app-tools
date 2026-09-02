@@ -970,6 +970,18 @@
         existing.geoLink = domMap.geoLink;
       }
     }
+
+    // JSONブロックはページ読み込み時点の静的なスナップショットのため、
+    // その後に削除されたマップのIDが残り続けてしまう。ネイティブDOMは
+    // 削除を即座に反映するので、そちらに存在しないIDは除去する。
+    if (merged !== fromDom && fromDom.size > 0) {
+      for (const id of merged.keys()) {
+        if (!fromDom.has(id)) {
+          merged.delete(id);
+        }
+      }
+    }
+
     return merged;
   }
 
