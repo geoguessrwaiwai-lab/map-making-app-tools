@@ -33,6 +33,7 @@
   let pochiFeatureEnabled = false;
   let initializationRetryTimer = null;
   let initializationAttempts = 0;
+  let knownLocationCount = 0;
   const previouslySelectedKeys = new Set();
 
   /** Map Making Appが公開しているエディターをMAIN worldから取得する。 */
@@ -168,9 +169,47 @@
         }
       }
 
+      knownLocationCount = locations.length;
       return true;
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * JSONインポートなどでモード中に地点がまとめて追加された場合、
+   * 直前のスナップショットのまま残っていた未保護分を保護し直す。
+   * ぽちぽち操作自身が作る新規地点は1件ずつしか増えないため、
+   * 一度に2件以上増えた場合だけをインポート等による一括追加とみなす。
+   */
+  function reprotectOnBulkLocationChange() {
+    const mapEditor = getMapEditor();
+    if (
+      typeof mapEditor?.getLocationBounds !== "function" ||
+      typeof mapEditor?.getLocationsInBBox !== "function"
+    ) {
+      return;
+    }
+
+    try {
+      const bounds = mapEditor.getLocationBounds();
+      const locations = bounds ? mapEditor.getLocationsInBBox(bounds) : [];
+      if (!Array.isArray(locations)) {
+        return;
+      }
+
+      if (locations.length - knownLocationCount > 1) {
+        for (const location of locations) {
+          const keys = getLocationKeys(location);
+          if (keys.length > 0) {
+            protectLocation({ keys });
+          }
+        }
+      }
+
+      knownLocationCount = locations.length;
+    } catch {
+      // 取得に失敗した場合は何もしない。次回の検査で再試行される。
     }
   }
 
@@ -189,6 +228,11 @@
   /** Street Viewの置換後に、次に削除するロケーションかどうかを更新する。 */
   function inspectLocation() {
     inspectionQueued = false;
+
+    if (modeEnabled) {
+      reprotectOnBulkLocationChange();
+    }
+
     const nextLocation = getCurrentLocation();
 
     if (!nextLocation) {
