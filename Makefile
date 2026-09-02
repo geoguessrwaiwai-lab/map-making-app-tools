@@ -22,6 +22,7 @@ unpacked: validate
 		mkdir -p "$(UNPACKED_DIR)/$$(dirname $$locale)"; \
 		cp "$$locale" "$(UNPACKED_DIR)/$$locale"; \
 	done
+	@node scripts/prefix-unpacked-name.mjs "$(UNPACKED_DIR)"
 	@echo "Created: $(UNPACKED_DIR)"
 
 # プロジェクト構造、JavaScript、Manifest、プライバシー上の不変条件、フォーマットを検証する。
