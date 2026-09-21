@@ -2,6 +2,16 @@
 
 このプロジェクトの主な変更はこのファイルに記録します。バージョン番号は`manifest.json`に合わせます。
 
+## [1.4.3] - 2026-09-21
+
+### Fixed
+
+- ホーム画面を複数のタブで開いていると、片方のタブで行ったマップ作成・フォルダ分け・タグなどの変更が、もう片方のタブの古い内容で上書きされて消えてしまう不具合を修正。他のタブでの保存を開いているタブへ即座に取り込むようにし、そのタブの一覧にまだ現れていないマップも消さないようにした
+
+### Changed
+
+- ホーム画面で作成先フォルダを選んで新しいマップを作ったとき、そのフォルダの一番上ではなく一番下へ追加するようにした
+
 ## [1.4.2] - 2026-09-02
 
 ### Fixed
@@ -87,7 +97,8 @@
 
 - 案内サイトを共通の`browser-extensions-site`リポジトリへ移行
 
-[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.2...HEAD
+[Unreleased]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.3...HEAD
+[1.4.3]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/geoguessrwaiwai-lab/map-making-app-tools/compare/v1.3.0...v1.4.0
