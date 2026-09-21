@@ -74,6 +74,8 @@ MAIN worldとISOLATED worldに分かれているのは、Map Making App本体の
 - マップ名のリンクは既定で別タブ（`NEW_TAB_KEY`）を開く。オプションでOFFにすると同じタブになる
 - マップカードのロケーション数（`SHOW_LOCATION_COUNT_KEY`）と国チップアイコン（`SHOW_COUNTRY_KEY`）は、オプションで表示・非表示を切り替えられる（いずれも既定は表示）
 - フォルダ・並び順・お気に入り・国・タグは、マップURLに紐づかないアカウント単位の設定として保存する
+- 同じデータを複数タブで開くため、`chrome.storage.onChanged`で他タブの保存を即座に取り込む（`applyExternalDataChanges`）。取り込まないまま保存すると古い内容で相手の変更を消してしまう。自分の書き込みは`lastPersistedJson`で見分け、再描画しない
+- 他タブで追加されたばかりでこのタブのネイティブ一覧にまだ現れていないマップIDは`externallyAddedMapIds`で保護し、`reconcileMapIds`の「一覧に無いIDを消す」処理の対象外にする
 - 文言は`t("key")`/`data-i18n`で参照し、`MESSAGES`に日本語（`ja`）・英語（`en`）の両方を必ず定義する（`scripts/validate.mjs`が検証する）
 
 ## 実装と文言

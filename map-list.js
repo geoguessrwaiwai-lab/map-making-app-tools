@@ -485,6 +485,12 @@
   let viewMode = "custom";
   let searchQuery = "";
   let pendingNewMapHeadingId = null;
+  // 自分が最後に保存した内容（キーごとのJSON）。storage.onChangedの通知が
+  // 自分由来か他タブ由来かを見分けるために使う。
+  const lastPersistedJson = Object.create(null);
+  // 他タブで追加されたばかりで、このタブのネイティブ一覧にはまだ現れていないマップID。
+  // 一覧に無いからといって消すと、他タブの変更を巻き戻してしまうため保護する。
+  const externallyAddedMapIds = new Set();
   let draggingSectionId = null;
   let draggingCard = null;
   let cardMenuState = null;
@@ -702,10 +708,18 @@
 
   /* ---------- 保存・読み込み ---------- */
 
+  function serializeForCompare(value) {
+    return value === undefined ? "null" : JSON.stringify(value);
+  }
+
   function persistKey(key, value) {
     if (contextInvalidated) {
       return;
     }
+
+    // 自分が書き込んだ内容はstorage.onChangedでも通知されるため、
+    // 他タブ由来の変更と区別できるよう控えておく。
+    lastPersistedJson[key] = serializeForCompare(value);
 
     try {
       chrome.storage.local.set({ [key]: value }).catch((error) => {
@@ -748,6 +762,55 @@
     return { tags: [], mapTagIds: {} };
   }
 
+  function normalizeHeadingsData(stored) {
+    return stored &&
+      Array.isArray(stored.headings) &&
+      Array.isArray(stored.unassignedOrder)
+      ? {
+          initialized: stored.initialized === true,
+          headings: stored.headings
+            .filter(
+              (h) =>
+                h && typeof h.id === "string" && typeof h.label === "string"
+            )
+            .map((h) => ({
+              id: h.id,
+              label: h.label,
+              mapIds: Array.isArray(h.mapIds) ? h.mapIds.map(String) : [],
+            })),
+          unassignedOrder: stored.unassignedOrder.map(String),
+        }
+      : defaultHeadingsData();
+  }
+
+  function normalizeIdMapData(stored) {
+    return stored && typeof stored === "object" ? { ...stored } : {};
+  }
+
+  function normalizeTagsData(stored) {
+    return stored && Array.isArray(stored.tags) && stored.mapTagIds
+      ? {
+          tags: stored.tags
+            .filter(
+              (t) => t && typeof t.id === "string" && typeof t.name === "string"
+            )
+            .map((t) => ({
+              id: t.id,
+              name: t.name,
+              color: typeof t.color === "string" ? t.color : TAG_PALETTE[0],
+            })),
+          mapTagIds: Object.fromEntries(
+            Object.entries(stored.mapTagIds).map(([id, tagIds]) => [
+              id,
+              Array.isArray(tagIds)
+                ? tagIds.filter((tagId) => typeof tagId === "string")
+                : [],
+            ])
+          ),
+        }
+      : defaultTagsData();
+  }
+
   async function loadAllData() {
     try {
       const stored = await chrome.storage.local.get([
@@ -763,63 +826,10 @@
         PENDING_HEADING_KEY,
       ]);
 
-      const headings = stored[HEADINGS_KEY];
-      headingsData =
-        headings &&
-        Array.isArray(headings.headings) &&
-        Array.isArray(headings.unassignedOrder)
-          ? {
-              initialized: headings.initialized === true,
-              headings: headings.headings
-                .filter(
-                  (h) =>
-                    h && typeof h.id === "string" && typeof h.label === "string"
-                )
-                .map((h) => ({
-                  id: h.id,
-                  label: h.label,
-                  mapIds: Array.isArray(h.mapIds) ? h.mapIds.map(String) : [],
-                })),
-              unassignedOrder: headings.unassignedOrder.map(String),
-            }
-          : defaultHeadingsData();
-
-      const storedFavorites = stored[FAVORITES_KEY];
-      favorites =
-        storedFavorites && typeof storedFavorites === "object"
-          ? { ...storedFavorites }
-          : {};
-
-      const storedCountries = stored[COUNTRIES_KEY];
-      countries =
-        storedCountries && typeof storedCountries === "object"
-          ? { ...storedCountries }
-          : {};
-
-      const storedTags = stored[TAGS_KEY];
-      tagsData =
-        storedTags && Array.isArray(storedTags.tags) && storedTags.mapTagIds
-          ? {
-              tags: storedTags.tags
-                .filter(
-                  (t) =>
-                    t && typeof t.id === "string" && typeof t.name === "string"
-                )
-                .map((t) => ({
-                  id: t.id,
-                  name: t.name,
-                  color: typeof t.color === "string" ? t.color : TAG_PALETTE[0],
-                })),
-              mapTagIds: Object.fromEntries(
-                Object.entries(storedTags.mapTagIds).map(([id, tagIds]) => [
-                  id,
-                  Array.isArray(tagIds)
-                    ? tagIds.filter((tagId) => typeof tagId === "string")
-                    : [],
-                ])
-              ),
-            }
-          : defaultTagsData();
+      headingsData = normalizeHeadingsData(stored[HEADINGS_KEY]);
+      favorites = normalizeIdMapData(stored[FAVORITES_KEY]);
+      countries = normalizeIdMapData(stored[COUNTRIES_KEY]);
+      tagsData = normalizeTagsData(stored[TAGS_KEY]);
 
       viewMode = stored[VIEW_MODE_KEY] === "native" ? "native" : "custom";
       openInNewTab = stored[NEW_TAB_KEY] !== false;
@@ -1364,10 +1374,18 @@
     let changed = seedHeadingsIfNeeded();
     const currentIds = new Set(mapsById.keys());
     const placedIds = new Set();
+    // このタブの一覧に現れたIDは、もう保護しなくてよい。
+    for (const id of externallyAddedMapIds) {
+      if (currentIds.has(id)) {
+        externallyAddedMapIds.delete(id);
+      }
+    }
+    const isKnownId = (id) =>
+      currentIds.has(id) || externallyAddedMapIds.has(id);
 
     for (const heading of headingsData.headings) {
       const before = heading.mapIds.length;
-      heading.mapIds = heading.mapIds.filter((id) => currentIds.has(id));
+      heading.mapIds = heading.mapIds.filter(isKnownId);
       if (heading.mapIds.length !== before) {
         changed = true;
       }
@@ -1377,9 +1395,8 @@
     }
 
     const beforeUnassigned = headingsData.unassignedOrder.length;
-    headingsData.unassignedOrder = headingsData.unassignedOrder.filter((id) =>
-      currentIds.has(id)
-    );
+    headingsData.unassignedOrder =
+      headingsData.unassignedOrder.filter(isKnownId);
     if (headingsData.unassignedOrder.length !== beforeUnassigned) {
       changed = true;
     }
@@ -1397,7 +1414,8 @@
           )
         : null;
       if (targetHeading) {
-        targetHeading.mapIds.unshift(...newIds);
+        // 未分類と同じく、新しいマップはフォルダの末尾へ追加する。
+        targetHeading.mapIds.push(...newIds);
       } else {
         headingsData.unassignedOrder.push(...newIds);
       }
@@ -1408,19 +1426,19 @@
     }
 
     for (const id of Object.keys(favorites)) {
-      if (!currentIds.has(id)) {
+      if (!isKnownId(id)) {
         delete favorites[id];
         changed = true;
       }
     }
     for (const id of Object.keys(countries)) {
-      if (!currentIds.has(id)) {
+      if (!isKnownId(id)) {
         delete countries[id];
         changed = true;
       }
     }
     for (const id of Object.keys(tagsData.mapTagIds)) {
-      if (!currentIds.has(id)) {
+      if (!isKnownId(id)) {
         delete tagsData.mapTagIds[id];
         changed = true;
       }
@@ -3432,6 +3450,93 @@
     pendingNewMapHeadingId = null;
     draggingSectionId = null;
     draggingCard = null;
+    externallyAddedMapIds.clear();
+  }
+
+  /**
+   * 他タブで保存された変更を、開いたままのページへ取り込む。
+   * 取り込まないまま保存すると、こちらの古い内容で相手の変更を消してしまう。
+   */
+  function isOwnStorageChange(key, change) {
+    return (
+      lastPersistedJson[key] !== undefined &&
+      lastPersistedJson[key] === serializeForCompare(change.newValue)
+    );
+  }
+
+  function applyExternalDataChanges(changes) {
+    // 取り付け前・取り外し後は次回のloadAllDataで最新を読み直すため、何もしない。
+    if (!headingsData) {
+      return;
+    }
+
+    let changed = false;
+
+    if (
+      Object.hasOwn(changes, HEADINGS_KEY) &&
+      !isOwnStorageChange(HEADINGS_KEY, changes[HEADINGS_KEY])
+    ) {
+      headingsData = normalizeHeadingsData(changes[HEADINGS_KEY].newValue);
+      changed = true;
+    }
+
+    if (
+      Object.hasOwn(changes, FAVORITES_KEY) &&
+      !isOwnStorageChange(FAVORITES_KEY, changes[FAVORITES_KEY])
+    ) {
+      favorites = normalizeIdMapData(changes[FAVORITES_KEY].newValue);
+      changed = true;
+    }
+
+    if (
+      Object.hasOwn(changes, COUNTRIES_KEY) &&
+      !isOwnStorageChange(COUNTRIES_KEY, changes[COUNTRIES_KEY])
+    ) {
+      countries = normalizeIdMapData(changes[COUNTRIES_KEY].newValue);
+      changed = true;
+    }
+
+    if (
+      Object.hasOwn(changes, TAGS_KEY) &&
+      !isOwnStorageChange(TAGS_KEY, changes[TAGS_KEY])
+    ) {
+      tagsData = normalizeTagsData(changes[TAGS_KEY].newValue);
+      changed = true;
+    }
+
+    if (
+      Object.hasOwn(changes, PENDING_HEADING_KEY) &&
+      !isOwnStorageChange(PENDING_HEADING_KEY, changes[PENDING_HEADING_KEY])
+    ) {
+      const nextPending = changes[PENDING_HEADING_KEY].newValue;
+      pendingNewMapHeadingId =
+        typeof nextPending === "string" ? nextPending : null;
+    }
+
+    // 他タブで作られたばかりのマップは、このタブの一覧にはまだ現れない。
+    // 一覧との突き合わせ（reconcileMapIds）で消さないよう覚えておく。
+    for (const id of [
+      ...headingsData.headings.flatMap((heading) => heading.mapIds),
+      ...headingsData.unassignedOrder,
+    ]) {
+      if (!mapsById.has(id)) {
+        externallyAddedMapIds.add(id);
+      }
+    }
+
+    if (!changed) {
+      return;
+    }
+
+    // 他タブで作られたマップはこちらの一覧にまだ無いことがある。
+    // ここでreconcileMapIdsを呼ぶと未知のIDを消してしまうため、描画だけ更新し、
+    // 一覧の再読み込み（refreshFromNative）に突き合わせを任せる。
+    // ドラッグ中はDOMを作り直すと操作が壊れるので、終わってからの描画に任せる。
+    if (draggingCard || draggingSectionId) {
+      return;
+    }
+
+    render();
   }
 
   function reconcile() {
@@ -3503,6 +3608,10 @@
     if (areaName !== "local") {
       return;
     }
+
+    // フォルダ・お気に入り・国・タグは複数タブで共有するデータのため、
+    // 他タブの保存をその場で取り込む（古い内容での上書きを防ぐ）。
+    applyExternalDataChanges(changes);
 
     if (Object.hasOwn(changes, FEATURE_KEY)) {
       settingsLoaded = true;
