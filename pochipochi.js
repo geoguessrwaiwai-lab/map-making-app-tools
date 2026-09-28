@@ -213,6 +213,40 @@
     }
   }
 
+  /**
+   * 編集を閉じたタイミングで、保存済みインデックス側にある同じ地点のキー
+   * （保存時に確定した座標やpano ID）も保護対象へ取り込む。
+   * 編集で位置を動かして保存すると、開いていたときのキーと
+   * 保存後のキーがずれることがあるため。
+   */
+  function reprotectCurrentLocationFromIndex() {
+    const mapEditor = getMapEditor();
+    if (
+      !currentLocation ||
+      typeof mapEditor?.getLocationBounds !== "function" ||
+      typeof mapEditor?.getLocationsInBBox !== "function"
+    ) {
+      return;
+    }
+
+    try {
+      const bounds = mapEditor.getLocationBounds();
+      const locations = bounds ? mapEditor.getLocationsInBBox(bounds) : [];
+      if (!Array.isArray(locations)) {
+        return;
+      }
+
+      for (const location of locations) {
+        const keys = getLocationKeys(location);
+        if (keys.some((key) => currentLocation.keys.includes(key))) {
+          protectLocation({ keys });
+        }
+      }
+    } catch {
+      // 取得に失敗した場合は何もしない。
+    }
+  }
+
   /** Map Making App本来のDeleteボタンを使って、現在のロケーションを削除する。 */
   function clickDeleteButton() {
     const deleteButton = document.querySelector(DELETE_BUTTON_SELECTOR);
@@ -250,7 +284,14 @@
     }
 
     if (currentLocation.key === nextLocation.key) {
+      const wasTransient =
+        modeEnabled && transientLocationKey === currentLocation.key;
       currentLocation = nextLocation;
+      if (!wasTransient) {
+        // 保護済みロケーションを編集して動かした場合、新しい座標・pano IDの
+        // キーも保護しないと、保存後に開き直したときへ保護が引き継がれない。
+        protectLocation(nextLocation);
+      }
       return;
     }
 
@@ -675,6 +716,15 @@
       // 拡張機能自身のDeleteでは対象キーを先に解除するため、ここには到達しない。
       protectLocation(currentLocation);
       transientLocationKey = null;
+    }
+
+    if (
+      panoramaRemoved &&
+      !document.querySelector(PANORAMA_SELECTOR) &&
+      currentLocation &&
+      transientLocationKey !== currentLocation.key
+    ) {
+      reprotectCurrentLocationFromIndex();
     }
 
     const panoramaChanged = mutations.some((mutation) => {
