@@ -17,6 +17,11 @@
       defaultValue: false,
       input: document.querySelector("#pochipochi-default-enabled"),
     },
+    tagColor: {
+      key: "mma-feature-tag-color-enabled",
+      defaultValue: true,
+      input: document.querySelector("#tag-color-enabled"),
+    },
     mapList: {
       key: "mma-feature-map-list-enabled",
       defaultValue: true,
@@ -62,6 +67,9 @@
       pochiName: "ぽちぽちモード",
       pochiDescription:
         "新しく確認したロケーションを、次の選択時に削除します。",
+      tagColorName: "タグの色をキープ",
+      tagColorDescription:
+        "マップ編集画面でタグ名を変更したとき、色が初期値へ戻らないようにします。",
       folderViewName: "フォルダビュー",
       folderViewDescription:
         "トップページのマップ一覧を、フォルダ・お気に入り・タグ・国チップつきのカード表示に切り替えます。",
@@ -144,6 +152,9 @@
       pochiName: "Pochi-pochi mode",
       pochiDescription:
         "Deletes a newly reviewed location when you select the next one.",
+      tagColorName: "Keep tag colours",
+      tagColorDescription:
+        "Stops a tag's colour from being reset when you rename it in the map editor.",
       folderViewName: "Folder view",
       folderViewDescription:
         "Turns the map list on the home page into cards grouped by folder, with favourites, tags and country chips.",

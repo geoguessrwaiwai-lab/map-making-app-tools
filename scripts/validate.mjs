@@ -6,6 +6,8 @@ const REQUIRED_EXTENSION_FILES = [
   "resize.js",
   "pochipochi-bridge.js",
   "pochipochi.js",
+  "tag-color-bridge.js",
+  "tag-color.js",
   "map-list.js",
   "resize.css",
   "pochipochi.css",
@@ -79,8 +81,8 @@ assert(
   "manifest version must use MAJOR.MINOR.PATCH"
 );
 assert(
-  manifest.version === "1.4.4",
-  "the release package must remain version 1.4.4"
+  manifest.version === "1.5.0",
+  "the release package must remain version 1.5.0"
 );
 assert(
   manifest.default_locale === "ja",
@@ -135,12 +137,18 @@ assert(
 );
 assert(
   Array.isArray(manifest.content_scripts) &&
-    manifest.content_scripts.length === 4,
-  "exactly four content script definitions are required"
+    manifest.content_scripts.length === 6,
+  "exactly six content script definitions are required"
 );
 
-const [resizeScript, pochipochiBridgeScript, pochipochiScript, mapListScript] =
-  manifest.content_scripts;
+const [
+  resizeScript,
+  pochipochiBridgeScript,
+  pochipochiScript,
+  tagColorBridgeScript,
+  tagColorScript,
+  mapListScript,
+] = manifest.content_scripts;
 assert(
   JSON.stringify(resizeScript.matches) ===
     JSON.stringify(["https://map-making.app/maps/*"]),
@@ -203,6 +211,45 @@ assert(
   "pochipochi.js must run in MAIN world to use the editor's location API"
 );
 assert(
+  JSON.stringify(tagColorBridgeScript.matches) ===
+    JSON.stringify(["https://map-making.app/maps/*"]),
+  "the tag colour storage bridge matches must remain limited to Map Making App map paths"
+);
+assert(
+  JSON.stringify(tagColorBridgeScript.js) ===
+    JSON.stringify(["tag-color-bridge.js"]),
+  "the tag colour storage bridge entry point must be tag-color-bridge.js"
+);
+assert(
+  !Object.hasOwn(tagColorBridgeScript, "css"),
+  "the tag colour feature must not ship a stylesheet; it has no UI of its own"
+);
+assert(
+  tagColorBridgeScript.run_at === "document_start",
+  "the tag colour storage bridge must run at document_start so the setting is known before any tag is renamed"
+);
+assert(
+  !Object.hasOwn(tagColorBridgeScript, "world"),
+  "tag-color-bridge.js must run in the isolated world"
+);
+assert(
+  JSON.stringify(tagColorScript.matches) ===
+    JSON.stringify(["https://map-making.app/maps/*"]),
+  "the tag colour script matches must remain limited to Map Making App map paths"
+);
+assert(
+  JSON.stringify(tagColorScript.js) === JSON.stringify(["tag-color.js"]),
+  "the tag colour script entry point must be tag-color.js"
+);
+assert(
+  tagColorScript.run_at === "document_start",
+  "tag-color.js must run at document_start so it wraps fetch before the site's bundle calls it"
+);
+assert(
+  tagColorScript.world === "MAIN",
+  "tag-color.js must run in MAIN world to observe the site's own tag requests"
+);
+assert(
   JSON.stringify(mapListScript.matches) ===
     JSON.stringify(["https://map-making.app/"]),
   "the top page content script must remain limited to the map list page"
@@ -231,6 +278,8 @@ for (const path of Object.values(manifest.icons ?? {})) {
 const resizeSource = fs.readFileSync("resize.js", "utf8");
 const pochipochiBridgeSource = fs.readFileSync("pochipochi-bridge.js", "utf8");
 const pochipochiSource = fs.readFileSync("pochipochi.js", "utf8");
+const tagColorBridgeSource = fs.readFileSync("tag-color-bridge.js", "utf8");
+const tagColorSource = fs.readFileSync("tag-color.js", "utf8");
 const mapListSource = fs.readFileSync("map-list.js", "utf8");
 const resizeStyles = fs.readFileSync("resize.css", "utf8");
 const pochipochiStyles = fs.readFileSync("pochipochi.css", "utf8");
@@ -241,6 +290,8 @@ const optionsSource = fs.readFileSync("options.js", "utf8");
 new vm.Script(resizeSource, { filename: "resize.js" });
 new vm.Script(pochipochiBridgeSource, { filename: "pochipochi-bridge.js" });
 new vm.Script(pochipochiSource, { filename: "pochipochi.js" });
+new vm.Script(tagColorBridgeSource, { filename: "tag-color-bridge.js" });
+new vm.Script(tagColorSource, { filename: "tag-color.js" });
 new vm.Script(mapListSource, { filename: "map-list.js" });
 new vm.Script(optionsSource, { filename: "options.js" });
 
@@ -332,6 +383,15 @@ const forbiddenPatterns = [
 
 for (const [name, pattern] of forbiddenPatterns) {
   assert(!pattern.test(resizeSource), `resize.js must not use ${name}`);
+  assert(
+    !pattern.test(tagColorBridgeSource),
+    `tag-color-bridge.js must not use ${name}`
+  );
+  // tag-color.jsだけは、サイト自身のタグ更新リクエストを扱うためfetchを使う。
+  // 許されるのはタグAPIへのPATCHだけで、その範囲は後続のアサーションで固定している。
+  if (name !== "fetch") {
+    assert(!pattern.test(tagColorSource), `tag-color.js must not use ${name}`);
+  }
   assert(
     !pattern.test(pochipochiBridgeSource),
     `pochipochi-bridge.js must not use ${name}`
@@ -572,6 +632,73 @@ assert(
   ),
   "initializing Pochi-pochi controls must not be rendered"
 );
+// タグの色キープはfetchへ介入する唯一の機能なので、介入範囲を明示的に固定する。
+assert(
+  tagColorSource.includes(
+    "/^https:\\/\\/map-making\\.app\\/api\\/maps\\/\\d+\\/tags$/"
+  ),
+  "tag-color.js must only act on the Map Making App tag endpoint"
+);
+assert(
+  !/https?:\/\/(?!map-making\.app)/.test(tagColorSource),
+  "tag-color.js must not reference any host other than map-making.app"
+);
+assert(
+  tagColorSource.includes("const nativeFetch = window.fetch"),
+  "tag-color.js must keep the original fetch so wrapped requests cannot recurse"
+);
+assert(
+  tagColorSource.includes('resolveRequestMethod(input, init) !== "PATCH"'),
+  "tag-color.js must leave every request but the tag PATCH untouched"
+);
+assert(
+  tagColorSource.includes("findRenamedTag(payload)"),
+  "tag-color.js must only act on rename payloads, not on tag deletion or reordering"
+);
+assert(
+  tagColorSource.includes("removed.length === 0 || updated.length !== 1"),
+  "a rename must require both the removed old name and exactly one new name"
+);
+assert(
+  tagColorSource.includes("[renamed.name]: { ...renamed.entry, color }"),
+  "the rename request itself must carry the intended colour"
+);
+assert(
+  !/sendTagsPatch\([^)]*\{ \[renamed\.name\]: \{ color \} \}/.test(
+    tagColorSource
+  ),
+  "keeping a tag colour must not add a request of its own; the site's own rename request carries the colour"
+);
+assert(
+  tagColorSource.includes(
+    "if (attempt.ok || !REJECTED_STATUSES.has(attempt.status))"
+  ),
+  "a rejected colour field must fall back to the site's original request so renaming never breaks"
+);
+assert(
+  tagColorSource.includes(
+    "init?.signal ?? (input instanceof Request ? input.signal : undefined)"
+  ),
+  "the replaced request must keep the caller's abort signal"
+);
+assert(
+  !/\bchrome\b/.test(tagColorSource),
+  "tag-color.js runs in MAIN world and must read its setting through the bridge, not chrome.*"
+);
+assert(
+  tagColorSource.includes("let tagColorFeatureEnabled = false"),
+  "tag colour keeping must stay inactive until the stored feature setting arrives"
+);
+assert(
+  tagColorBridgeSource.includes(
+    'TAG_COLOR_FEATURE_KEY = "mma-feature-tag-color-enabled"'
+  ),
+  "the tag colour setting must be namespaced in extension storage"
+);
+assert(
+  tagColorBridgeSource.includes("chrome.storage.onChanged.addListener"),
+  "the tag colour bridge must push option changes to open editor tabs"
+);
 assert(
   optionsHtml.includes('id="resize-enabled"'),
   "the options page must show the screen width switch"
@@ -633,6 +760,11 @@ assert(
 assert(
   optionsSource.includes('key: "mma-pochipochi-default-enabled"'),
   "the options page must control the global Pochi-pochi default"
+);
+assert(
+  optionsHtml.includes('id="tag-color-enabled"') &&
+    optionsSource.includes('key: "mma-feature-tag-color-enabled"'),
+  "the options page must control tag colour keeping"
 );
 assert(
   optionsSource.includes('key: "mma-feature-map-list-enabled"'),

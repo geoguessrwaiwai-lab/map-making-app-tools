@@ -1,6 +1,6 @@
 # Chrome Web Store 掲載情報
 
-Map Making App Tools `1.4.1` のChrome Web Store提出用情報です。
+Map Making App Tools `1.5.0` のChrome Web Store提出用情報です。
 
 ホームページはCloudflare Workersで公開しています。
 
@@ -19,7 +19,9 @@ Map Making App Toolsは、Map Making Appのマップ編集画面の幅調整、�
 
 トップページのマップ一覧には「フォルダビュー」を追加しました。ネイティブの一覧の見た目・機能を変えずに視覚的に隠し、フォルダでグループ化したカード表示を重ねます。フォルダの追加・並び替え、マップのお気に入り・国チップ・タグ付けができ、編集・削除やマップ作成はMap Making App本体の操作に委譲します。表示言語（日本語／英語）や、マップカードのロケーション数・国チップアイコンの表示は設定で切り替えられます。フッターからいつでもネイティブの表示へ戻せます。設定画面からは、すべての設定をJSONファイルへエクスポート・インポートしてバックアップできます。
 
-外部通信、広告、分析ツール、Cookie、外部JavaScriptは使用しません。拡張機能専用ストレージには、機能別設定、ぽちぽちモードの全体デフォルト、対象のマップURLとURL別のON／OFF、フォルダビューのフォルダ構成・フォルダとマップの並び順・お気に入り・国チップ・タグ・表示言語・表示設定だけを保存します。地点ID、pano ID、座標はページ内で一時的に処理し、保存または外部送信しません。
+タグ編集では、タグ名を変更するとMap Making App側でタグが作り直されて色が初期値へ戻ってしまいます。「タグの色をキープ」をONにしておくと、保存時に入力されていた色がそのまま保たれます。
+
+拡張機能の独自サーバーや第三者への通信、広告、分析ツール、Cookie、外部JavaScriptは使用しません。「タグの色をキープ」は、利用者がタグ名を保存したときにMap Making App自身が送るタグ更新リクエスト（PATCH https://map-making.app/api/maps/<ID>/tags）へ色の指定を足して同じ宛先へ送り直すだけで、新たな送信先への通信は行いません。拡張機能専用ストレージには、機能別設定、ぽちぽちモードの全体デフォルト、対象のマップURLとURL別のON／OFF、フォルダビューのフォルダ構成・フォルダとマップの並び順・お気に入り・国チップ・タグ・表示言語・表示設定だけを保存します。地点ID、pano ID、座標はページ内で一時的に処理し、保存または外部送信しません。
 
 本拡張機能は非公式であり、Map Making Appまたはその運営者との提携、承認、関係を示すものではありません。
 ```
@@ -35,7 +37,9 @@ Turn on Pochi-pochi mode to continuously select and view new locations without c
 
 The map list on the home page now has a folder view. It visually hides the native list without changing its behavior, and overlays a card layout grouped by user-defined folders. You can add and reorder folders, favorite maps, and assign a country chip and tags to each map, while editing, deleting, and creating maps still delegate to Map Making App's own controls. Settings let you switch the display language (Japanese or English) and choose whether map cards show location counts and country chip icons. You can return to the native list from the footer at any time. The settings screen also lets you export or import all of your settings as a JSON file for backup.
 
-The extension does not use external network requests, advertising, analytics tools, cookies, or remote JavaScript. Extension-local storage contains only feature settings, the global Pochi-pochi mode default, the target map URL, the URL-specific ON/OFF setting, and the folder view's folders, the order of folders and maps, favorites, country chips, tags, display language, and display preferences. Location IDs, pano IDs, and coordinates are processed temporarily within the page and are neither stored nor transmitted externally.
+Renaming a tag makes Map Making App recreate it and reset its colour. Turn on "Keep tag colours" and the colour you had in the Edit tag form is preserved.
+
+The extension does not use its own servers, third-party network requests, advertising, analytics tools, cookies, or remote JavaScript. "Keep tag colours" only adds the colour to the tag update request Map Making App itself sends when you save a renamed tag (PATCH https://map-making.app/api/maps/<ID>/tags), resending it to that same destination. It introduces no new destination and no extra request. Extension-local storage contains only feature settings, the global Pochi-pochi mode default, the target map URL, the URL-specific ON/OFF setting, and the folder view's folders, the order of folders and maps, favorites, country chips, tags, display language, and display preferences. Location IDs, pano IDs, and coordinates are processed temporarily within the page and are neither stored nor transmitted externally.
 
 This is an unofficial extension and is not affiliated with, endorsed by, or otherwise associated with Map Making App or its operators.
 ```
@@ -43,13 +47,13 @@ This is an unofficial extension and is not affiliated with, endorsed by, or othe
 ### 単一用途
 
 ```text
-Map Making Appの自分のマップを扱う画面の表示を、利用者が扱いやすいように調整できるようにすること。具体的には、編集画面で左右の画面幅を調整すること、利用者が明示的に有効化した間だけ新しく確認したロケーションを次の選択時に削除すること、トップページのマップ一覧を利用者が決めたフォルダで分類して表示することです。
+Map Making Appの自分のマップを扱う画面の表示を、利用者が扱いやすいように調整できるようにすること。具体的には、編集画面で左右の画面幅を調整すること、利用者が明示的に有効化した間だけ新しく確認したロケーションを次の選択時に削除すること、トップページのマップ一覧を利用者が決めたフォルダで分類して表示すること、タグ名の変更でタグの色が初期値へ戻らないようにすることです。
 ```
 
 ### 単一用途（English）
 
 ```text
-Let users adjust how their own Map Making App maps are presented: resize the editor screen widths, delete each newly reviewed location when selecting the next one while the mode is explicitly enabled, and group the home page map list into folders the user defines.
+Let users adjust how their own Map Making App maps are presented: resize the editor screen widths, delete each newly reviewed location when selecting the next one while the mode is explicitly enabled, group the home page map list into folders the user defines, and keep a tag's colour when it is renamed.
 ```
 
 ### 権限が必要な理由（`storage`が必要な理由）
@@ -67,13 +71,13 @@ The storage permission saves feature enable/disable preferences, the global Poch
 ### 権限が必要な理由（ホスト権限が必要な理由）
 
 ```text
-本拡張機能はhttps://map-making.app/maps/*とhttps://map-making.app/でのみコンテンツスクリプトを実行します。対象ページの編集グリッドとロケーションプレビュー、またはトップページのマップ一覧を検出し、画面幅を調整し、ぽちぽちモード中の地点変更と削除を処理し、マップ一覧にフォルダビューを重ねるために必要です。地点ID、pano ID、座標、マップ名・ID・地点数はページ内で一時的に処理するだけで、収集、保存、送信しません。
+本拡張機能はhttps://map-making.app/maps/*とhttps://map-making.app/でのみコンテンツスクリプトを実行します。対象ページの編集グリッドとロケーションプレビュー、またはトップページのマップ一覧を検出し、画面幅を調整し、ぽちぽちモード中の地点変更と削除を処理し、マップ一覧にフォルダビューを重ね、タグ名の変更時にMap Making App自身のタグ更新リクエストへ色の指定を足して送り直すために必要です。地点ID、pano ID、座標、マップ名・ID・地点数はページ内で一時的に処理するだけで、収集、保存、送信しません。
 ```
 
 ### 権限が必要な理由（ホスト権限が必要な理由・English）
 
 ```text
-The content scripts run only on https://map-making.app/maps/* and https://map-making.app/ so they can adjust the editor screen width, detect location changes for Pochi-pochi mode, and overlay the folder view on the map list. Location IDs, pano IDs, coordinates, and map names/IDs/location counts are processed temporarily in page memory and are not collected, stored, or transmitted.
+The content scripts run only on https://map-making.app/maps/* and https://map-making.app/ so they can adjust the editor screen width, detect location changes for Pochi-pochi mode, overlay the folder view on the map list, and add the colour to Map Making App's own tag update request when a tag is renamed. Location IDs, pano IDs, coordinates, and map names/IDs/location counts are processed temporarily in page memory and are not collected, stored, or transmitted.
 ```
 
 ## 基本情報（日本語・デフォルト）
@@ -140,7 +144,7 @@ Adjust the editor screen width, streamline location cleanup, and group your map 
 - ユーザーのアクティビティ: `収集しない`
 - ウェブサイトのコンテンツ: `収集しない`
 
-ポインターのX座標、地点ID、pano ID、座標は、幅計算またはぽちぽちモードの判定にだけ一時的に使用し、記録、保存、送信しません。機能別設定、全体デフォルト、対象のマップURLとURLごとのON／OFF設定、フォルダビューのフォルダ構成・フォルダとマップの並び順・お気に入り・国チップ・タグ・表示言語・表示設定だけを端末内の拡張機能専用ストレージへ保存し、外部へ送信しません。
+ポインターのX座標、地点ID、pano ID、座標は、幅計算またはぽちぽちモードの判定にだけ一時的に使用し、記録、保存、送信しません。機能別設定、全体デフォルト、対象のマップURLとURLごとのON／OFF設定、フォルダビューのフォルダ構成・フォルダとマップの並び順・お気に入り・国チップ・タグ・表示言語・表示設定だけを端末内の拡張機能専用ストレージへ保存し、外部へ送信しません。「タグの色をキープ」がONの場合にかぎり、利用者がタグ名を保存したときにMap Making App自身が送るタグ更新リクエスト（`PATCH https://map-making.app/api/maps/<ID>/tags`）へ色の指定を足して同じ宛先へ送り直します。新たな送信先はなく、拡張機能の独自サーバーや第三者へは何も送信しません。
 
 ### 開示・認証項目
 

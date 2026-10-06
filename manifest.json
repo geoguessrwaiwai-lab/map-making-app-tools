@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.4.4",
+  "version": "1.5.0",
   "description": "__MSG_extDescription__",
   "default_locale": "ja",
   "permissions": ["storage"],
@@ -32,6 +32,17 @@
       "matches": ["https://map-making.app/maps/*"],
       "js": ["pochipochi.js"],
       "run_at": "document_idle",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://map-making.app/maps/*"],
+      "js": ["tag-color-bridge.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://map-making.app/maps/*"],
+      "js": ["tag-color.js"],
+      "run_at": "document_start",
       "world": "MAIN"
     },
     {
