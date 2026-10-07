@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "__MSG_extDescription__",
   "default_locale": "ja",
   "permissions": ["storage"],
@@ -44,6 +44,11 @@
       "js": ["tag-color.js"],
       "run_at": "document_start",
       "world": "MAIN"
+    },
+    {
+      "matches": ["https://map-making.app/maps/*"],
+      "js": ["heading-direction.js"],
+      "run_at": "document_start"
     },
     {
       "matches": ["https://map-making.app/"],

@@ -8,6 +8,7 @@ const REQUIRED_EXTENSION_FILES = [
   "pochipochi.js",
   "tag-color-bridge.js",
   "tag-color.js",
+  "heading-direction.js",
   "map-list.js",
   "resize.css",
   "pochipochi.css",
@@ -81,8 +82,8 @@ assert(
   "manifest version must use MAJOR.MINOR.PATCH"
 );
 assert(
-  manifest.version === "1.5.0",
-  "the release package must remain version 1.5.0"
+  manifest.version === "1.6.0",
+  "the release package must remain version 1.6.0"
 );
 assert(
   manifest.default_locale === "ja",
@@ -137,8 +138,8 @@ assert(
 );
 assert(
   Array.isArray(manifest.content_scripts) &&
-    manifest.content_scripts.length === 6,
-  "exactly six content script definitions are required"
+    manifest.content_scripts.length === 7,
+  "exactly seven content script definitions are required"
 );
 
 const [
@@ -147,6 +148,7 @@ const [
   pochipochiScript,
   tagColorBridgeScript,
   tagColorScript,
+  headingDirectionScript,
   mapListScript,
 ] = manifest.content_scripts;
 assert(
@@ -250,6 +252,28 @@ assert(
   "tag-color.js must run in MAIN world to observe the site's own tag requests"
 );
 assert(
+  JSON.stringify(headingDirectionScript.matches) ===
+    JSON.stringify(["https://map-making.app/maps/*"]),
+  "the heading direction script matches must remain limited to Map Making App map paths"
+);
+assert(
+  JSON.stringify(headingDirectionScript.js) ===
+    JSON.stringify(["heading-direction.js"]),
+  "the heading direction script entry point must be heading-direction.js"
+);
+assert(
+  !Object.hasOwn(headingDirectionScript, "css"),
+  "the heading direction feature must not ship a stylesheet; it has no UI of its own"
+);
+assert(
+  headingDirectionScript.run_at === "document_start",
+  "heading-direction.js must run at document_start so it reaches the embedded map data before the site's bundle reads it"
+);
+assert(
+  !Object.hasOwn(headingDirectionScript, "world"),
+  "heading-direction.js must run in the isolated world; it only touches the DOM and chrome.storage"
+);
+assert(
   JSON.stringify(mapListScript.matches) ===
     JSON.stringify(["https://map-making.app/"]),
   "the top page content script must remain limited to the map list page"
@@ -280,6 +304,7 @@ const pochipochiBridgeSource = fs.readFileSync("pochipochi-bridge.js", "utf8");
 const pochipochiSource = fs.readFileSync("pochipochi.js", "utf8");
 const tagColorBridgeSource = fs.readFileSync("tag-color-bridge.js", "utf8");
 const tagColorSource = fs.readFileSync("tag-color.js", "utf8");
+const headingDirectionSource = fs.readFileSync("heading-direction.js", "utf8");
 const mapListSource = fs.readFileSync("map-list.js", "utf8");
 const resizeStyles = fs.readFileSync("resize.css", "utf8");
 const pochipochiStyles = fs.readFileSync("pochipochi.css", "utf8");
@@ -287,6 +312,7 @@ const mapListStyles = fs.readFileSync("map-list.css", "utf8");
 const optionsHtml = fs.readFileSync("options.html", "utf8");
 const optionsStyles = fs.readFileSync("options.css", "utf8");
 const optionsSource = fs.readFileSync("options.js", "utf8");
+new vm.Script(headingDirectionSource, { filename: "heading-direction.js" });
 new vm.Script(resizeSource, { filename: "resize.js" });
 new vm.Script(pochipochiBridgeSource, { filename: "pochipochi-bridge.js" });
 new vm.Script(pochipochiSource, { filename: "pochipochi.js" });
@@ -398,6 +424,10 @@ for (const [name, pattern] of forbiddenPatterns) {
   );
   assert(!pattern.test(pochipochiSource), `pochipochi.js must not use ${name}`);
   assert(!pattern.test(mapListSource), `map-list.js must not use ${name}`);
+  assert(
+    !pattern.test(headingDirectionSource),
+    `heading-direction.js must not use ${name}`
+  );
   assert(!pattern.test(optionsSource), `options.js must not use ${name}`);
 }
 
@@ -767,6 +797,11 @@ assert(
   "the options page must control tag colour keeping"
 );
 assert(
+  optionsHtml.includes('id="heading-direction-enabled"') &&
+    optionsSource.includes('key: "mma-feature-heading-direction-enabled"'),
+  "the options page must expose the heading direction toggle"
+);
+assert(
   optionsSource.includes('key: "mma-feature-map-list-enabled"'),
   "the options page must control the folder view feature"
 );
@@ -869,6 +904,34 @@ assert(
 assert(
   pochipochiStyles.includes("top: 7px"),
   "pochi-pochi mode must be positioned 7px from the top"
+);
+
+// 新しい地点を進行方向へ向ける機能は、埋め込みデータの1フィールドだけに触れる。この範囲を広げない。
+assert(
+  headingDirectionSource.includes('const META_SELECTOR = "script#map-meta"'),
+  "the heading direction feature must only read the site's embedded map data element"
+);
+assert(
+  (headingDirectionSource.match(/querySelector\(/g) ?? []).length === 1 &&
+    headingDirectionSource.includes("document.querySelector(META_SELECTOR)"),
+  "the heading direction feature must not query any element other than the embedded map data"
+);
+assert(
+  headingDirectionSource.includes("settings.preferDirection = FORWARDS") &&
+    (headingDirectionSource.match(/settings\.\w+\s*=/g) ?? []).length === 1,
+  "the heading direction feature must only write preferDirection, never any other map setting"
+);
+assert(
+  headingDirectionSource.includes("if (settings.preferDirection != null)"),
+  "the heading direction feature must leave an explicitly chosen direction untouched"
+);
+assert(
+  !/\bpointAlongRoad\b/.test(headingDirectionSource),
+  "the heading direction feature must not change whether the site points the view along the road"
+);
+assert(
+  headingDirectionSource.includes("featureEnabled = false"),
+  "the heading direction feature must stay inert until the stored setting says otherwise"
 );
 
 console.log(`Validation passed for version ${manifest.version}.`);
