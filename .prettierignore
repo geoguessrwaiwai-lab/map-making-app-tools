@@ -1,4 +1,5 @@
 /dist/
+/.claude/
 /artwork/
 /store-assets/
 *.png
