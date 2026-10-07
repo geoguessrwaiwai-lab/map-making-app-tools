@@ -22,6 +22,11 @@
       defaultValue: true,
       input: document.querySelector("#tag-color-enabled"),
     },
+    headingDirection: {
+      key: "mma-feature-heading-direction-enabled",
+      defaultValue: true,
+      input: document.querySelector("#heading-direction-enabled"),
+    },
     mapList: {
       key: "mma-feature-map-list-enabled",
       defaultValue: true,
@@ -70,6 +75,9 @@
       tagColorName: "タグの色をキープ",
       tagColorDescription:
         "マップ編集画面でタグ名を変更したとき、色が初期値へ戻らないようにします。",
+      headingDirectionName: "新しい地点を進行方向へ向ける",
+      headingDirectionDescription:
+        "マップのDirectionが未設定のとき、新しく追加する地点が撮影車の進行方向を向くようにします。",
       folderViewName: "フォルダビュー",
       folderViewDescription:
         "トップページのマップ一覧を、フォルダ・お気に入り・タグ・国チップつきのカード表示に切り替えます。",
@@ -155,6 +163,9 @@
       tagColorName: "Keep tag colours",
       tagColorDescription:
         "Stops a tag's colour from being reset when you rename it in the map editor.",
+      headingDirectionName: "Point new locations forwards",
+      headingDirectionDescription:
+        "When the map has no Direction set, make newly added locations face the direction the camera car was travelling.",
       folderViewName: "Folder view",
       folderViewDescription:
         "Turns the map list on the home page into cards grouped by folder, with favourites, tags and country chips.",

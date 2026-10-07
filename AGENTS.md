@@ -22,6 +22,7 @@ pochipochi.js                           ぽちぽちモード本体（MAIN world
 pochipochi-bridge.js / pochipochi.css   ぽちぽちモードの設定を分離ストレージへ橋渡し（ISOLATED world, /maps/数字）
 tag-color.js                            タグ名変更時の色キープ（MAIN world, /maps/数字）
 tag-color-bridge.js                     タグの色キープの設定を分離ストレージへ橋渡し（ISOLATED world, /maps/数字）
+heading-direction.js                    新しい地点を進行方向へ向ける（ISOLATED world, /maps/数字）
 map-list.js / map-list.css              トップページのフォルダビュー（ISOLATED world, /）
 options.html / options.css / options.js 拡張機能の設定画面
 _locales/ja/messages.json               ストア掲載用の商品名・概要（日本語、default_locale）
@@ -72,6 +73,18 @@ Map Making Appはタグ名を変更すると内部的にタグを作り直し、
 - 元のリクエストの認証情報・ヘッダーを引き継ぎ、`nativeFetch`（差し替え前の`fetch`）で送るため、自分が送ったリクエストを再び介入対象にしない
 - DOMには何も足さない（`submit`をcapture phaseで監視するだけ）。専用CSSを持たない
 - 拡張機能の設定でOFFにできる（`mma-feature-tag-color-enabled`、既定はON）。設定が届くまでは介入しない（`let tagColorFeatureEnabled = false`）
+
+### 新しい地点を進行方向へ向ける（heading-direction.js）
+
+Map Making Appはマップ設定の`preferDirection`が未設定（`null`）のとき、新しい地点のheadingを道路の接続（link）配列の先頭から決める。この並び順は撮影車の進行方向を表さないため、約半数の地点が進行方向と逆を向いて作られる。`preferDirection`が`forwards`ならMap Making App自身がパノラマの撮影方向（`tiles.centerHeading`）を使うため、未設定のときだけ`forwards`を補って本来の経路へ乗せる。
+
+- Map Making Appはマップ編集画面の初期データを`<script type="application/json" id="map-meta">`へ埋め込み、ページ本体のモジュールスクリプトから読む。モジュールスクリプトはHTMLの解析後に実行されるため、`document_start`で`MutationObserver`を張れば読み込み前に差し替えられる
+- 触れるのは`settings.preferDirection`の1フィールドだけ。`pointAlongRoad`を含む他の設定には一切触れない（`scripts/validate.mjs`がアサーションで固定している）
+- `preferDirection`が`null`以外なら何もしない。設定画面のDirectionには「未設定」を選ぶ選択肢がなく、`null`はユーザーが一度も選んでいない状態だけを表すため、明示的な選択を上書きすることはない
+- DOMとストレージしか使わないためISOLATED world。通信は行わず、サーバー上のマップ設定も変更しない。拡張機能をOFFにすれば元の挙動へ戻る
+- 設定の読み込みが終わるまでは差し替えない（`let featureEnabled = null`、読み込み失敗時はOFF扱い）
+- 要素を差し替えた時点、または`DOMContentLoaded`の時点で監視を打ち切る。編集画面は重いため監視を残さない
+- 拡張機能の設定でOFFにできる（`mma-feature-heading-direction-enabled`、既定はON）
 
 ### フォルダビュー（map-list.js / map-list.css）
 
@@ -132,24 +145,30 @@ Map Making Appはタグ名を変更すると内部的にタグを作り直し、
 9. ON中にSaveまたはCloseしたロケーションを再選択しても削除されない
 10. URL別設定がないマップでは、オプション画面のデフォルトON／OFFが反映される
 
+**新しい地点を進行方向へ向ける**
+
+11. `Direction`が未設定のマップで新しい地点を追加すると、パノラマとマップ上の矢印が撮影車の進行方向を向く
+12. `Direction`を自分で選んでいるマップでは、その選択どおりに動く（介入しない）
+13. 機能をOFFにすると、Map Making App本来の挙動に戻る
+
 **タグの色をキープ**
 
-11. タグ名だけを変更して保存すると、色が変わらずに残る
-12. タグ名と色を同時に変更して保存すると、入力した色になる
-13. タグの削除・並び替え・色だけの変更が、これまでどおり動く
+14. タグ名だけを変更して保存すると、色が変わらずに残る
+15. タグ名と色を同時に変更して保存すると、入力した色になる
+16. タグの削除・並び替え・色だけの変更が、これまでどおり動く
 
 **フォルダビュー**
 
-14. トップページでフォルダの追加・名称変更・削除、フォルダ・マップの並び替え、お気に入り、国チップ、タグの付与ができる
-15. フォルダを選択して新しいマップを作成すると、そのマップが選択したフォルダへ入る
-16. カードの「⋯」メニューから編集・お気に入り・削除ができ、削除では確認モーダルが開く
-17. 右上のトグルでネイティブ表示に戻せ、戻した状態でも検索・New map・New folderが問題なく使える
-18. マップ名のクリックで別タブが開き、オプション画面でOFFにすると同じタブで開く
-19. フッター右下とオプション画面のどちらで言語を変えても、両方の表示が日本語／英語に切り替わる
+17. トップページでフォルダの追加・名称変更・削除、フォルダ・マップの並び替え、お気に入り、国チップ、タグの付与ができる
+18. フォルダを選択して新しいマップを作成すると、そのマップが選択したフォルダへ入る
+19. カードの「⋯」メニューから編集・お気に入り・削除ができ、削除では確認モーダルが開く
+20. 右上のトグルでネイティブ表示に戻せ、戻した状態でも検索・New map・New folderが問題なく使える
+21. マップ名のクリックで別タブが開き、オプション画面でOFFにすると同じタブで開く
+22. フッター右下とオプション画面のどちらで言語を変えても、両方の表示が日本語／英語に切り替わる
 
 **共通**
 
-20. オプション画面で各機能を個別に無効化できる
+23. オプション画面で各機能を個別に無効化できる
 
 ## リリース
 
